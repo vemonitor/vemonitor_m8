@@ -1,0 +1,14 @@
+# ---------------------------
+# redBatteryData default pytest settings
+# Use YAML syntax
+# ---------------------------
+- "Includes battery.yaml"
+    
+
+- Dummy 1:
+  - 1
+  - 2
+
+- Dummy 2:
+  - 2
+  - 3

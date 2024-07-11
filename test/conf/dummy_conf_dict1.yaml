@@ -1,0 +1,12 @@
+# ---------------------------
+# redBatteryData default pytest settings
+# Use YAML syntax
+# ---------------------------
+
+Dummy_3:
+  - 1
+  - 2
+
+Dummy_4:
+  - 2
+  - 3
