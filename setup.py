@@ -42,6 +42,7 @@ setup(name='vemonitor_m8',
             'conf/*.yml'
         ]
     },
+    include_package_data=True,
     install_requires=[
         'jsonschema',
         'pyyaml',
