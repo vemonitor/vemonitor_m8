@@ -1,0 +1,287 @@
+# ---------------------------
+# This file is the root configuation file for vemonitor package.
+# Use YAML syntax
+# ---------------------------
+keys:
+    BMV: [
+            'V', 'VS', 'VM', 'DM', 'T', 'I', 'P', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay',
+            'PID', 'FW', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 
+            'H11', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18'
+        ]
+
+    MPPT: [
+            'V', 'VPV', 'PPV', 'I', 'IL', 'LOAD', 'Relay',
+            'PID', 'FW', 'H19', 'H20', 'H21', 'H22', 'H23', 'ERR', 'CS', 'HSDS'
+        ]
+
+    INVERTER: [
+            'V', 'VS', 'VM', 'DM', 'T', 'I', 'P', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay',
+            'PID', 'FW', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 
+            'H11', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18'
+            ]
+
+points:
+    V: 
+        name: "Main (battery) voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    VS:
+        name: "Auxiliary (starter) voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    VM:
+        name: "Mid-point voltage of the battery bank"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    DM:
+        name: "Mid-point deviation of the battery bank"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: '%'
+    VPV:
+        name: "Panel voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    PPV:
+        name: "Panel power"
+        input_type: 'int'
+        output_type: 'int'
+        unit: 'W'
+    I:
+        name: "Battery current"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'A'
+    IL:
+        name: "Load current"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'A'
+    LOAD:
+        name: "Load output state (ON/OFF)"
+        input_type: 'onOff'
+        output_type: 'intBool'
+    T:
+        name: "Battery temperature"
+        input_type: 'int'
+        output_type: 'int'
+        unit: '°C'
+    P:
+        name: "Instantaneous power"
+        input_type: 'int'
+        output_type: 'float'
+        unit: 'W'
+    CE:
+        name: "Consumed Amp Hours"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'Ah'
+    SOC:
+        name: "State-of-charge"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: '%'
+    TTG:
+        name: "Time-to-go"
+        input_type: 'int'
+        output_type: 'int'
+        unit: 'Minutes'
+    Alarm:
+        name: "Alarm condition active"
+        input_type: 'onOff'
+        output_type: 'intBool'
+    Relay:
+        name: "Relay state"
+        input_type: 'int'
+        output_type: 'intBool'
+    AR:
+        name: "Alarm reason"
+        input_type: 'int'
+        output_type: 'int'
+    H1:
+        name: "Depth of the deepest discharge"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'Ah'
+    H2:
+        name: "Depth of the last discharge"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'Ah'
+    H3:
+        name: "Depth of the average discharge"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'Ah'
+    H4:
+        name: "Number of charge cycles"
+        input_type: 'int'
+        output_type: 'int'
+    H5:
+        name: "Number of full discharges"
+        input_type: 'int'
+        output_type: 'int'
+    H6:
+        name: "Cumulative Amp Hours drawn"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'Ah'
+    H7:
+        name: "Minimum main (battery) voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    H8:
+        name: "Maximum main (battery) voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    H9:
+        name: "Number of seconds since last full charge"
+        input_type: 'int'
+        output_type: 'float'
+        unit: 'S'
+    H10:
+        name: "Number of automatic synchronizations"
+        input_type: 'int'
+        output_type: 'int'
+    H11:
+        name: "Number of low main voltage alarms"
+        input_type: 'int'
+        output_type: 'int'
+    H12:
+        name: "Number of high main voltage alarms"
+        input_type: 'int'
+        output_type: 'int'
+    H13:
+        name: "Number of low auxiliary voltage alarms"
+        input_type: 'int'
+        output_type: 'int'
+    H14:
+        name: "Number of high auxiliary voltage alarms"
+        input_type: 'int'
+        output_type: 'int'
+    H15:
+        name: "Minimum auxiliary (battery) voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    H16:
+        name: "Maximum auxiliary (battery) voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    H17:
+        name: "Amount of discharged energy"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'Kwh'
+    H18:
+        name: "Amount of charged energy"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'Kwh'
+    H19:
+        name: "Yield total (user resettable counter)"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'kW'
+    H20:
+        name: "Yield today"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'kW'
+    H21:
+        name: "Maximum power today"
+        input_type: 'int'
+        output_type: 'int'
+        unit: 'W'
+    H22:
+        name: "Yield yesterday"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'kW'
+    H23:
+        name: "Maximum power yesterday"
+        input_type: 'int'
+        output_type: 'int'
+        unit: 'W'
+    ERR:
+        name: "Error code"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'Ah'
+    CS:
+        name: "State of operation"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    FW:
+        name: "Firmware version"
+        input_type: 'str'
+        output_type: 'str'
+    PID:
+        name: "Product ID"
+        input_type: 'str'
+        output_type: 'str'
+    SER#:
+        name: "Serial number"
+        input_type: 'str'
+        output_type: 'str'
+    HSDS:
+        name: "Day sequence number (0..364)"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: 'V'
+    MODE:
+        name: "Device mode"
+        input_type: 'str'
+        output_type: 'str'
+    AC_OUT_V:
+        name: "AC output voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'V'
+    AC_OUT_I:
+        name: "AC output current"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.1
+        unit: 'V'
+    WARN:
+        name: "Warning reason"
+        input_type: 'int'
+        output_type: 'int'
+
+
+

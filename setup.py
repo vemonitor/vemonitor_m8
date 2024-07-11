@@ -7,13 +7,13 @@ HERE = pathlib.Path(__file__).parent
 # The text of the README file
 README = (HERE / "README.md").read_text()
 
-setup(name='vemonitor',
+setup(name='vemonitor_m8',
     version='0.0.1',
     description='Solar Plant Monitoring',
     url='https://github.com/vemonitor/vemonitor_m8',
     author='Eli Serra',
     author_email='eli.serra173@gmail.com',
-    description='Simple image tools package. Used to convert, downscale or upscale images.',
+    description='Victron Serial VeDirect Monitoring App.',
     long_description=README,
     long_description_content_type="text/markdown",
     classifiers=[
@@ -27,7 +27,22 @@ setup(name='vemonitor',
         "Programming Language :: Python :: 3.10",
     ],
     license='Apache',
-    packages=['tests', 'vemonitor'],
+    packages=['tests', 'vemonitor_m8'],
+    package_dir={
+        'vemonitor_m8': 'imgtools_m8',
+        'tests': 'tests'
+    },
+    package_data={
+        'vemonitor_m8': [
+            'confManager/confFiles/*.yaml',
+            'confManager/confFiles/*.yml'
+        ],
+        'tests': [
+            'conf/*.yaml',
+            'conf/*.yml'
+        ]
+    },
+    include_package_data=True,
     install_requires=[
         'jsonschema',
         'pyyaml',

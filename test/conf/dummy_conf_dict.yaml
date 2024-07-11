@@ -1,0 +1,16 @@
+# ---------------------------
+# redBatteryData default pytest settings
+# Use YAML syntax
+# ---------------------------
+Imports:
+    - "dummy_conf_dict1.yaml"
+    - "dummy_conf_dict2.yaml"
+    
+
+Dummy_1:
+  - 1
+  - 2
+
+Dummy_2:
+  - 2
+  - 3
