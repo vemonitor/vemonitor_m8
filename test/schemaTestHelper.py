@@ -198,13 +198,13 @@ class SchemaTestHelper:
                 and Ut.is_list(list_values, not_null=True):
 
             for val_tst in list_values:
-                if choice == "good" and restrict is not "bad":
+                if choice == "good" and restrict != "bad":
                     assert self._run_test_good_value_data(key, item, val_tst)
-                elif choice == "bad" and restrict is not "good":
+                elif choice == "bad" and restrict != "good":
                     assert self._run_test_bad_value_data(key, item, val_tst)
                 else:
-                    if not ((choice == "good" and restrict is "bad") \
-                            or (choice == "bad" and restrict is "good")):
+                    if not ((choice == "good" and restrict == "bad") \
+                            or (choice == "bad" and restrict == "good")):
                         raise ValueError(
                             "Fatal error: Unable to evaluate %s value "
                             "on key %s. With restriction value %s" %
