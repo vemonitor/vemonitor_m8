@@ -1,0 +1,255 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Battery Bank vemonitor configuration",
+    "type" : "object",
+    "properties" : {
+        "batteryDatas": {
+            "description": "Batteries data configuration data.",
+            "type": "object",
+            "properties" : {
+                "batteries": {
+                    "description": "Batteries items properties.",
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 20,
+                    "propertyNames": {
+                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                    },
+                    "additionalProperties": {
+                        "description": "Single Battery item properties..",
+                        "$ref": "/schemas/battery"
+                    }
+                },
+                "bankItems": {
+                    "description": "Battery banks properties.", 
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 20,
+                    "propertyNames": {
+                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                    },
+                    "additionalProperties": {
+                        "description": "Single Battery bank properties.", 
+                        "type": "object",
+                        "minProperties": 4,
+                        "maxProperties": 4,
+                        "additionalProperties": false,
+                        "required": [ "battery_type", "battery_key", "in_series", "in_parallel" ],
+                        "properties" : {
+                            "battery_type": {
+                                "description": "Type of Batteries.", 
+                                "$ref": "/schemas/battery_type"
+                            },
+                            "battery_key": {
+                                "description": "Battery key fom batteryDatas.",
+                                "$ref": "/schemas/battery_key"
+                            },
+                            "in_series": {
+                                "description": "Number of Batteries in series.",
+                                "$ref": "/schemas/in_series"
+                            },
+                            "in_parallel": {
+                                "description": "Number of Batteries in parallel.",
+                                "$ref": "/schemas/in_parallel"
+                            }
+                        }
+                    }
+        
+                }
+            }
+        },
+        "batteryBankArgs": {
+            "type": "object",
+            "minProperties": 6,
+            "maxProperties": 6,
+            "additionalProperties": false,
+            "required": [ "name", "battery_type", "battery_key", "battery", "in_series", "in_parallel" ],
+            "properties" : {
+                "name": {
+                    "description": "Name of BatteryBank.", 
+                    "$ref": "/schemas/name"
+                },
+                "battery_type": {
+                    "description": "Type of Batteries.", 
+                    "$ref": "/schemas/battery_type"
+                },
+                "battery_key": {
+                    "description": "Battery key fom batteryDatas.",
+                    "$ref": "/schemas/battery_key"
+                },
+                "battery": {
+                    "description": "Battery key fom batteryDatas.",
+                    "$ref": "/schemas/battery"
+                },
+                "in_series": {
+                    "description": "Number of Batteries in series.",
+                    "$ref": "/schemas/in_series"
+                },
+                "in_parallel": {
+                    "description": "Number of Batteries in parallel.",
+                    "$ref": "/schemas/in_parallel"
+                }
+            }
+        }
+    },
+    "$defs": {
+        "battery": {
+            "$id": "/schemas/battery",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Battery item.",
+            "type": "object",
+            "minProperties": 5,
+            "maxProperties": 7,
+            "additionalProperties": false,
+            "required": [ "manufacturer", "model", "cell_voltage", "nb_cells", "capacity" ],
+            "properties" : {
+                "manufacturer": {
+                    "description": "Manufacturer name of the battery.",
+                    "$ref": "/schemas/manufacturer"
+                },
+                "model": {
+                    "description": "Model name of the battery.",
+                    "$ref": "/schemas/model"
+                },
+                "cell_voltage": {
+                    "description": "Voltage of single battery cell.",
+                    "$ref": "/schemas/cell_voltage"
+                },
+                "nb_cells": {
+                    "description": "Number of battery cells.",
+                    "$ref": "/schemas/nb_cells"
+                },
+                "bulk_voltage": {
+                    "description": "Bulk Voltage of single battery cell.",
+                    "$ref": "/schemas/bulk_voltage"
+                },
+                "float_voltage": {
+                    "description": "Float Voltage of single battery cell.",
+                    "$ref": "/schemas/float_voltage"
+                },
+                "capacity": {
+                    "description": "Battery capacity Array values.",
+                    "$ref": "/schemas/capacity"
+                }
+            }
+        },
+        "manufacturer": {
+            "$id": "/schemas/manufacturer",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Manufacturer name of the battery.",
+            "type": "string",
+            "pattern": "(?=[a-zA-Z0-9_\\-./ ]{1,30}$)^([a-zA-Z0-9 ]+(?:_[a-zA-Z0-9\\-./ ]+)*(?:[a-zA-Z0-9\\-./ ]+)*)$"
+        },
+        "model": {
+            "$id": "/schemas/model",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Model name of the battery.",
+            "type": "string",
+            "pattern": "(?=[a-zA-Z0-9_\\-./ ]{1,30}$)^([a-zA-Z0-9 ]+(?:_[a-zA-Z0-9\\-./ ]+)*(?:[a-zA-Z0-9\\-./ ]+)*)$"
+        },
+        "cell_voltage": {
+            "$id": "/schemas/cell_voltage",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Voltage of single battery cell.",
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 100
+        },
+        "nb_cells": {
+            "$id": "/schemas/nb_cells",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Number of battery cells.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+        },
+        "bulk_voltage": {
+            "$id": "/schemas/bulk_voltage",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Bulk Voltage of single battery cell.",
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 100
+        },
+        "float_voltage": {
+            "$id": "/schemas/float_voltage",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Float Voltage of single battery cell.",
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 100
+        },
+        "capacity": {
+            "$id": "/schemas/capacity",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Battery capacity Array values.",
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 300,
+            "items": {
+                "description": "Battery capacity Array columns (hour rate, capacity, current).",
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "prefixItems": [
+                    { 
+                        "description": "Battery hour rate value",
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 100
+                    },
+                    { 
+                        "description": "Battery capacity value",
+                        "type": "number",
+                        "minimum": 1,
+                        "maximum": 100000
+                    },
+                    {
+                        "description": "Battery current value", 
+                        "type": "number",
+                        "minimum": 0.001,
+                        "maximum": 100000
+                    }
+                ]
+            }
+        },
+        "name": {
+            "$id": "/schemas/name",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Name.", 
+            "type": "string",
+            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "battery_type": {
+            "$id": "/schemas/battery_type",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Type of Batteries.", 
+            "type": "string",
+            "emum": ["flooded", "gel", "agm", "li"],
+            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "battery_key": {
+            "$id": "/schemas/battery_key",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Battery key fom batteryDatas.",
+            "type": "string",
+            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "in_series": {
+            "$id": "/schemas/in_series",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Number of Batteries in series.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+        },
+        "in_parallel": {
+            "$id": "/schemas/in_parallel",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Number of Batteries in parallel.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+        }
+    }
+}

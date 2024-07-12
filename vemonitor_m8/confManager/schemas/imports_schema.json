@@ -1,0 +1,12 @@
+{
+    "$id": "https://example.com/schemas/imports_schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "List of Imports in main yaml vemonitor configuration",
+    "description": "List of Imports in main yaml vemonitor configuration.",
+    "type" : "array",
+    "maxItems": 10,
+    "items" : {
+        "type": "string",
+        "pattern": "(?=[a-zA-Z0-9_\\.]{6,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*\\.yaml)$"
+        }
+    }
