@@ -1,0 +1,112 @@
+    # Define a block item
+    - # block item name 
+      # str : (required, must be unique)
+      name: "bmvFakeSerial" # test ok
+      # app name of the block item
+      # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
+      app: "batSerialMonitor" # test ok
+      # args add extra data to app.
+      # related to batteryBank and/or solarPlant sections.
+      # dict : 
+      #       -> {extra object names: extra object item names}
+      #       -> {['batteryBanks', 'solar_plant']: extra object item names}
+      args: 
+          batteryBanks: "project1" # test ok
+      # inputs of app block item.
+      # Used to get data from variety of AppConectors.
+      # Every AppConector, has different type of configuration parameters.
+      # dict : {AppConector key: list of conector inputs}
+      inputs:
+          serial:
+              - source: "bmv700" # test ok
+                time_interval: 1
+                material: "BMV" # test ok
+                ref_cols: [ # test ok
+                            ['bat_voltage', 'V'], 
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: [ # test ok
+                          'V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay', 
+                          'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12'
+                          ]
+      outputs:
+          redis:
+              - source: "local" # test ok
+                redis_node: "sim_BMV" # test ok
+                time_interval: 1
+                ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+              - source: "local"
+                redis_node: "sim_BMV"
+                time_interval: 5
+                ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12']
+          influxDb2:
+              - source: "local"
+                db: 'telegraf_z'
+                mesurement: 'solar'
+                tags: ['BMV700']
+                time_interval: 1
+                ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+
+    - name: "monitFakeProject1"
+      app: "redisBatMonitor"
+      args: 
+          batteryBanks: "project1"
+      inputs:
+          redis:
+              - source: "local"
+                redis_node: "sim_BMV"
+                time_interval: 1
+                max_items: 300
+                ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: ['V', 'I', 'P', 't_bat', 't_int']
+      outputs:
+          redis:
+              - source: "local"
+                time_interval: 1
+                redis_node: "sim_BMV"
+                ref_cols:  [
+                      ['bat_status', 'stat_bat'],
+                      ['charge_status', 'stat_chrg'],
+                      ['discharge_status', 'stat_dschrg'],
+                      ['capacity', 'vm_cap'],
+                      ['capacity_by_temp', 'vm_cap_t'],
+                      ['real_capacity', 'vm_real_cap']
+                ]
+                columns: ['stat_bat', 'stat_chrg', 'stat_dschrg', 'vm_cap', 'vm_cap_t', 'vm_real_cap']
+          influxDb2:
+              - source: "local"
+                time_interval: 1
+                db: 'telegraf_z'
+                mesurement: 'solar'
+                tags: ['BMV700']
+                columns: ['V', 'I', 'P', 't_bat', 't_int']

@@ -1,0 +1,131 @@
+# ---------------------------
+# This file is the root configuation file for vemonitor package.
+# Use YAML syntax
+# ---------------------------
+
+# Imports section :
+# Here you can put paths of extra files you need to import.
+# Paths must be relative to this file path.
+# Extensions must be .yaml or .yml.
+# If you want to cut this configuration file in multiples files,
+# you need to set those paths here.
+Imports:
+    - "dummy_g_batteryBank.yaml"
+    - "dummy_g_appConnectors.yaml"
+
+
+# global section :
+# Here you can define global configuration.
+# Used on running scipts.
+global:
+    redis_cached:
+        active: true
+        source: "local"
+        redis_node: "app_name"
+        columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+        ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+# appBlocks section :
+# Used to define, actions executed by the different apps.
+# A block is an item of appBlocks list and represents, actions, to be executed by one app.
+# You can choose your app in ['batSerialMonitor', 'simData', 'redVeSimFaker'].
+# Every block must contain the keys: [name, app] and inputs and/or outputs
+# Inputs and Outputs can only have keys from AppConector section : ['serial', 'redis', 'influxDb2']
+# args are used to add extra data to run the app block.
+appBlocks:
+    # Define a block item
+    - # block item name 
+      # str : (required, must be unique)
+      name: "bmvFakeSerial"
+      # app name of the block item
+      # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
+      app: "batSerialMonitor"
+      # args add extra data to app.
+      # related to batteryBank and/or solarPlant sections.
+      # dict : 
+      #       -> {extra object names: extra object item names}
+      #       -> {['batteryBanks', 'solar_plant']: extra object item names}
+      args: 
+          batteryBanks: "project1"
+      # inputs of app block item.
+      # Used to get data from variety of AppConectors.
+      # Every AppConector, has different type of configuration parameters.
+      # dict : {AppConector key: list of conector inputs}
+      inputs:
+          serial:
+              - source: "bmv700"
+                time_interval: 1
+                material: "BMV"
+                ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: [
+                          'V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay', 
+                          'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12'
+                          ]
+      outputs:
+          redis:
+              - source: "local"
+                redis_node: "sim_BMV"
+                time_interval: 1
+                columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+              - source: "local"
+                redis_node: "sim_BMV"
+                time_interval: 5
+                columns: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12']
+          influxDb2:
+              - source: "local"
+                db: 'telegraf_z'
+                mesurement: 'solar'
+                tags: ['BMV700']
+                time_interval: 1
+                columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+
+    - name: "monitFakeProject1"
+      app: "redisBatMonitor"
+      args: 
+          batteryBanks: "project1"
+      inputs:
+          redis:
+              - source: "local"
+                redis_node: "sim_BMV"
+                time_interval: 1
+                max_items: 300
+                ref_cols: [
+                            ['bat_voltage', 'V'],
+                            ['bat_current', 'I'],
+                            ['bat_power', 'P'],
+                            ['bat_temperature', 't_bat'],
+                            ['loc_temperature', 't_int']
+                ]
+                columns: ['V', 'I', 'P', 't_bat', 't_int']
+      outputs:
+          redis:
+              - source: "local"
+                time_interval: 1
+                redis_node: "sim_BMV"
+                ref_cols:  [
+                      ['bat_status', 'stat_bat'],
+                      ['charge_status', 'stat_chrg'],
+                      ['discharge_status', 'stat_dschrg'],
+                      ['capacity', 'vm_cap'],
+                      ['capacity_by_temp', 'vm_cap_t'],
+                      ['real_capacity', 'vm_real_cap']
+                ]
+                columns: ['stat_bat', 'stat_chrg', 'stat_dschrg', 'vm_cap', 'vm_cap_t', 'vm_real_cap']
+          influxDb2:
+              - source: "local"
+                time_interval: 1
+                db: 'telegraf_z'
+                mesurement: 'solar'
+                tags: ['BMV700']
+                columns: ['V', 'I', 'P', 't_bat', 't_int']
