@@ -205,7 +205,7 @@ class Loader():
             user_path = os.path.dirname(os.path.abspath(self.file_path))
             path = os.path.join(user_path, file_path)
 
-        if Ut.is_str(file_path) and os.path.isfile(path):
+        if Ut.is_str(path) and os.path.isfile(path):
             return YmlConfLoader.get_config(path)
         else:
             raise YAMLFileNotFound(
