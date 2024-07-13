@@ -1,57 +1,63 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+"""
+Test data_structure json schema validation.
+"""
 import pytest
-from .schemaTestHelper import SchemaTestHelper
-from vemonitor_m8.confManager.schemaValidate import SchemaValidate
-from vemonitor_m8.confManager.loader import Loader
 from ve_utils.utype import UType as Ut
-from jsonschema.exceptions import SchemaError, ValidationError
+from jsonschema.exceptions import SchemaError
+from vemonitor_m8.confManager.schema_validate import SchemaValidate
+from vemonitor_m8.confManager.loader import Loader
+from .schema_test_helper import SchemaTestHelper
 
-class TestColumnsChecksSchema(SchemaTestHelper):
-    """ToDo: Test all patterns in jsonshema"""
-    def setup_method(self):
-        """ setup any state tied to the execution of the given function.
-        Invoked for every test function in the module.
-        """
-        self.schema = SchemaValidate._load_schema("data_structure")
-        loader = Loader("vemonitor_m8/confManager/confFiles/victronDeviceData.yaml")
-        self.obj = loader.get_yaml_columns_check(file_path="victronDeviceData.yaml")
+@pytest.fixture(name="schema_manager", scope="class")
+def schema_manager_fixture():
+    """Json Schema test manager fixture"""
+    class SchemaManager(SchemaTestHelper):
+        """Json Schema test manager fixture Class"""
+        def __init__(self):
+            SchemaTestHelper.__init__(self)
+            self.schema = SchemaValidate.load_schema("data_structure")
+            loader = Loader("vemonitor_m8/confManager/confFiles/victronDeviceData.yaml")
+            self.obj = loader.get_yaml_columns_check(file_path="victronDeviceData.yaml")
 
-    def teardown_method(self):
-        """ teardown any state that was previously setup with a setup_function
-        call.
-        """
-        pass
+    return SchemaManager()
+
+class TestSchemaDataStructure:
+    """
+    Test data_structure json schema validation.
+    ToDo: Test all patterns in jsonshema
+    """
 
     def test_bad_file_key(self):
+        """Test bad file keys"""
         # test empty dict
         with pytest.raises(SchemaError):
-            SchemaValidate._load_schema("bad_key")
+            SchemaValidate.load_schema("bad_key")
 
-    def test_data_validation(self):
-        data = SchemaValidate.validate_data(self.obj, "data_structure")
+    def test_data_validation(self, schema_manager):
+        """Test data validation"""
+        data = SchemaValidate.validate_data(schema_manager.obj, "data_structure")
         assert Ut.is_dict(data, not_null=True)
-        
-    def test_datas_string_key_pattern(self):
+
+    def test_datas_string_key_pattern(self, schema_manager):
         """Test bad key patterns on data"""
-        datas = [ 
-                ('input_type', self.obj['points']['V']),
-                ('output_type', self.obj['points']['V'])
+        datas = [
+                ('input_type', schema_manager.obj['points']['V']),
+                ('output_type', schema_manager.obj['points']['V'])
             ]
-        self.run_test_values(datas = datas, key = "string_key")
+        schema_manager.run_test_values(datas = datas, key = "string_key")
 
-    def test_string_column_pattern(self):
+    def test_string_column_pattern(self, schema_manager):
         """Test string_column values to validate patterns"""
-        datas = [ 
-                (0, self.obj['keys']['BMV'])
+        datas = [
+                (0, schema_manager.obj['keys']['BMV']),
             ]
-        self.run_test_values(datas = datas, key = "string_column")
+        schema_manager.run_test_values(datas = datas, key = "string_column")
 
-    def test_datas_positive_number(self):
+    def test_datas_positive_number(self, schema_manager):
         """Test bad key patterns on data"""
         datas =  [
-                ('floatpoint', self.obj['points']['V'])
+                ('floatpoint', schema_manager.obj['points']['V'])
             ]
-        self.run_test_values(datas = datas, key = "positive_number")
-    
-    
+        schema_manager.run_test_values(datas = datas, key = "positive_number")

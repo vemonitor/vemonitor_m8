@@ -11,6 +11,10 @@ from vemonitor_m8.confManager.schema_validate import SchemaValidate
 class SchemaTestHelper:
     """Helper class to test json schemas validation."""
 
+    def __init__(self):
+        self.schema = None
+        self.obj = None
+
     def get_values_helper(self, key: str, choice: str) -> Optional[list]:
         """
         Return a list of values to test json schema validation.
@@ -248,7 +252,7 @@ class SchemaTestHelper:
         else:
             raise ValueError(
                 "Fatal error: Unable to evaluate good values "
-                f"on list values {key}"
+                f"on list values {list_values}"
             )
 
     def run_test_values(self, datas: list, key: str):
