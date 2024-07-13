@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import pytest
-from .schemaTestHelper import SchemaTestHelper
-from vemonitor_m8.confManager.schemaValidate import SchemaValidate
+from .schema_test_helper import SchemaTestHelper
+from vemonitor_m8.confManager.schema_validate import SchemaValidate
 from vemonitor_m8.confManager.loader import Loader
 from ve_utils.utype import UType as Ut
 from jsonschema.exceptions import SchemaError, ValidationError
@@ -13,7 +13,7 @@ class TestBatteryBankSchema(SchemaTestHelper):
         """ setup any state tied to the execution of the given function.
         Invoked for every test function in the module.
         """
-        self.schema = SchemaValidate._load_schema("batteryBanks")
+        self.schema = SchemaValidate.load_schema("batteryBanks")
         self.obj = None
 
     def teardown_method(self):
@@ -39,7 +39,7 @@ class TestBatteryBankSchema(SchemaTestHelper):
     def test_bad_file_key(self):
         # test empty dict
         with pytest.raises(SchemaError):
-            SchemaValidate._load_schema("bad_key")
+            SchemaValidate.load_schema("bad_key")
 
     def test_data_validation(self):
         self.load_battery_bank_conf('batteryDatas')

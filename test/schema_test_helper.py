@@ -1,16 +1,17 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import pytest
+"""Helper class to test json schemas validation."""
 from typing import Optional, Union
+import pytest
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.confManager.schemaValidate import SchemaValidate
 from jsonschema.exceptions import ValidationError
+from vemonitor_m8.confManager.schema_validate import SchemaValidate
 
 
 class SchemaTestHelper:
-    """Helper clas to test json schemas validation."""
+    """Helper class to test json schemas validation."""
 
-    def get_values_helper(self, key: str, choice: str) -> list:
+    def get_values_helper(self, key: str, choice: str) -> Optional[list]:
         """
         Return a list of values to test json schema validation.
 
@@ -25,17 +26,19 @@ class SchemaTestHelper:
         :return: A list of values for the given key and choice
         :doc-author: Trelent
         """
+        result = None
         if Ut.is_str(key) and choice in ['good', 'bad']:
             if key == "string_key":
-                return self.get_string_key_values_helper(choice)
+                result = self.get_string_key_values_helper(choice)
             elif key == "string_column":
-                return self.get_string_columns_values_helper(choice)
+                result = self.get_string_columns_values_helper(choice)
             elif key == "string_text":
-                return self.get_string_text_values_helper(choice)
+                result = self.get_string_text_values_helper(choice)
             elif key == "positive_number":
-                return self.get_positive_number_values_helper(choice)
+                result = self.get_positive_number_values_helper(choice)
             elif key == "positive_integer":
-                return self.get_positive_integer_values_helper(choice)
+                result = self.get_positive_integer_values_helper(choice)
+        return result
 
     def get_string_text_values_helper(self, choice: str) -> list:
         """
@@ -164,10 +167,10 @@ class SchemaTestHelper:
                    ]
 
     def _run_test_bad_value_data(self,
-                           key: Union[str, int],
-                           data: any,
-                           new_val: any
-                           ) -> None:
+                                 key: Union[str, int],
+                                 data: any,
+                                 new_val: any
+                                 ) -> None:
         val = data[key]
         data[key] = new_val
         with pytest.raises(ValidationError):
@@ -176,10 +179,10 @@ class SchemaTestHelper:
         return data[key] == val
 
     def _run_test_good_value_data(self,
-                            key: Union[str, int],
-                            data: any,
-                            new_val: any
-                            ) -> None:
+                                  key: Union[str, int],
+                                  data: any,
+                                  new_val: any
+                                  ) -> None:
         val = data[key]
         data[key] = new_val
         SchemaValidate.validate_data_from_schema(self.obj, self.schema)
@@ -206,22 +209,21 @@ class SchemaTestHelper:
                     if not ((choice == "good" and restrict == "bad") \
                             or (choice == "bad" and restrict == "good")):
                         raise ValueError(
-                            "Fatal error: Unable to evaluate %s value "
-                            "on key %s. With restriction value %s" %
-                            (choice, key, restrict)
+                            f"Fatal error: Unable to evaluate {choice} value "
+                            f"on key {key}. With restriction value {restrict}"
                         )
         else:
             raise ValueError(
                 "Fatal error: Unable to evaluate good values "
-                "on key %s" %
-                (key)
+                f"on key {key}"
             )
 
-    def run_test_values_data(self, 
+    def run_test_values_data(self,
                              datas: list,
                              list_values: list,
                              choice: str
                              ):
+        """Apply and test values."""
         if Ut.is_list(datas, not_null=True) and Ut.is_list(list_values, not_null=True):
             for data_item in datas:
                 key, item, restrict = None, None, None
@@ -233,35 +235,32 @@ class SchemaTestHelper:
                     else:
                         raise ValueError(
                         "Fatal error: Unable to evaluate good values "
-                        "on key %s, items tuple must have a length of 2 or 3. "
-                        "( key: str or int, data: list or dict )" %
-                        (key)
+                        f"on key {key}, items tuple must have a length of 2 or 3. "
+                        "( key: str or int, data: list or dict )"
                     )
                     self._run_assert_values_data(key, item, list_values, choice, restrict)
                 else:
                     raise ValueError(
                         "Fatal error: Unable to evaluate good values "
-                        "on key %s, items must be a tuple. "
-                        "( key: str or int, data: list or dict )" %
-                        (key)
+                        f"on key {key}, items must be a tuple. "
+                        "( key: str or int, data: list or dict )"
                     )
         else:
             raise ValueError(
                 "Fatal error: Unable to evaluate good values "
-                "on list values %s" %
-                (list_values)
+                f"on list values {key}"
             )
-    
+
     def run_test_values(self, datas: list, key: str):
+        """Apply and test all values."""
         self.run_test_values_data(
             datas = datas,
             list_values = self.get_values_helper(key, 'good'),
             choice='good'
         )
-       
+
         self.run_test_values_data(
             datas = datas,
             list_values = self.get_values_helper(key, 'bad'),
             choice='bad'
         )
-        

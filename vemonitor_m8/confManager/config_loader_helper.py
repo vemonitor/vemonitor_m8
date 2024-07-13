@@ -22,7 +22,7 @@ import logging
 
 from typing import Optional
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.confManager.schemaValidate import SchemaValidate as sValid
+from vemonitor_m8.confManager.schema_validate import SchemaValidate as sValid
 from vemonitor_m8.core.exceptions import SettingInvalidException, NullSettingException
 
 logging.basicConfig()
