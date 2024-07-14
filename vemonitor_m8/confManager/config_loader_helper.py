@@ -23,7 +23,6 @@ import logging
 from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.confManager.shema_validate_selector import SchemaValidateSelector as jValid
-from vemonitor_m8.confManager.schema_validate import SchemaValidate as sValid
 from vemonitor_m8.core.exceptions import SettingInvalidException, NullSettingException
 
 logging.basicConfig()
@@ -39,10 +38,11 @@ class ConfigLoaderHelper:
                                block_name: Optional[str]=None,
                                app_name: Optional[str]=None
                                ) -> Optional[dict]:
+        """Get AppBlocks from config by app or by name."""
         res = None
         if Ut.is_list(app_blocks, not_null=True)\
                 and jValid.is_valid_app_blocks_conf(app_blocks):
-            res = list()
+            res = []
             for block in app_blocks:
                 if Ut.is_dict(block, not_null=True):
                     if Ut.is_str(block_name)\
@@ -67,9 +67,10 @@ class ConfigLoaderHelper:
                                    args:dict,
                                    conf: dict
                                    ) -> Optional[dict]:
+        """Get Args data from config."""
         obj = None
         if Ut.is_dict(args, not_null=True) and Ut.is_dict(conf, not_null=True):
-            obj = dict()
+            obj = {}
             for key, arg in args.items():
                 if Ut.is_str(key) and Ut.is_str(arg):
                     if key == 'batteryBanks':
@@ -85,10 +86,11 @@ class ConfigLoaderHelper:
                                     app_blocks: list,
                                     conf: dict
                                     ) -> Optional[dict]:
+        """Get App Blocks Args data from config."""
         obj = None
         if jValid.is_valid_app_blocks_conf(app_blocks)\
                 and Ut.is_dict(conf, not_null=True):
-            obj = dict()
+            obj = {}
             for block in app_blocks:
                 if Ut.is_dict(block, not_null=True):
                     obj.update(
@@ -101,9 +103,10 @@ class ConfigLoaderHelper:
                                      conector: dict,
                                      sources: list
                                      ) -> Optional[dict]:
+        """Get App Connector Item data from config."""
         res = None
         if Ut.is_dict(conector, not_null=True) and Ut.is_list(sources, not_null=True):
-            res = dict()
+            res = {}
             for item_key, item in conector.items():
                 if Ut.is_dict(item) and\
                         item_key in sources: # and\
@@ -126,11 +129,12 @@ class ConfigLoaderHelper:
                                         app_conectors: dict,
                                         sources: Optional[dict]=None
                                         ) -> Optional[dict]:
+        """Get App Connectors data from config."""
         res = None
         if jValid.is_valid_app_connectors_conf(app_conectors):
             if Ut.is_dict(sources, not_null=True):
                 sources_keys = list(sources.keys())
-                res = dict()
+                res = {}
                 for key, conector in app_conectors.items():
                     if not Ut.is_dict(conector, not_null=True):
                         raise SettingInvalidException(
@@ -153,11 +157,13 @@ class ConfigLoaderHelper:
 
     @classmethod
     def is_battery_banks(cls, battery_bank: dict) -> bool:
+        """Test if is valid battery banks data."""
         return Ut.is_dict(battery_bank, not_null=True) and \
             Ut.is_dict(battery_bank.get('batteryDatas'), not_null=True)
 
     @classmethod
     def is_battery_banks_items(cls, battery_bank: dict) -> bool:
+        """Test if is valid battery banks items data."""
         return cls.is_battery_banks(battery_bank)\
             and Ut.is_dict(battery_bank['batteryDatas'].get('bankItems'), not_null=True)
 
@@ -166,6 +172,7 @@ class ConfigLoaderHelper:
                                    key: str,
                                    battery_bank: dict
                                    ) -> bool:
+        """Test if is valid battery banks items key."""
         return cls.is_battery_banks_items(battery_bank) and \
             Ut.is_str(key) and\
             Ut.is_dict(battery_bank['batteryDatas']['bankItems'].get(key), not_null=True)
@@ -175,11 +182,13 @@ class ConfigLoaderHelper:
                                     key: str,
                                     battery_bank: dict
                                     ) -> dict:
+        """Get battery banks items key."""
         if cls.is_battery_banks_items_key(key, battery_bank):
             return battery_bank['batteryDatas']['bankItems'].get(key)
 
     @classmethod
     def is_battery_items(cls, battery_bank: dict) -> bool:
+        """Test if is valid battery items."""
         return cls.is_battery_banks(battery_bank)\
             and Ut.is_dict(battery_bank['batteryDatas'].get('batteries'), not_null=True)
 
@@ -188,6 +197,7 @@ class ConfigLoaderHelper:
                              key: str,
                              battery_bank: dict
                              ) -> bool:
+        """Test if is valid battery items key."""
         return cls.is_battery_items(battery_bank) and \
             Ut.is_str(key) and\
             Ut.is_dict(battery_bank['batteryDatas']['batteries'].get(key), not_null=True)
@@ -197,6 +207,7 @@ class ConfigLoaderHelper:
                               key: str,
                               battery_bank: dict
                               ) -> dict:
+        """Get battery items key."""
         if cls.is_battery_items_key(key, battery_bank):
             return battery_bank['batteryDatas']['batteries'].get(key)
 
@@ -206,6 +217,7 @@ class ConfigLoaderHelper:
                          battery: dict,
                          battery_bank: dict
                          ) -> dict:
+        """Set battery item."""
         return{
             **battery_bank,
             'name': key,
@@ -217,6 +229,7 @@ class ConfigLoaderHelper:
                                   arg: str,
                                   battery_bank: dict
                                   ) -> Optional[dict]:
+        """Get battery banks from Args data config."""
         if jValid.is_valid_battery_banks_conf(battery_bank):
             bank = cls.get_battery_banks_items_key(arg, battery_bank)
             if Ut.is_dict(bank, not_null=True)\
@@ -247,6 +260,7 @@ class ConfigLoaderHelper:
                       key: str,
                       check_keys: Optional[list] = None
                       ) -> bool:
+        """Test if is filtered key."""
         return (not Ut.is_list(check_keys, not_null=True)\
                 or (
                     Ut.is_list(check_keys, not_null=True)\
@@ -259,16 +273,16 @@ class ConfigLoaderHelper:
                            data: dict,
                            check_keys: Optional[list] = None
                            ) -> bool:
-        """"""
+        """Check columns keys."""
         res = None
         if Ut.is_dict(data):
-            res = dict()
+            res = {}
             for key, item in data.items():
                 if Ut.is_list(item, not_null=True):
 
                     if not Ut.is_list(res.get(key)) and\
                             cls._is_filtered_key(key, check_keys):
-                        res[key] = list()
+                        res[key] = []
 
                     for item_key in item:
                         if cls._is_filtered_key(key, check_keys):
@@ -312,7 +326,7 @@ class ConfigLoaderHelper:
         """
         res = None
         if Ut.is_dict(data, not_null=True):
-            res = dict()
+            res = {}
             for key, item in data.items():
                 if Ut.is_dict(item, not_null=True) and cls._is_filtered_key(key, points):
                     res[key] = item
@@ -329,9 +343,10 @@ class ConfigLoaderHelper:
                           check_keys: Optional[list] = None,
                           points: Optional[list] = None
                           ) -> Optional[dict]:
+        """Get Data Structure Config."""
         res = None
         if jValid.is_valid_data_structure_conf(data_structure):
-            res = dict()
+            res = {}
             res['keys'] = cls._check_column_keys(
                 data = data_structure.get('keys'),
                 check_keys = check_keys)
