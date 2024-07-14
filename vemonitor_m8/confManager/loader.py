@@ -18,7 +18,7 @@ import logging
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 from ve_utils.usys import USys as Usys
-from vemonitor_m8.confManager.loaderYaml import YmlConfLoader
+from vemonitor_m8.confManager.yaml_loader import YmlConfLoader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
 
 __author__ = "Eli Serra"
