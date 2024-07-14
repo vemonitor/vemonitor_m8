@@ -3,7 +3,6 @@ import inspect
 from os import path as Opath
 import pytest
 from ve_utils.utype import UType as Ut
-from jsonschema.exceptions import SchemaError
 from jsonschema.exceptions import ValidationError
 from vemonitor_m8.confManager.config_loader_helper import ConfigLoaderHelper as clh
 from vemonitor_m8.confManager.config_loader import ConfigLoader
@@ -307,16 +306,16 @@ class TestConfigLoaderHelper:
                 data=None
             )
 
-    def test_get_columns_check(self, helper_manager):
-        """Test get_columns_check method"""
+    def test_get_data_structure(self, helper_manager):
+        """Test get_data_structure method"""
         c_loader = ConfigLoader(helper_manager.test_path)
         settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
-        res = clh.get_columns_check(
-            columns_check=settings.columns_checks
+        res = clh.get_data_structure(
+            data_structure=settings.data_structures
         )
         assert Ut.is_dict(res, not_null=True)
 
         with pytest.raises(ValidationError):
-            clh.get_columns_check(
-                columns_check=None
+            clh.get_data_structure(
+                data_structure=None
             )

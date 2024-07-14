@@ -324,24 +324,24 @@ class ConfigLoaderHelper:
         return res
 
     @classmethod
-    def get_columns_check(cls, 
-                          columns_check: dict,
+    def get_data_structure(cls,
+                          data_structure: dict,
                           check_keys: Optional[list] = None,
                           points: Optional[list] = None
                           ) -> Optional[dict]:
         res = None
-        if jValid.is_valid_data_structure_conf(columns_check):
+        if jValid.is_valid_data_structure_conf(data_structure):
             res = dict()
             res['keys'] = cls._check_column_keys(
-                data = columns_check.get('keys'),
+                data = data_structure.get('keys'),
                 check_keys = check_keys)
 
             res['points'] = cls._check_column_points(
-                data = columns_check.get('points'),
+                data = data_structure.get('points'),
                 points = points)
         else:
             raise NullSettingException(
                 "Error on appBlocks configuration settings, "
-                f"data must be a dict. type(appBlocks): {type(columns_check)}"
+                f"data must be a dict. type(appBlocks): {type(data_structure)}"
             )
         return res

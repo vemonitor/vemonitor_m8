@@ -178,7 +178,7 @@ class Loader():
         """
         return YmlConfLoader.get_config(self.file_path, child_list)
 
-    def get_yaml_columns_check(self,
+    def get_yaml_data_structure(self,
                                file_path: Optional[str]=None
                                ) -> Optional[Union[dict, list]]:
         """
@@ -215,7 +215,7 @@ class Loader():
             return YmlConfLoader.get_config(path)
         else:
             raise YAMLFileNotFound(
-                "[Loader::get_yaml_columns_check] Fatal Error: "
+                "[Loader::get_yaml_data_structure] Fatal Error: "
                 "Unable to load columns check configuration file path "
                 f"{file_path}"
                 )

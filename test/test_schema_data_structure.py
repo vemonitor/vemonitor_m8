@@ -19,7 +19,7 @@ def schema_manager_fixture():
             SchemaTestHelper.__init__(self)
             self.schema = SchemaValidate.load_schema("data_structure")
             loader = Loader("vemonitor_m8/confManager/confFiles/victronDeviceData.yaml")
-            self.obj = loader.get_yaml_columns_check(file_path="victronDeviceData.yaml")
+            self.obj = loader.get_yaml_data_structure(file_path="victronDeviceData.yaml")
 
     return SchemaManager()
 

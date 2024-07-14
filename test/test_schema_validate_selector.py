@@ -77,7 +77,7 @@ class TestSchemaValidateSelector:
         """Test is_valid_app_connectors_conf method"""
         c_loader = ConfigLoader(helper_manager.test_path)
         settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
-        res = jValid.is_valid_data_structure_conf(conf_item=settings.columns_checks)
+        res = jValid.is_valid_data_structure_conf(conf_item=settings.data_structures)
         assert res is True
 
         res = jValid.is_valid_data_structure_conf(conf_item={})
