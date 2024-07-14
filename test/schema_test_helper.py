@@ -163,12 +163,15 @@ class SchemaTestHelper:
         :param choice: Determine which list of values to return
         :return: A list of values that are bad or good positive_integer
         """
+        result = None
         if choice == "good":
-            return[1, 3, 10]
+            result = [1, 3, 10]
         else:
-            return[0, -1, -0.1, 0.1, 2.2, "_hel lo",
-                   False, None, dict(), tuple()
-                   ]
+            result = [
+                0, -1, -0.1, 0.1, 2.2, "_hel lo",
+                False, None, dict(), tuple()
+            ]
+        return result
 
     def _run_test_bad_value_data(self,
                                  key: Union[str, int],
