@@ -22,6 +22,7 @@ import logging
 
 from typing import Optional
 from ve_utils.utype import UType as Ut
+from vemonitor_m8.confManager.shema_validate_selector import SchemaValidateSelector as jValid
 from vemonitor_m8.confManager.schema_validate import SchemaValidate as sValid
 from vemonitor_m8.core.exceptions import SettingInvalidException, NullSettingException
 
@@ -33,13 +34,6 @@ class ConfigLoaderHelper:
     """Used to get the Config settings as an object."""
 
     @classmethod
-    def is_jsonschema_validated(cls,
-                                key:str,
-                                conf_item: dict
-                                ) -> Optional[dict]:
-        return sValid.validate_data(conf_item, key) is not None
-
-    @classmethod
     def get_app_blocks_by_app_or_name(cls,
                                app_blocks:list,
                                block_name: Optional[str]=None,
@@ -47,7 +41,7 @@ class ConfigLoaderHelper:
                                ) -> Optional[dict]:
         res = None
         if Ut.is_list(app_blocks, not_null=True)\
-                and cls.is_jsonschema_validated('appBlocks', app_blocks):
+                and jValid.is_valid_app_blocks_conf(app_blocks):
             res = list()
             for block in app_blocks:
                 if Ut.is_dict(block, not_null=True):
@@ -67,7 +61,7 @@ class ConfigLoaderHelper:
                     elif not Ut.is_str(block_name) and not Ut.is_str(app_name):
                         res.append(block)
         return res
-    
+
     @classmethod
     def get_args_objects_from_conf(cls,
                                    args:dict,
@@ -80,20 +74,19 @@ class ConfigLoaderHelper:
                 if Ut.is_str(key) and Ut.is_str(arg):
                     if key == 'batteryBanks':
                         obj[arg] = cls.get_battery_bank_from_arg(
-                            key,
                             arg,
                             conf.get(key)
                         )
-                    
+
         return obj
-    
+
     @classmethod
     def get_app_blocks_args_objects(cls,
                                     app_blocks: list,
                                     conf: dict
                                     ) -> Optional[dict]:
         obj = None
-        if cls.is_jsonschema_validated('appBlocks', app_blocks)\
+        if jValid.is_valid_app_blocks_conf(app_blocks)\
                 and Ut.is_dict(conf, not_null=True):
             obj = dict()
             for block in app_blocks:
@@ -102,10 +95,9 @@ class ConfigLoaderHelper:
                         cls.get_args_objects_from_conf(block.get('args'), conf)
                     )
         return obj
-    
+
     @classmethod
     def get_app_conector_from_source(cls,
-                                     key: str,
                                      conector: dict,
                                      sources: list
                                      ) -> Optional[dict]:
@@ -125,16 +117,17 @@ class ConfigLoaderHelper:
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get appConnectors from sources, "
-                "conector key %s is not valid. " % (key))
+                "conector key {key} is not valid. "
+            )
         return res
-    
+
     @classmethod
     def get_app_connectors_from_sources(cls,
                                         app_conectors: dict,
                                         sources: Optional[dict]=None
                                         ) -> Optional[dict]:
         res = None
-        if cls.is_jsonschema_validated('appConnectors', app_conectors):
+        if jValid.is_valid_app_connectors_conf(app_conectors):
             if Ut.is_dict(sources, not_null=True):
                 sources_keys = list(sources.keys())
                 res = dict()
@@ -142,15 +135,14 @@ class ConfigLoaderHelper:
                     if not Ut.is_dict(conector, not_null=True):
                         raise SettingInvalidException(
                             "Fatal Error: unable to get appConnectors from sources, "
-                            "conector key %s is not valid. " % (key))
-                    
+                            "conector key {key} is not valid. "
+                        )
+
                     if key in sources_keys:
                         res[key] = cls.get_app_conector_from_source(
-                            key,
                             conector,
                             sources.get(key)
                         )
-                        
             else:
                 return app_conectors
         else:
@@ -168,7 +160,7 @@ class ConfigLoaderHelper:
     def is_battery_banks_items(cls, battery_bank: dict) -> bool:
         return cls.is_battery_banks(battery_bank)\
             and Ut.is_dict(battery_bank['batteryDatas'].get('bankItems'), not_null=True)
-    
+
     @classmethod
     def is_battery_banks_items_key(cls,
                                    key: str,
@@ -207,7 +199,7 @@ class ConfigLoaderHelper:
                               ) -> dict:
         if cls.is_battery_items_key(key, battery_bank):
             return battery_bank['batteryDatas']['batteries'].get(key)
-    
+
     @classmethod
     def set_battery_item(cls,
                          key: str,
@@ -221,36 +213,34 @@ class ConfigLoaderHelper:
         }
 
     @classmethod
-    def get_battery_bank_from_arg(cls, 
-                                  key: str,
+    def get_battery_bank_from_arg(cls,
                                   arg: str,
                                   battery_bank: dict
                                   ) -> Optional[dict]:
-        if key == 'batteryBanks'\
-                and cls.is_jsonschema_validated(key, battery_bank):
+        if jValid.is_valid_battery_banks_conf(battery_bank):
             bank = cls.get_battery_banks_items_key(arg, battery_bank)
             if Ut.is_dict(bank, not_null=True)\
                     and Ut.is_str(bank.get('battery_key')):
-                    
+
                 battery = cls.get_battery_items_key(bank.get('battery_key'), battery_bank)
                 if Ut.is_dict(battery, not_null=True):
                     return cls.set_battery_item(arg, battery, bank)
                 else:
                     raise SettingInvalidException(
                         "Fatal Error: unable to get battery data, "
-                        "from arg %s in batteryBank key %s." % 
-                        (bank.get('battery_key'), arg))
+                        f"from arg {bank.get('battery_key')} in batteryBank key {arg}."
+                    )
             else:
                 raise SettingInvalidException(
                     "Fatal Error: unable to get batteryBank data, "
-                    "from arg %s." % 
-                    (arg))
+                    "from arg {arg}."
+                )
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get batteryBank data, "
                 "validation fails or bad root key. "
-                "key: %s, arg: %s." % 
-                (key, arg))
+                "arg: {arg}." 
+            )
 
     @classmethod
     def _is_filtered_key(cls,
@@ -282,23 +272,22 @@ class ConfigLoaderHelper:
 
                     for item_key in item:
                         if cls._is_filtered_key(key, check_keys):
-                                res[key].append(item_key)
+                            res[key].append(item_key)
                         else:
                             raise SettingInvalidException(
-                                    "Error on checkColumns configuration, "
-                                    "checks Key %s is not valid: %s"%(item)
-                                )
+                                "Error on checkColumns configuration, "
+                                f"checks Key {key} is not valid: {item}"
+                            )
                 else:
                     raise SettingInvalidException(
                             "Error on checkColumns configuration, "
-                            "column key %s is not valid"
-                            "and/or check keys not a list. type(checksKeys): %s" %
-                            (key, type(item))
+                            f"column key {key} is not valid"
+                            f"and/or check keys not a list. type(checksKeys): {type(item)}"
                         )
         else:
             raise SettingInvalidException(
                 "Error on checkColumns configuration, empty columns keys data: "
-            )    
+            )
 
         return res
 
@@ -310,8 +299,10 @@ class ConfigLoaderHelper:
         """
             Helper function that checks the input configuration for appBlocks. 
             It is called by the _is_app_blocks method and takes two arguments: key, data. 
-            The key argument is a string containing the name of an input connector (i.e., serial or redis). 
-            The data argument is a dictionary containing all of the settings for that specific input connector.
+            The key argument is a string containing the name of an input connector
+            (i.e., serial or redis). 
+            The data argument is a dictionary containing all of the settings 
+            for that specific input connector.
             
             :param self: Reference the class instance
             :param key: Check if the input is valid
@@ -324,11 +315,11 @@ class ConfigLoaderHelper:
             res = dict()
             for key, item in data.items():
                 if Ut.is_dict(item, not_null=True) and cls._is_filtered_key(key, points):
-                   res[key] = item
+                    res[key] = item
         else:
             raise SettingInvalidException(
                 "Error on checkColumns configuration, empty columns keys data: "
-            )    
+            )
 
         return res
 
@@ -339,17 +330,18 @@ class ConfigLoaderHelper:
                           points: Optional[list] = None
                           ) -> Optional[dict]:
         res = None
-        if cls.is_jsonschema_validated('data_structure', columns_check):
+        if jValid.is_valid_data_structure_conf(columns_check):
             res = dict()
             res['keys'] = cls._check_column_keys(
                 data = columns_check.get('keys'),
                 check_keys = check_keys)
-            
+
             res['points'] = cls._check_column_points(
                 data = columns_check.get('points'),
                 points = points)
         else:
             raise NullSettingException(
-                "Error on appBlocks configuration settings, data must be a dict. type(appBlocks): %s"%(type(columns_check))
+                "Error on appBlocks configuration settings, "
+                f"data must be a dict. type(appBlocks): {type(columns_check)}"
             )
         return res
