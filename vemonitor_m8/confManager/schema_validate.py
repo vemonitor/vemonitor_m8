@@ -16,14 +16,13 @@ Or if no error occurs, return data tested object
  .. seealso:: ConfigLoader
  .. raises:: ValidationError, SchemaError, ErrorTree
 """
-import os
 import inspect
 import logging
+from os import path as Opath
 from jsonschema import validate
 from jsonschema.exceptions import SchemaError
 
-from ve_utils.usys import USys as USys
-from ve_utils.ujson import UJson as UJson
+from ve_utils.ujson import UJson
 from ve_utils.utype import UType as Ut
 
 __author__ = "Eli Serra"
@@ -67,13 +66,12 @@ class SchemaValidate():
         .. raises:: ValidationError, SchemaError, ErrorTree
         .. warnings:: Class Method and Public
         """
-        schema = SchemaValidate._load_schema(shem_key_path)
+        schema = SchemaValidate.load_schema(shem_key_path)
         if Ut.is_dict(schema, not_null=True):
             return SchemaValidate.validate_data_from_schema(data, schema)
         raise SchemaError(
-            "Fatal error unable to load valid jsonschema for key %s" %
-            (shem_key_path)
-            )
+            f"Fatal error unable to load valid jsonschema for key {shem_key_path}"
+        )
 
     @classmethod
     def validate_data_from_schema(cls, data: any, schema: dict) -> None:
@@ -105,12 +103,11 @@ class SchemaValidate():
             validate(instance=data, schema=schema)
             return data
         raise SchemaError(
-            "Fatal error: invalid jsonschema : %s" %
-            (schema)
-            )
+            f"Fatal error: invalid jsonschema : {schema}"
+        )
 
     @classmethod
-    def _load_schema(cls,
+    def load_schema(cls,
                       file_key: str
                       ):
         """
@@ -142,37 +139,33 @@ class SchemaValidate():
         .. raises:: ValidationError, SchemaError, ErrorTree
         .. warnings:: Class Method and Private
         """
-        if Ut.is_str(file_key) and not os.path.isabs(file_key):
-            current_script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-            file_path = "%s_schema.json" % (file_key)
-            path = os.path.join(current_script_path, 'schemas', file_path)
-            if os.path.isfile(path):
-                file_size = os.path.getsize(path)
+        if Ut.is_str(file_key) and not Opath.isabs(file_key):
+            current_script_path = Opath.dirname(
+                Opath.abspath(inspect.getfile(inspect.currentframe()))
+            )
+            file_path = f"{file_key}_schema.json"
+            path = Opath.join(current_script_path, 'schemas', file_path)
+            if Opath.isfile(path):
+                file_size = Opath.getsize(path)
                 if file_size <= cls.MAX_FILE_SIZE:
                     data = None
                     # load the yaml file
-                    with open(path, "r") as f:
+                    with open(path, "r", encoding="utf-8") as f:
                         data = UJson.load_json(f)
-                    
+
                     return data
                 else:
                     raise SchemaError(
-                        "Fatal error jsonschema file is too big,"
-                        "file size : %s/%s" %
-                        (file_size, cls.MAX_FILE_SIZE)
+                        "Fatal error jsonschema file is too big, "
+                        f"file size : {file_size}/{cls.MAX_FILE_SIZE}"
                     )
             else:
                 raise SchemaError(
-                    "Fatal error, unable to load jsonschema for key %s."
-                    "Path : %s" %
-                    (file_key, path)
+                    f"Fatal error, unable to load jsonschema for key {file_key}."
+                    f"Path : {path}"
                 )
         else:
             raise SchemaError(
-                "Fatal error, jsonschema for key %s."
-                "is not valid" %
-                (file_key)
+                f"Fatal error, jsonschema for key {file_key}."
+                "is not valid"
             )
-        
-
-    

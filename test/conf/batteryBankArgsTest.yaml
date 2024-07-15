@@ -1,0 +1,22 @@
+  # ---------------------------
+# This file is the root configuation file for vemonitor package.
+# Use YAML syntax
+# ---------------------------
+batteryBankArgs:
+    name: 'existant'
+    battery_type: 'flooded'
+    battery_key: 'existant'
+    battery: 
+        manufacturer: "BlackBull"
+        model: "BOX-C"
+        cell_voltage: 12
+        nb_cells: 6
+        bulk_voltage: 2.47
+        float_voltage: 2.25
+        capacity: [
+            [5, 185, 37],
+            [20, 220, 11],
+            [100, 250, 2.5]
+        ]
+    in_series: 2
+    in_parallel: 1

@@ -17,8 +17,8 @@ import inspect
 import logging
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
-from ve_utils.usys import USys as USys
-from vemonitor_m8.confManager.loaderYaml import YmlConfLoader
+from ve_utils.usys import USys as Usys
+from vemonitor_m8.confManager.yaml_loader import YmlConfLoader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
 
 __author__ = "Eli Serra"
@@ -43,8 +43,7 @@ class Loader():
         self.settings = None
         self.file_path = None
         self.set_file_path(file_names, file_path)
-        
-    
+
     def get_real_file_path(self, file_path: Optional[str]) -> Optional[str]:
         """
             Try to return a full path from a given <file_path>
@@ -73,10 +72,10 @@ class Loader():
                 3: os.path.join("etc", "vemonitor", "conf", file_path),
                 # In this case 'get_current_file_parent_parent_path' is corresponding
                 # to vemonitor root path
-                # from /an/unknown/path/vemonitor/vemonitor/confManager/loader 
+                # from /an/unknown/path/vemonitor/vemonitor/confManager/loader
                 # to /an/unknown/path/vemonitor/vemonitor
                 4: os.path.join(
-                    USys.get_current_file_parent_parent_path(
+                    Usys.get_current_file_parent_parent_path(
                         current_script_path
                     ),
                     file_path
@@ -86,7 +85,7 @@ class Loader():
             for key in sorted(path_order):
                 new_file_path = path_order[key]
                 if os.path.isfile(new_file_path):
-                    logger.debug("File found in %s" % new_file_path)
+                    logger.debug("File found in %s", new_file_path)
                     return new_file_path
 
         else:
@@ -96,14 +95,19 @@ class Loader():
     def set_file_path(self,
                       file_name: Optional[Union[str, list, tuple]],
                       path: Optional[str]=None
-                      ):  
+                      ):
         """
             Used to set the file path of a given file.
-            The function takes one argument, which is either a string or list/tuple of strings.
-            If the argument is a string, it will be interpreted as an absolute or relative path to 
-            a file that exists on disk. If the argument is a tuple/list, each item in that list must 
-            be either another tuple/list containing multiple strings (e.g., ['file_name', 'sub_dir', 'etc']), 
-            or just one string (e.g., ['file_name']). The first item in this nested structure must be 
+            The function takes one argument, which is either
+            a string or list/tuple of strings.
+            If the argument is a string, it will be interpreted
+            as an absolute or relative path to a file that exists
+            on disk. If the argument is a tuple/list,
+            each item in that list must be either another tuple/list
+            containing multiple strings
+            (e.g., ['file_name', 'sub_dir', 'etc']), 
+            or just one string (e.g., ['file_name']).
+            The first item in this nested structure must be 
             the name of an existing file somewhere on disk;
             if there are more than one items in this nested
             structure then any number of them can be passed 
@@ -127,7 +131,7 @@ class Loader():
                 gpath = os.path.join(path, file_name)
                 if os.path.isfile(gpath):
                     self.file_path = gpath
-            
+
             if self.file_path is None:
                 self.file_path = self.get_real_file_path(file_name)
 
@@ -139,29 +143,28 @@ class Loader():
                     if os.path.isfile(tmp):
                         self.file_path = tmp
                         break
-                
+
                 if tmp is None:
                     tmp = self.get_real_file_path(name)
 
                     if Ut.is_str(tmp) and os.path.isfile(tmp):
                         self.file_path = tmp
                         break
-        
+
         # if the returned file path is none, the file doesn't exist
         if self.file_path is None:
             raise YAMLFileNotFound(
                 "[Loader::set_file_path] Fatal Error: "
                 "Unable to set configuration file path "
-                "for file_name %s" % 
-                (file_name)
+                f"for file_name {file_name}"
                 )
 
     def get_yaml_config(self,
-                        child_list: Optional[list] = None,
-                        file_path: Optional[str]=None
+                        child_list: Optional[list] = None
                         ) -> Optional[Union[dict, list]]:
         """
-            Class Methods which loads the provided YAML file from self.file_path and return it as a dict or list.
+            Class Methods which loads the provided YAML file
+            from self.file_path and return it as a dict or list.
             In the main configuaration file, child import can be done.
 
             :return: The loaded config YAML
@@ -169,16 +172,18 @@ class Loader():
 
             :Example:
                 config_yaml = Loader.get_yaml_config(['batteryBank.yaml'])
-                Result is list or dict of main configuartion file content and batteryBank.yaml content if exist on same path.
+                Result is list or dict of main configuartion file
+                content and batteryBank.yaml content if exist on same path.
             .. warnings:: Class Method
         """
         return YmlConfLoader.get_config(self.file_path, child_list)
-    
-    def get_yaml_columns_check(self,
+
+    def get_yaml_data_structure(self,
                                file_path: Optional[str]=None
                                ) -> Optional[Union[dict, list]]:
         """
-            Class Methods which loads the provided YAML file from self.file_path and return it as a dict or list.
+            Class Methods which loads the provided YAML 
+            file from self.file_path and return it as a dict or list.
             In the main configuaration file, child import can be done.
 
             :return: The loaded config YAML
@@ -186,7 +191,8 @@ class Loader():
 
             :Example:
                 config_yaml = Loader.get_yaml_config(['batteryBank.yaml'])
-                Result is list or dict of main configuartion file content and batteryBank.yaml content if exist on same path.
+                Result is list or dict of main configuartion file content
+                and batteryBank.yaml content if exist on same path.
             .. warnings:: Class Method
         """
         main_files = ['victronDeviceData.yaml']
@@ -205,12 +211,11 @@ class Loader():
             user_path = os.path.dirname(os.path.abspath(self.file_path))
             path = os.path.join(user_path, file_path)
 
-        if Ut.is_str(file_path) and os.path.isfile(path):
+        if Ut.is_str(path) and os.path.isfile(path):
             return YmlConfLoader.get_config(path)
         else:
             raise YAMLFileNotFound(
-                "[Loader::get_yaml_columns_check] Fatal Error: "
+                "[Loader::get_yaml_data_structure] Fatal Error: "
                 "Unable to load columns check configuration file path "
-                "%s" % 
-                (file_path)
+                f"{file_path}"
                 )

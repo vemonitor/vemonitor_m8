@@ -1,0 +1,49 @@
+  # ---------------------------
+  # Serial Conector configuarations
+  # ---------------------------
+  serial:
+      bmv700:
+          active: True
+          # Number max of inputs sended per block 
+          #blockLengthInputs: 18
+          # time interval to send all blocks on serial (microseconds)
+          #intervalDataSend: 1000
+          #baud: 19200
+          #timeout: 10
+          #delimiters: {header1: "\r", header2: "\n", delimiter: "\t"}
+          
+          onError: "waitConnection"
+          # path of serial port
+          # -> required with devTty if no serialTest setting present
+          serialpath: "/tmp"
+          serialPort: '/tmp/vmodem1'
+          # Serial test to determine if serial readed data corespond with this serial item.
+          # -> usefull for conection issues, serial port change.
+          # -> eg. changing usb port, and serial port name devTty not be updated by user.
+          # -> scan all serial ports on serial path devPath or in ['/dev', '/tmp'] and search corresponding serial
+          # -> only works on ve direct serial protocol
+          serialTest:
+            PIDTest:
+              typeTest: "value"
+              key: "PID"
+              value: "0x203"
+  # ---------------------------
+  # Redis Server configuarations
+  # ---------------------------
+  redis:
+      local:
+          active: True
+          host: "192.168.0.0"
+          port: 1
+          auth: "my_secure_auth_key"
+  # ---------------------------
+  # InfluxDb 2 Api configuarations
+  # ---------------------------
+  influxDb2:
+      local:
+          active: True
+          host: "http://192.168.0.0:1"
+          org: 'vemonitor'
+          auth: "my_secure_auth_key"
+          timeout: 6000
+          verify_ssl: False

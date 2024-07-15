@@ -18,7 +18,10 @@ keys:
             'V', 'VS', 'VM', 'DM', 'T', 'I', 'P', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay',
             'PID', 'FW', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 
             'H11', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H18'
-            ]
+        ]
+    ARDMONITOR: [
+            't_bat', 't_int', 't_ext'
+        ]
 
 points:
     V: 
@@ -277,11 +280,68 @@ points:
         input_type: 'int'
         output_type: 'float'
         floatpoint: 0.1
-        unit: 'V'
+        unit: 'A'
     WARN:
         name: "Warning reason"
         input_type: 'int'
         output_type: 'int'
-
+    t_int:
+        name: "Battery room temperature"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: '°C'
+    t_bat:
+        name: "Battery temperature"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: '°C'
+    t_ext:
+        name: "Outdoor temperature"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.001
+        unit: '°C'
+    bat_voltage:
+        name: "Battery voltage"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'V'
+    vm_cap:
+        name: "Current battery capacity"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'Ah'
+    vm_cap_t:
+        name: "Battery capacity weighted by temperature"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'Ah'
+    vm_cap_t:
+        name: "Current real battery capacity"
+        input_type: 'int'
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'Ah'
+    stat_bat:
+        name: "Battery current status (charge, discharge or wait)"
+        input_type: 'int'
+        output_type: 'int'
+    stat_chrg:
+        name: "Battery charge status (bulk, absorption or float)"
+        input_type: 'int'
+        output_type: 'int'
+    stat_dschrg:
+        name: "Battery discharge status (...)"
+        input_type: 'int'
+        output_type: 'int'
+    vm_real_cap:
+        name: "Battery real discharge capacity"
+        input_type: 'int'
+        output_type: 'int'
 
 

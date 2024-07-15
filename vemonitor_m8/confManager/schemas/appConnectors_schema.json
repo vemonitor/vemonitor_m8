@@ -1,0 +1,168 @@
+{
+    "$id": "https://example.com/schemas/appBlocks_schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "AppConnectors vemonitor configuration",
+    "description": "AppConnectors properties.",
+    "type" : "object",
+    "minProperties": 1,
+    "maxProperties": 3,
+    "additionalProperties": false,
+    "properties" : {
+        "serial": {
+            "description": "Serial AppConnectors properties.",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 20,
+            "propertyNames": {
+                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            },
+            "additionalProperties" : {
+                "description": "Serial AppConnector itmem properties.",
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 5,
+                "additionalProperties": false,
+                "properties" : {
+                    "active": {
+                        "description": "Is AppConnector itmem active.",
+                        "type": "boolean"
+                    },
+                    "onError": {
+                        "description": "Serial AppConnector itmem onError action.",
+                        "type": "string",
+                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                    },
+                    "serialpath": {
+                        "description": "Serial AppConnector itmem path.",
+                        "type": "string",
+                        "pattern": "^([a-zA-Z0-9_\\-/.]{1,30})$"
+                    },
+                    "serialPort": {
+                        "description": "Serial AppConnector itmem port.",
+                        "type": "string",
+                        "pattern": "^([a-zA-Z0-9_\\-/.]{1,30})$"
+                    },
+                    "serialTest": {
+                        "description": "Serial AppConnector itmem test items.",
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 10,
+                        "propertyNames": {
+                            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                        },
+                        "additionalProperties" : {
+                            "description": "Serial AppConnector itmem test block.",
+                            "type": "object",
+                            "minProperties": 3,
+                            "maxProperties": 3,
+                            "additionalProperties": false,
+                            "required": [ "typeTest", "key", "value"],
+                            "properties" : {
+                                "typeTest": {
+                                    "description": "Serial AppConnector itmem test block typeTest.",
+                                    "type": "string",
+                                    "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                                },
+                                "key": {
+                                    "description": "Serial AppConnector itmem test block key.",
+                                    "type": "string",
+                                    "pattern": "(?=[a-zA-Z0-9_#]{1,30}$)^([a-zA-Z0-9#]+(?:_[a-zA-Z0-9#]+)*)$"
+                                },
+                                "value": {
+                                    "description": "Serial AppConnector itmem test block value.",
+                                    "type": "string",
+                                    "pattern": "^(\\S+)$"
+                                }
+                            }
+                            
+                        }
+                    }
+
+                }
+            }
+        },
+        "redis": {
+            "description": "Redis AppConnectors properties.",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 20,
+            "propertyNames": {
+                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            },
+            "additionalProperties" : {
+                "description": "Redis AppConnector itmem properties.",
+                "type": "object",
+                "minProperties": 2,
+                "maxProperties": 4,
+                "additionalProperties": false,
+                "required": [ "host", "port" ],
+                "properties" : {
+                    "active": {
+                        "description": "Redis AppConnector itmem active.",
+                        "type": "boolean"
+                    },
+                    "host": {
+                        "description": "Redis AppConnector itmem host.",
+                        "type": "string",
+                        "pattern": "^((?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4][0-9])|(?:25[0-5])))$"
+                    },
+                    "port": {
+                        "description": "Redis AppConnector itmem port.",
+                        "type": "integer"
+                    },
+                    "auth": {
+                        "description": "Redis AppConnector itmem auth.",
+                        "type": "string",
+                        "pattern": "^(\\S+)$"
+                    }
+                }
+            }
+        },
+        "influxDb2": {
+            "description": "influxDb2 AppConnectors properties.",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 20,
+            "propertyNames": {
+                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            },
+            "additionalProperties" : {
+                "description": "influxDb2 AppConnector itmem properties.",
+                "type": "object",
+                "minProperties": 3,
+                "maxProperties": 6,
+                "additionalProperties": false,
+                "required": [ "host", "org", "auth" ],
+                "properties" : {
+                    "active": {
+                        "description": "influxDb2 AppConnector itmem active.",
+                        "type": "boolean"
+                    },
+                    "host": {
+                        "description": "influxDb2 AppConnector itmem host.",
+                        "type": "string",
+                        "pattern": "^(?:https?:\/\/)((?P<ipaddr>(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5])){1}(?:\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))){3})|(([a-zA-Z]+[a-zA-Z0-9\\-]*\\.)?[^\\.:]+\\.[a-zA-Z]+[a-zA-Z0-9\\-]*))(:(?:(?:6553[0-5])|(?:655[0-2]\\d)|(?:654\\d{2})|(?:6[0-4]\\d{3})|(?:[1-5]\\d{4})|(?:[1-9]\\d{2,3})|(?:[1-9]\\d)|(?:\\d)))?(?:\/[^&:?]+)?$"
+                    },
+                    "org": {
+                        "description": "influxDb2 AppConnector itmem org.",
+                        "type": "string",
+                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                    },
+                    "auth": {
+                        "description": "influxDb2 AppConnector itmem auth.",
+                        "type": "string",
+                        "pattern": "^(\\S+)$"
+                    },
+                    "timeout": {
+                        "description": "influxDb2 AppConnector itmem timeout.",
+                        "type": "integer"
+                    },
+                    "verify_ssl": {
+                        "description": "influxDb2 AppConnector itmem verify_ssl.",
+                        "type": "boolean"
+                    }
+                }
+            }
+        }
+    }
+}

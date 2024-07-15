@@ -1,5 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 """
 Used to load yaml configuration file.
 
@@ -18,8 +16,8 @@ Used to load yaml configuration file.
 """
 import logging
 import os
-import yaml
 from typing import Optional, Union
+import yaml
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.core.exceptions import \
     YAMLFileNotFound, YAMLFileEmpty, YAMLFileError
@@ -70,7 +68,10 @@ class YmlConfLoader:
         :doc-author: Trelent
         """
         cls.file_path_to_load = yaml_file
-        logger.debug("File path to load: %s " % cls.file_path_to_load)
+        logger.debug(
+            "File path to load: %s",
+            cls.file_path_to_load
+        )
         if os.path.isfile(cls.file_path_to_load):
             # import the main configuration file content
             inc_import = IncludeImport(cls.file_path_to_load)
@@ -81,10 +82,10 @@ class YmlConfLoader:
 
             return inc_import.get_data()
         else:
-            raise YAMLFileNotFound("File %s not found" % cls.file_path_to_load)
+            raise YAMLFileNotFound(f"File {cls.file_path_to_load} not found")
 
 
-class IncludeImport(object):
+class IncludeImport:
     """
     Manage the Include Import statement in the brain.yml file.
 
@@ -163,20 +164,20 @@ class IncludeImport(object):
         self.data = None
         if os.path.isfile(file_path):
             file_size = os.path.getsize(file_path)
-            f_name, f_ext = os.path.splitext(file_path)
-            if file_size <= self.MAX_FILE_SIZE and f_ext in ['.yaml', '.yml']:
+
+            if file_size <= self.MAX_FILE_SIZE and IncludeImport.is_yaml_ext(file_path):
                 self.cumuled_size = file_size
                 # load the yaml file
-                with open(file_path, "r") as f:
+                with open(file_path, "r", encoding="utf-8") as f:
                     self.data = yaml.safe_load(f)
             else:
                 raise YAMLFileError(
-                    "[YAMLLoader] File %s is too big ( > 500Mb ) "
-                    "and/or have bad file extension ( != .yaml or .yml )." %
-                    (file_path))
+                    f"[YAMLLoader] File {file_path} is too big ( > 500Mb ) "
+                    "and/or have bad file extension ( != .yaml or .yml )."
+                )
 
         if not Ut.is_dict(self.data) and not Ut.is_list(self.data, not_null=True):
-            raise YAMLFileEmpty("[YAMLLoader] File %s is empty" % file_path)
+            raise YAMLFileEmpty("[YAMLLoader] File {file_path} is empty")
 
     def _get_included_file_conf(self,
                                 file_path: Optional[str],
@@ -226,30 +227,30 @@ class IncludeImport(object):
                 # get the parent dir. will be used in case of relative path
                 parent_dir = os.path.normpath(main_path + os.sep + os.pardir)
                 logger.debug(
-                   "File path %s is relative, adding the root path" %
-                   parent_dir)
+                   "File path %s is relative, adding the root path",
+                   parent_dir
+                )
                 file_path = os.path.join(parent_dir, file_path)
                 # logger.debug("New path: %s" % inc)
 
             if os.path.isfile(file_path):
                 file_size = os.path.getsize(file_path)
-                f_name, f_ext = os.path.splitext(file_path)
 
                 if os.path.getsize(file_path) <= self.MAX_FILE_SIZE and\
                         self.cumuled_size < self.MAX_TOTAL_SIZE and\
-                        f_ext in ['.yaml', '.yml']:
+                        IncludeImport.is_yaml_ext(file_path):
 
                     self.cumuled_size = self.cumuled_size + file_size
 
-                    with open(file_path, "r") as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         conf = yaml.safe_load(f)
                 else:
                     raise YAMLFileError(
-                        "[YAMLLoader] File %s is too big, "
+                        f"[YAMLLoader] File {file_path} is too big, "
                         "or cumuled files size too big ( < 500Mb ) "
                         "and/or have bad file extension "
-                        "( != .yaml or .yml )." %
-                        file_path)
+                        "( != .yaml or .yml )."
+                        )
         return conf
 
     def get_included_files(self) -> Optional[list]:
@@ -338,7 +339,7 @@ class IncludeImport(object):
         if Ut.is_list(imports, not_null=True):
 
             logger.info(
-                "List of files ready to import : %s" % imports)
+                "List of files ready to import : %s", imports)
             for f in imports:
                 if not Ut.is_list(child_list, not_null=True) or \
                         (Ut.is_list(child_list, not_null=True) and f in child_list):
@@ -346,21 +347,21 @@ class IncludeImport(object):
                     conf = self._get_included_file_conf(f, main_path)
                     if isinstance(conf, type(self.data)):
                         logger.info(
-                            "importing %s conf data in global configuration." %
+                            "importing %s conf data in global configuration.",
                             f)
                         tst = True
                         self.update(conf)
                     else:
                         if conf is None:
                             raise YAMLFileNotFound(
-                                "[YAMLLoader] Unable to load child file %s. "
-                                "File don't exist or contain bad content." %
-                                f)
+                                f"[YAMLLoader] Unable to load child file {f}. "
+                                "File don't exist or contain bad content."
+                            )
                         raise YAMLFileError(
-                            "[YAMLLoader] the child file %s,"
+                            f"[YAMLLoader] the child file {f},"
                             "don't return same data type of father conf."
-                            "child type : %s, base : %s" %
-                            (f, type(conf), type(self.data)))
+                            f"child type : {type(conf)}, base : {type(self.data)}"
+                        )
         return tst
 
     def get_data(self) -> Optional[Union[dict, list]]:
@@ -393,3 +394,9 @@ class IncludeImport(object):
                 self.data = self.data + conf
                 return True
         return False
+
+    @staticmethod
+    def is_yaml_ext(file_name: str) -> bool:
+        """Test if file has yaml extension."""
+        f_split = os.path.splitext(file_name)
+        return Ut.is_tuple(f_split) and f_split[1] in ['.yaml', '.yml']

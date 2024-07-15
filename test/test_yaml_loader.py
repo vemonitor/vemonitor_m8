@@ -1,48 +1,58 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-import pytest
+"""
+YmlConfLoader Unit Tests class
+"""
 import os
 import inspect
-from vemonitor_m8.confManager.loaderYaml import YmlConfLoader
-from vemonitor_m8.core.exceptions import YAMLFileNotFound, YAMLFileEmpty, YAMLFileError
+import pytest
 from ve_utils.utype import UType as Ut
+from vemonitor_m8.confManager.yaml_loader import YmlConfLoader
+from vemonitor_m8.core.exceptions import YAMLFileNotFound, YAMLFileError
 
 
-class TestLoaderYaml():
+class TestYmlConfLoader():
+    """YmlConfLoader Unit Tests class"""
 
-    def setup_method(self):
-        """ setup any state tied to the execution of the given function.
-        Invoked for every test function in the module.
-        """
+    @staticmethod
+    def get_dummy_conf_path():
+        """Get dummy configuration files path for tests."""
         current_script_path = os.path.dirname(
             os.path.abspath(
                 inspect.getfile(inspect.currentframe())
             )
         )
-        self.test_path = os.path.join(
+        return os.path.join(
             current_script_path,
             "conf"
         )
 
     def test_file_not_found(self):
+        """Test get_config method YAMLFileNotFound Error."""
         with pytest.raises(YAMLFileNotFound):
             YmlConfLoader.get_config(
-                os.path.join(self.test_path, "not_exist.yaml")
+                os.path.join(
+                    TestYmlConfLoader.get_dummy_conf_path(),
+                    "not_exist.yaml"
+                )
             )
-    
+
     def test_file_error(self):
+        """Test get_config method YAMLFileError Error."""
         with pytest.raises(YAMLFileError):
             YmlConfLoader.get_config(
-                os.path.join(self.test_path, "dummy_conf_dict_error.yaml")
+                os.path.join(
+                    TestYmlConfLoader.get_dummy_conf_path(),
+                    "dummy_conf_dict_error.yaml"
+                )
             )
 
     def test_get_config(self):
-        """"""
-        current_script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        current_script_path = current_script_path + os.sep + "conf" + os.sep
+        """Test get_config method."""
         # test importing all child configuration
         conf = YmlConfLoader.get_config(
-            os.path.join(self.test_path, "dummy_conf_dict.yaml")
+            os.path.join(
+                TestYmlConfLoader.get_dummy_conf_path(),
+                "dummy_conf_dict.yaml"
+                )
         )
         assert Ut.is_dict(conf) and len(conf) == 7 and \
                len(conf.get('Imports')) == 2 and \
@@ -52,10 +62,13 @@ class TestLoaderYaml():
                len(conf.get('Dummy_4')) == 2 and\
                len(conf.get('Dummy_5')) == 2 and\
                len(conf.get('Dummy_6')) == 2
-        
+
         # test importing all child configuration
         conf = YmlConfLoader.get_config(
-            os.path.join(self.test_path, "dummy_conf_dict.yaml"),
+            os.path.join(
+                TestYmlConfLoader.get_dummy_conf_path(),
+                "dummy_conf_dict.yaml"
+            ),
             ['dummy_conf_dict1.yaml']
         )
         assert Ut.is_dict(conf) and len(conf) == 5 and \
@@ -66,4 +79,3 @@ class TestLoaderYaml():
                len(conf.get('Dummy_4')) == 2 and\
                conf.get('Dummy_5') is None and\
                conf.get('Dummy_6') is None
-
