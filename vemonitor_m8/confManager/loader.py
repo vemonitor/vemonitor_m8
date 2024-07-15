@@ -24,7 +24,7 @@ from vemonitor_m8.core.exceptions import YAMLFileNotFound
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2020, Eli Serra"
 __deprecated__ = False
-__license__ = "GPLv3"
+__license__ = "Apache"
 __status__ = "Production"
 __version__ = "0.0.1"
 

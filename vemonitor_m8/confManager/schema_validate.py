@@ -28,7 +28,7 @@ from ve_utils.utype import UType as Ut
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
-__license__ = "GPLv3"
+__license__ = "Apache"
 __status__ = "Dev" #Production
 __version__ = "0.0.1"
 
