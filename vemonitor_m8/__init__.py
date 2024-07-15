@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+"""Init vemonitor_m8 App"""
 import logging
 import sys
 import argparse
@@ -42,7 +43,7 @@ def main():
     # check if we want debug
     configure_logging(debug=parser.debug)
 
-    logger.debug("VeMonitor args: %s" % parser)
+    logger.debug("VeMonitor args: %s", parser)
 
     try:
         main_app = 2
@@ -56,7 +57,7 @@ class AppFilter(logging.Filter):
     """
 
     def filter(self, record):
-        record.app_version = "vemonitor-%s" % __version__
+        record.app_version = f"vemonitor-{__version__}"
         return True
 
 def configure_logging(debug=None):
@@ -66,21 +67,23 @@ def configure_logging(debug=None):
     :param debug: If true, set the lof level to debug
 
     """
-    logger = logging.getLogger("vemonitor")
-    logger.addFilter(AppFilter())
-    logger.propagate = False
+    log = logging.getLogger("vemonitor")
+    log.addFilter(AppFilter())
+    log.propagate = False
     syslog = logging.StreamHandler()
     syslog.setLevel(logging.DEBUG)
 
-    formatter = logging.Formatter('%(asctime)s :: %(app_version)s :: %(message)s', "%Y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter(
+        '%(asctime)s :: %(app_version)s :: %(message)s', "%Y-%m-%d %H:%M:%S"
+    )
     syslog.setFormatter(formatter)
 
     if debug:
-        logger.setLevel(logging.DEBUG)
+        log.setLevel(logging.DEBUG)
     else:
-        logger.setLevel(logging.INFO)
+        log.setLevel(logging.INFO)
 
     # add the handlers to logger
-    logger.addHandler(syslog)
+    log.addHandler(syslog)
 
-    logger.debug("Logger ready")
+    log.debug("Logger ready")
