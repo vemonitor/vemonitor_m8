@@ -6,6 +6,7 @@ from ve_utils.utype import UType as Ut
 from vemonitor_m8.confManager.config_loader import ConfigLoader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
 from vemonitor_m8.models.settings.config import Config
+from vemonitor_m8.models.settings.config_helper import ConfigHelper
 
 
 @pytest.fixture(name="helper_manager", scope="class")
@@ -40,7 +41,7 @@ class TestConfigLoader():
             settings,
             Config
         )
-        assert settings.is_app_block(
+        assert ConfigHelper.is_app_block(
             settings.app_blocks[0]
         ) and settings.app_blocks[0].get('app') == "batSerialMonitor"
         assert settings.has_battery_banks()
@@ -61,7 +62,7 @@ class TestConfigLoader():
             settings,
             Config
         ) and settings.is_valid() and len(settings.app_blocks) == 1
-        assert settings.is_app_block(
+        assert ConfigHelper.is_app_block(
             settings.app_blocks[0]
         ) and settings.app_blocks[0].get('app') == "batSerialMonitor"
         assert settings.has_battery_banks() and settings.has_data_structures()
