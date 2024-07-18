@@ -72,3 +72,22 @@ class TestLoader:
 
         with pytest.raises(YAMLFileNotFound):
             obj.get_yaml_data_structure("userColumnsChecks.yaml")
+
+    def test_get_real_file_path(self, helper_manager):
+        """Test get_paths_order method """
+        file_name = 'dummy_conf_dict.yaml'
+
+        # Test relative path
+        test_path = Opath.join('test', 'conf', file_name)
+        result = Loader.get_real_file_path(test_path)
+        assert Opath.isfile(result)
+
+        # Test absolute path
+        abs_path = Opath.join(helper_manager.test_path, file_name)
+        result = Loader.get_real_file_path(abs_path)
+        assert Opath.isfile(result)
+
+    def test_get_paths_order(self):
+        """Test get_paths_order method """
+        path_order = Loader.get_paths_order()
+        assert Ut.is_list(path_order, not_null=True)
