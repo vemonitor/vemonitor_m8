@@ -181,10 +181,12 @@ class ConfigLoaderHelper:
     def get_battery_banks_items_key(cls,
                                     key: str,
                                     battery_bank: dict
-                                    ) -> dict:
+                                    ) -> Optional[dict]:
         """Get battery banks items key."""
+        result = None
         if cls.is_battery_banks_items_key(key, battery_bank):
-            return battery_bank['batteryDatas']['bankItems'].get(key)
+            result = battery_bank['batteryDatas']['bankItems'].get(key)
+        return result
 
     @classmethod
     def is_battery_items(cls, battery_bank: dict) -> bool:

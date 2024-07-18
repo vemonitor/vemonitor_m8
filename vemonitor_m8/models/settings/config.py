@@ -21,8 +21,12 @@ class Config(ConfigHelper):
                  app_blocks:Optional[list]=None,
                  app_connectors:Optional[dict]=None):
         """
+        Initialise Config model instance.
+
+        :Example :
+            >>> conf = Config(app_blocks=[...], app_connectors={...})
         :param app_blocks: App Blocks settings
-        :param app_connectors: Output Api's settings
+        :param app_connectors: Output Api Connectors settings
         """
         ConfigHelper.__init__(self)
         self.app_blocks = None
@@ -42,11 +46,11 @@ class Config(ConfigHelper):
         return self.has_app_blocks() and self.has_app_connectors() and self.has_data_structures()
 
     def has_app_blocks(self) -> bool:
-        """Test if obj has valid App Blocks"""
+        """Test instance has app_blocks configuration"""
         return Ut.is_list(self.app_blocks, not_null=True)
 
     def set_app_blocks(self, app_blocks: list) -> bool:
-        """Set App Blocks"""
+        """Set App Blocks configuration"""
         if jValid.is_valid_app_blocks_conf(app_blocks):
             self.app_blocks = app_blocks
             return True
@@ -54,25 +58,31 @@ class Config(ConfigHelper):
 
     def get_app_block_by_name(self, block_name: str) -> Optional[dict]:
         """Get App Blocks by Name"""
+        result = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                if self.is_app_block(block) and block.get('name') == block_name:
-                    return block
+                if ConfigHelper.is_app_block(block) and block.get('name') == block_name:
+                    result = block
+                    break
+        return result
 
     def get_app_block_by_app(self, app_name: str) -> Optional[dict]:
         """Get App Blocks by App"""
+        result = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                if self.is_app_block(block) and block.get('app') == app_name:
-                    return block
+                if ConfigHelper.is_app_block(block) and block.get('app') == app_name:
+                    result = block
+                    break
+        return result
 
     def get_app_blocks_columns(self) -> Optional[dict]:
         """Get App Blocks columns"""
         res = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                if self.is_app_block(block):
-                    res = self.get_app_block_columns_by_block(block)
+                if ConfigHelper.is_app_block(block):
+                    res = ConfigHelper.get_app_block_columns_by_block(block)
         return res
 
     def get_app_blocks_sources(self) -> Optional[dict]:
@@ -80,7 +90,7 @@ class Config(ConfigHelper):
         sources = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                sources = self.get_app_block_sources(block, sources=sources)
+                sources = ConfigHelper.get_app_block_sources(block, sources=sources)
         return sources
 
     def set_and_reduce_app_connectors(self, app_connector: dict) -> None:
@@ -99,7 +109,8 @@ class Config(ConfigHelper):
         """Reduce App Connectors from sources"""
         res = None
         sources = self.get_app_blocks_sources()
-        if self.is_app_connectors(app_connector) and self.is_app_block_sources(sources):
+        if ConfigHelper.is_app_connectors(app_connector)\
+                and ConfigHelper.is_app_block_sources(sources):
 
             sources_keys = list(sources.keys())
             res = dict()
@@ -118,7 +129,7 @@ class Config(ConfigHelper):
     def set_data_structures(self, data_structures: dict) -> None:
         """Set Data Structures Conf"""
         cols = self.get_app_blocks_columns()
-        if self.is_missing_data_structure(data_structures, cols)\
+        if ConfigHelper.is_missing_data_structure(data_structures, cols)\
                 and jValid.is_valid_data_structure_conf(
                                             conf_item=data_structures):
             self.data_structures = data_structures
@@ -177,9 +188,9 @@ class Config(ConfigHelper):
         """
         conf = ConfigItem()
         conf.app_block = self.get_app_block_by_app(app_name)
-        sources = self.get_app_block_sources(conf.app_block)
+        sources = ConfigHelper.get_app_block_sources(conf.app_block)
         conf.app_connectors = self.get_app_connector_by_sources(sources)
-        columns = self.get_app_block_columns_by_block(conf.app_block)
+        columns = ConfigHelper.get_app_block_columns_by_block(conf.app_block)
         conf.data_structures = self.get_data_structures_point_by_columns(columns)
 
         battery_bank = self.get_battery_banks_from_args(conf.app_block.get('args'))

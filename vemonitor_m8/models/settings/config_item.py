@@ -41,7 +41,7 @@ class ConfigItem(ConfigHelper):
 
     def has_app_block(self) -> bool:
         """Test if obj has valid App Block item"""
-        return self.is_app_block(self.app_block)
+        return ConfigHelper.is_app_block(self.app_block)
 
     def set_app_block(self, block: list) -> bool:
         """Set App Block item"""
@@ -86,12 +86,12 @@ class ConfigItem(ConfigHelper):
 
     def get_app_block_columns(self) -> Optional[dict]:
         """Get App Block columns"""
-        return self.get_app_block_columns_by_block(self.app_block)
+        return ConfigHelper.get_app_block_columns_by_block(self.app_block)
 
     def set_data_structures(self, data_structures: dict) -> None:
         """Set Data Structure Conf"""
         cols = self.get_app_block_columns()
-        if self.is_missing_data_structure(data_structures, cols)\
+        if ConfigHelper.is_missing_data_structure(data_structures, cols)\
                 and jValid.is_valid_data_structure_conf(
                     conf_item=data_structures
                 ):
