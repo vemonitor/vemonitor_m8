@@ -153,11 +153,7 @@ class Loader():
             file_path = 'victronDeviceData.yaml'
 
         if file_path in main_files:
-            current_script_path = os.path.dirname(
-                os.path.abspath(
-                    inspect.getfile(inspect.currentframe())
-                )
-            )
+            current_script_path = Loader.get_current_script_path()
             path = os.path.join(current_script_path, 'confFiles', file_path)
         elif file_path == "userColumnsChecks.yaml":
             user_path = os.path.dirname(os.path.abspath(self.file_path))
@@ -205,3 +201,13 @@ class Loader():
             if os.path.isfile(file_path):
                 result = file_path
         return result
+
+    @staticmethod
+    def get_current_script_path() -> str:
+        """Get Current script path"""
+        return os.path.dirname(
+            os.path.abspath(
+                inspect.getfile(inspect.currentframe())
+            )
+        )
+
