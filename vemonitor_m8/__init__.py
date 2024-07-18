@@ -4,7 +4,7 @@
 import logging
 import sys
 import argparse
-from ve_utils.utils import UType as Ut
+from ve_utils.utype import UType as Ut
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
