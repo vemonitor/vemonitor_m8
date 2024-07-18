@@ -155,7 +155,7 @@ class Loader():
         if file_path in main_files:
             current_script_path = Loader.get_current_script_path()
             path = os.path.join(current_script_path, 'confFiles', file_path)
-        elif file_path == "userColumnsChecks.yaml":
+        elif file_path == "userDeviceData.yaml":
             user_path = os.path.dirname(os.path.abspath(self.file_path))
             path = os.path.join(user_path, file_path)
 
