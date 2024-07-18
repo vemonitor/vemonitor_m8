@@ -2,7 +2,9 @@
 import inspect
 from os import path as Opath
 import pytest
+from ve_utils.utype import UType as Ut
 from vemonitor_m8.confManager.config_loader import ConfigLoader
+from vemonitor_m8.core.exceptions import YAMLFileNotFound
 from vemonitor_m8.models.settings.config import Config
 
 
@@ -42,6 +44,13 @@ class TestConfigLoader():
             settings.app_blocks[0]
         ) and settings.app_blocks[0].get('app') == "batSerialMonitor"
         assert settings.has_battery_banks()
+
+    def test_get_yaml_data_structure(self, helper_manager):
+        """Test get_app_blocks_by_app_or_name method """
+        assert Ut.is_dict(helper_manager.obj.get_yaml_data_structure())
+
+        with pytest.raises(YAMLFileNotFound):
+            helper_manager.obj.get_yaml_data_structure("userDeviceData.yaml")
 
     def test_get_settings_from_schema(self, helper_manager):
         """Test get_settings_from_schema method"""

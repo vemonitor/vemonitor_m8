@@ -129,44 +129,6 @@ class Loader():
         """
         return YmlConfLoader.get_config(self.file_path, child_list)
 
-    def get_yaml_data_structure(self,
-                               file_path: Optional[str]=None
-                               ) -> Optional[Union[dict, list]]:
-        """
-            Class Methods which loads the provided YAML 
-            file from self.file_path and return it as a dict or list.
-            In the main configuaration file, child import can be done.
-
-            :return: The loaded config YAML
-            :rtype: list dict or None
-
-            :Example:
-                config_yaml = Loader.get_yaml_config(['batteryBank.yaml'])
-                Result is list or dict of main configuartion file content
-                and batteryBank.yaml content if exist on same path.
-            .. warnings:: Class Method
-        """
-        main_files = ['victronDeviceData.yaml']
-        path = None
-        if file_path is None:
-            file_path = 'victronDeviceData.yaml'
-
-        if file_path in main_files:
-            current_script_path = Loader.get_current_script_path()
-            path = os.path.join(current_script_path, 'confFiles', file_path)
-        elif file_path == "userDeviceData.yaml":
-            user_path = os.path.dirname(os.path.abspath(self.file_path))
-            path = os.path.join(user_path, file_path)
-
-        if Ut.is_str(path) and os.path.isfile(path):
-            return YmlConfLoader.get_config(path)
-        else:
-            raise YAMLFileNotFound(
-                "[Loader::get_yaml_data_structure] Fatal Error: "
-                "Unable to load columns check configuration file path "
-                f"{file_path}"
-                )
-
     @staticmethod
     def get_real_file_path(file_path: Optional[str]) -> Optional[str]:
         """
