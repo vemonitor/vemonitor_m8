@@ -180,7 +180,7 @@ class IncludeImport:
                     "and/or have bad file extension ( != .yaml or .yml )."
                 )
 
-        if not Ut.is_dict(self.data) and not Ut.is_list(self.data, not_null=True):
+        if not Ut.is_dict(self.data, not_null=True) and not Ut.is_list(self.data, not_null=True):
             raise YAMLFileEmpty("[YAMLLoader] File {file_path} is empty")
 
     def _get_included_file_conf(self,
