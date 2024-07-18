@@ -211,3 +211,16 @@ class Loader():
             )
         )
 
+    @staticmethod
+    def get_paths_order() -> list:
+        """Get Paths order to load config."""
+        return [
+            # Only linux
+            os.path.join(os.path.sep, "opt", "vemonitor", "conf"),
+            # Linux  and/or windows
+            Usys.get_current_file_parent_parent_path(
+                Loader.get_current_script_path()
+            ),
+            os.path.join(os.path.abspath(os.path.expanduser("~")), ".vemonitor"),
+            os.path.abspath(os.getcwd()),
+        ]
