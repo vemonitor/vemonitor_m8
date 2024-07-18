@@ -115,18 +115,17 @@ class Loader():
                         child_list: Optional[list] = None
                         ) -> Optional[Union[dict, list]]:
         """
-            Class Methods which loads the provided YAML file
-            from self.file_path and return it as a dict or list.
-            In the main configuaration file, child import can be done.
+        Loads the provided YAML file from self.file_path and return it as a dict or list.
 
-            :return: The loaded config YAML
-            :rtype: list dict or None
+        In the main configuration file, child import can be done.
+        Result is list or dict of configuration files content
+        and batteryBank.yaml content if exist on same path.
 
-            :Example:
-                config_yaml = Loader.get_yaml_config(['batteryBank.yaml'])
-                Result is list or dict of main configuartion file
-                content and batteryBank.yaml content if exist on same path.
-            .. warnings:: Class Method
+        :Example :
+            >>> config_yaml = self.get_yaml_config(child_list=['batteryBank.yaml'])
+            >>> {...} # Content of yaml files (result can be a list)
+        :param child_list: list or None: List of yaml file names to import, others are not.
+        :return: list dict or None: The loaded YAML data
         """
         return YmlConfLoader.get_config(self.file_path, child_list)
 
