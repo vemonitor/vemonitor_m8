@@ -20,13 +20,12 @@ Used to load configuration from yaml file.
 
 import logging
 import time
-
 from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.models.settings.config import Config
 from vemonitor_m8.confManager.schema_validate import SchemaValidate as sValid
 from vemonitor_m8.confManager.config_loader_helper import ConfigLoaderHelper as cHelp
-from vemonitor_m8.confManager.loader import Loader
+from vemonitor_m8.confManager.data_structure_loader import DataStructureLoader
 from vemonitor_m8.core.exceptions import NullSettingException, YAMLFileNotFound
 
 logging.basicConfig()
@@ -34,13 +33,13 @@ logger = logging.getLogger("vemonitor")
 
 
 
-class ConfigLoader(Loader):
+class ConfigLoader(DataStructureLoader):
     """Used to get the Config settings as an object."""
 
     FILE_NAMES = ("vm_conf.yaml", "dummy_g_conf.yaml", "vemonitor.yaml")
 
     def __init__(self, file_path=None):
-        Loader.__init__(self, self.FILE_NAMES, file_path)
+        DataStructureLoader.__init__(self, self.FILE_NAMES, file_path)
 
     def _get_settings_from_file(self,
                                 child_list: Optional[list] = None,

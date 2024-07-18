@@ -25,7 +25,7 @@ from vemonitor_m8.core.exceptions import \
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2020, Eli Serra"
 __deprecated__ = False
-__license__ = "GPLv3"
+__license__ = "Apache"
 __status__ = "Production"
 __version__ = "0.0.1"
 
@@ -36,10 +36,10 @@ logger = logging.getLogger("vemonitor")
 class YmlConfLoader:
     """Simple Class to Verify / Load a YAML file."""
 
-    @classmethod
-    def get_config(cls,
-                   yaml_file: Optional[str],
-                   child_list: Optional[list] = None):
+    @staticmethod
+    def get_config(yaml_file: Optional[str],
+                   child_list: Optional[list] = None
+                   ) -> Optional[Union[dict, list]]:
         """
         Load the configuration file.
 
@@ -50,16 +50,19 @@ class YmlConfLoader:
         :param cls:
             Used to Refer to the class itself,
             so that we can call its methods.
-        :param yaml_file:strorNone:
+        :param yaml_file:str or None:
             Used to Specify the path to the main configuration file.
-        :param child_list:listorNone=None:
+        :param child_list:list or None=None:
             Used to Import only the list of childs
             from a parent configuration file.
         :return: The content of the configuration file.
 
         :Example:
 
-            YAMLLoader.get_config(file_path)
+            YAMLLoader.get_config(
+                yaml_file=file_path,
+                child_list=['Import1', 'Import2']
+            )
 
         .. seealso::  Loader, ConfigLoader
         .. raises:: YAMLFileNotFound
@@ -67,23 +70,24 @@ class YmlConfLoader:
 
         :doc-author: Trelent
         """
-        cls.file_path_to_load = yaml_file
+        result = None
+        file_path_to_load = yaml_file
         logger.debug(
             "File path to load: %s",
-            cls.file_path_to_load
+            file_path_to_load
         )
-        if os.path.isfile(cls.file_path_to_load):
+        if os.path.isfile(file_path_to_load):
             # import the main configuration file content
-            inc_import = IncludeImport(cls.file_path_to_load)
-            # import all or selected childs configuration files on same path
+            inc_import = IncludeImport(file_path_to_load)
+            # import all or selected childs from configuration files on same path
             inc_import.import_from_included_files(
-                cls.file_path_to_load,
+                file_path_to_load,
                 child_list)
 
-            return inc_import.get_data()
+            result = inc_import.get_data()
         else:
-            raise YAMLFileNotFound(f"File {cls.file_path_to_load} not found")
-
+            raise YAMLFileNotFound(f"File {file_path_to_load} not found")
+        return result
 
 class IncludeImport:
     """
@@ -176,7 +180,7 @@ class IncludeImport:
                     "and/or have bad file extension ( != .yaml or .yml )."
                 )
 
-        if not Ut.is_dict(self.data) and not Ut.is_list(self.data, not_null=True):
+        if not Ut.is_dict(self.data, not_null=True) and not Ut.is_list(self.data, not_null=True):
             raise YAMLFileEmpty("[YAMLLoader] File {file_path} is empty")
 
     def _get_included_file_conf(self,
@@ -284,9 +288,9 @@ class IncludeImport:
 
         elif Ut.is_list(self.data, not_null=True):
             imports = list()
-            for el in self.data:
-                if "includes" in el:
-                    for inc in el["includes"]:
+            for element in self.data:
+                if "includes" in element:
+                    for inc in element["includes"]:
                         imports.append(inc)
 
             if not Ut.is_list(imports, not_null=True):
@@ -340,25 +344,25 @@ class IncludeImport:
 
             logger.info(
                 "List of files ready to import : %s", imports)
-            for f in imports:
+            for file_name in imports:
                 if not Ut.is_list(child_list, not_null=True) or \
-                        (Ut.is_list(child_list, not_null=True) and f in child_list):
+                        (Ut.is_list(child_list, not_null=True) and file_name in child_list):
 
-                    conf = self._get_included_file_conf(f, main_path)
+                    conf = self._get_included_file_conf(file_name, main_path)
                     if isinstance(conf, type(self.data)):
                         logger.info(
                             "importing %s conf data in global configuration.",
-                            f)
+                            file_name)
                         tst = True
                         self.update(conf)
                     else:
                         if conf is None:
                             raise YAMLFileNotFound(
-                                f"[YAMLLoader] Unable to load child file {f}. "
+                                f"[YAMLLoader] Unable to load child file {file_name}. "
                                 "File don't exist or contain bad content."
                             )
                         raise YAMLFileError(
-                            f"[YAMLLoader] the child file {f},"
+                            f"[YAMLLoader] the child file {file_name},"
                             "don't return same data type of father conf."
                             f"child type : {type(conf)}, base : {type(self.data)}"
                         )
@@ -385,15 +389,16 @@ class IncludeImport:
         :return: True id data was update or False
         """
         # we add each conf inside the extended conf data
+        res = False
         if isinstance(conf, type(self.data)) and len(conf) > 0:
             if Ut.is_dict(self.data):
                 self.data.update(conf)
-                return True
+                res = True
 
             elif Ut.is_list(self.data):
                 self.data = self.data + conf
-                return True
-        return False
+                res = True
+        return res
 
     @staticmethod
     def is_yaml_ext(file_name: str) -> bool:

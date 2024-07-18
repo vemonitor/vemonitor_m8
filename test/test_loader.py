@@ -63,12 +63,21 @@ class TestLoader:
             conf.get('Dummy_5') is None and\
             conf.get('Dummy_6') is None
 
-    def test_get_yaml_data_structure(self, helper_manager):
-        """Test get_app_blocks_by_app_or_name method """
-        file_names = ['dummy_conf_dict.yaml']
-        obj = Loader(file_names, file_path=helper_manager.test_path)
+    def test_get_real_file_path(self, helper_manager):
+        """Test get_paths_order method """
+        file_name = 'dummy_conf_dict.yaml'
 
-        assert Ut.is_dict(obj.get_yaml_data_structure())
+        # Test relative path
+        test_path = Opath.join('test', 'conf', file_name)
+        result = Loader.get_real_file_path(test_path)
+        assert Opath.isfile(result)
 
-        with pytest.raises(YAMLFileNotFound):
-            obj.get_yaml_data_structure("userColumnsChecks.yaml")
+        # Test absolute path
+        abs_path = Opath.join(helper_manager.test_path, file_name)
+        result = Loader.get_real_file_path(abs_path)
+        assert Opath.isfile(result)
+
+    def test_get_paths_order(self):
+        """Test get_paths_order method """
+        path_order = Loader.get_paths_order()
+        assert Ut.is_list(path_order, not_null=True)
