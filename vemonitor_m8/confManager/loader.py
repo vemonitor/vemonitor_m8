@@ -44,54 +44,6 @@ class Loader():
         self.file_path = None
         self.set_file_path(file_names, file_path)
 
-    def get_real_file_path(self, file_path: Optional[str]) -> Optional[str]:
-        """
-            Try to return a full path from a given <file_path>
-            If the path is an absolute on, we return it directly.
-
-            If the path is relative, we try to get the full path in this order:
-            - from the current directory where vemonitor has been called + the file_path.
-            Eg: /home/me/Documents/vemonitor_config
-            - from /etc/vemonitor + file_path
-            - from the default file passed as <file_name> at the root of the project
-
-            :param file_path file path to test
-            :type file_path: str
-            :return: absolute path to the file file_path or None if is doen't exist
-        """
-        if not os.path.isabs(file_path):
-            current_script_path = os.path.dirname(
-                os.path.abspath(
-                    inspect.getfile(inspect.currentframe())
-                )
-            )
-
-            path_order = {
-                1: os.path.join(os.getcwd(), file_path),
-                2: os.path.join("opt", "vemonitor", "conf", file_path),
-                3: os.path.join("etc", "vemonitor", "conf", file_path),
-                # In this case 'get_current_file_parent_parent_path' is corresponding
-                # to vemonitor root path
-                # from /an/unknown/path/vemonitor/vemonitor/confManager/loader
-                # to /an/unknown/path/vemonitor/vemonitor
-                4: os.path.join(
-                    Usys.get_current_file_parent_parent_path(
-                        current_script_path
-                    ),
-                    file_path
-                )
-            }
-
-            for key in sorted(path_order):
-                new_file_path = path_order[key]
-                if os.path.isfile(new_file_path):
-                    logger.debug("File found in %s", new_file_path)
-                    return new_file_path
-
-        else:
-            if os.path.isfile(file_path):
-                return file_path
-
     def set_file_path(self,
                       file_name: Optional[Union[str, list, tuple]],
                       path: Optional[str]=None
@@ -133,7 +85,7 @@ class Loader():
                     self.file_path = gpath
 
             if self.file_path is None:
-                self.file_path = self.get_real_file_path(file_name)
+                self.file_path = Loader.get_real_file_path(file_name)
 
         elif Ut.is_tuple(file_name) or Ut.is_list(file_name):
             tmp = None
@@ -145,7 +97,7 @@ class Loader():
                         break
 
                 if tmp is None:
-                    tmp = self.get_real_file_path(name)
+                    tmp = Loader.get_real_file_path(name)
 
                     if Ut.is_str(tmp) and os.path.isfile(tmp):
                         self.file_path = tmp
@@ -219,3 +171,37 @@ class Loader():
                 "Unable to load columns check configuration file path "
                 f"{file_path}"
                 )
+
+    @staticmethod
+    def get_real_file_path(file_path: Optional[str]) -> Optional[str]:
+        """
+            Try to return a full path from a given <file_path>
+            If the path is an absolute on, we return it directly.
+
+            If the path is relative, we try to get the full path in this order:
+            - from the current directory where vemonitor has been called + the file_path.
+            Eg: /home/me/Documents/vemonitor_config
+            - from /etc/vemonitor + file_path
+            - from the default file passed as <file_name> at the root of the project
+
+            :param file_path file path to test
+            :type file_path: str
+            :return: absolute path to the file file_path or None if is doen't exist
+        """
+        result = None
+        # ToDo: data must be sanitized
+        if not os.path.isabs(file_path):
+
+            paths_order = Loader.get_paths_order()
+
+            for current_path in paths_order:
+                sel_path = os.path.join(current_path, file_path)
+                if os.path.isfile(sel_path):
+                    logger.debug("File found in %s", current_path)
+                    result = sel_path
+                    break
+
+        else:
+            if os.path.isfile(file_path):
+                result = file_path
+        return result
