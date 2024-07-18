@@ -36,10 +36,10 @@ logger = logging.getLogger("vemonitor")
 class YmlConfLoader:
     """Simple Class to Verify / Load a YAML file."""
 
-    @classmethod
-    def get_config(cls,
-                   yaml_file: Optional[str],
-                   child_list: Optional[list] = None):
+    @staticmethod
+    def get_config(yaml_file: Optional[str],
+                   child_list: Optional[list] = None
+                   ) -> Optional[Union[dict, list]]:
         """
         Load the configuration file.
 
@@ -50,16 +50,19 @@ class YmlConfLoader:
         :param cls:
             Used to Refer to the class itself,
             so that we can call its methods.
-        :param yaml_file:strorNone:
+        :param yaml_file:str or None:
             Used to Specify the path to the main configuration file.
-        :param child_list:listorNone=None:
+        :param child_list:list or None=None:
             Used to Import only the list of childs
             from a parent configuration file.
         :return: The content of the configuration file.
 
         :Example:
 
-            YAMLLoader.get_config(file_path)
+            YAMLLoader.get_config(
+                yaml_file=file_path,
+                child_list=['Import1', 'Import2']
+            )
 
         .. seealso::  Loader, ConfigLoader
         .. raises:: YAMLFileNotFound
@@ -67,23 +70,24 @@ class YmlConfLoader:
 
         :doc-author: Trelent
         """
-        cls.file_path_to_load = yaml_file
+        result = None
+        file_path_to_load = yaml_file
         logger.debug(
             "File path to load: %s",
-            cls.file_path_to_load
+            file_path_to_load
         )
-        if os.path.isfile(cls.file_path_to_load):
+        if os.path.isfile(file_path_to_load):
             # import the main configuration file content
-            inc_import = IncludeImport(cls.file_path_to_load)
-            # import all or selected childs configuration files on same path
+            inc_import = IncludeImport(file_path_to_load)
+            # import all or selected childs from configuration files on same path
             inc_import.import_from_included_files(
-                cls.file_path_to_load,
+                file_path_to_load,
                 child_list)
 
-            return inc_import.get_data()
+            result = inc_import.get_data()
         else:
-            raise YAMLFileNotFound(f"File {cls.file_path_to_load} not found")
-
+            raise YAMLFileNotFound(f"File {file_path_to_load} not found")
+        return result
 
 class IncludeImport:
     """
