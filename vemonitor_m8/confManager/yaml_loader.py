@@ -288,9 +288,9 @@ class IncludeImport:
 
         elif Ut.is_list(self.data, not_null=True):
             imports = list()
-            for el in self.data:
-                if "includes" in el:
-                    for inc in el["includes"]:
+            for element in self.data:
+                if "includes" in element:
+                    for inc in element["includes"]:
                         imports.append(inc)
 
             if not Ut.is_list(imports, not_null=True):
@@ -344,25 +344,25 @@ class IncludeImport:
 
             logger.info(
                 "List of files ready to import : %s", imports)
-            for f in imports:
+            for file_name in imports:
                 if not Ut.is_list(child_list, not_null=True) or \
-                        (Ut.is_list(child_list, not_null=True) and f in child_list):
+                        (Ut.is_list(child_list, not_null=True) and file_name in child_list):
 
-                    conf = self._get_included_file_conf(f, main_path)
+                    conf = self._get_included_file_conf(file_name, main_path)
                     if isinstance(conf, type(self.data)):
                         logger.info(
                             "importing %s conf data in global configuration.",
-                            f)
+                            file_name)
                         tst = True
                         self.update(conf)
                     else:
                         if conf is None:
                             raise YAMLFileNotFound(
-                                f"[YAMLLoader] Unable to load child file {f}. "
+                                f"[YAMLLoader] Unable to load child file {file_name}. "
                                 "File don't exist or contain bad content."
                             )
                         raise YAMLFileError(
-                            f"[YAMLLoader] the child file {f},"
+                            f"[YAMLLoader] the child file {file_name},"
                             "don't return same data type of father conf."
                             f"child type : {type(conf)}, base : {type(self.data)}"
                         )
@@ -389,15 +389,16 @@ class IncludeImport:
         :return: True id data was update or False
         """
         # we add each conf inside the extended conf data
+        res = False
         if isinstance(conf, type(self.data)) and len(conf) > 0:
             if Ut.is_dict(self.data):
                 self.data.update(conf)
-                return True
+                res = True
 
             elif Ut.is_list(self.data):
                 self.data = self.data + conf
-                return True
-        return False
+                res = True
+        return res
 
     @staticmethod
     def is_yaml_ext(file_name: str) -> bool:
