@@ -1,8 +1,12 @@
 """Vemonitor main runner."""
+import logging
 from ve_utils.utype import UType as Ut
 
 from vemonitor_m8.apps.async_app_run import AppBlockRun
 from vemonitor_m8.confManager.config_loader import ConfigLoader
+
+logging.basicConfig()
+logger = logging.getLogger("vemonitor")
 
 
 class AppRun:
@@ -11,8 +15,8 @@ class AppRun:
         self.conf = None
         self.app = None
         self.params = {
-            "block": Ut.get_str(block),
-            "app": Ut.get_str(app),
+            "block": block,
+            "app": app,
         }
         if self.load_conf():
             self.run()
@@ -36,4 +40,7 @@ class AppRun:
     def run(self) -> bool:
         """Test if instance has params"""
         if self.conf.is_valid():
+            logger.info(
+                "Starting app blocks workers"
+            )
             self.app = AppBlockRun(self.conf)
