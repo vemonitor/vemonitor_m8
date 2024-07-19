@@ -18,13 +18,13 @@
             ]
         },
         {
-            "name": "Python : veMonitor redBattery",
+            "name": "Python : veMonitor batSerialMonitor",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/__main__.py",
             "args": [
                 "--debug",
-                "--app=redBattery"
+                "--app=batSerialMonitor"
             ],
             "jinja": true
         }
