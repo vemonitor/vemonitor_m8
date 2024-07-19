@@ -112,11 +112,10 @@ class ConfigLoaderHelper:
                         item_key in sources: # and\
                         # key == item_key:
                     res[item_key] = item
-            # if not Ut.is_dict(res, not_null=True):
-                else:
-                    raise SettingInvalidException(
-                        "Fatal Error: unable to get appConnectors from sources, "
-                        "validation fails or bad root key. ")
+            if not Ut.is_dict(res, not_null=True):        
+                raise SettingInvalidException(
+                    "Fatal Error: unable to get appConnectors from sources, "
+                    "validation fails or bad root key. ")
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get appConnectors from sources, "
