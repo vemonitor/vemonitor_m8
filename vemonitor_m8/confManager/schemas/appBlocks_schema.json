@@ -8,20 +8,20 @@
     "items" : {
         "type": "object",
         "minProperties": 2,
-        "maxProperties": 5,
+        "maxProperties": 6,
         "additionalProperties": false,
         "required": [ "name", "app" ],
         "properties" : {
             "name": {
                 "description": "Name of the block.",
                 "type": "string",
-                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             },
             "app": {
                 "description": "App Name of the block.",
                 "type": "string",
                 "enum": ["redisBatMonitor", "batSerialMonitor", "redVeSimFaker"],
-                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             },
             "args": {
                 "description": "Dict selector of extra objects.",
@@ -32,14 +32,18 @@
                     "batteryBanks": {
                         "description": "Battery Bank Data object selector. (see batteryData.schema.json)",
                         "type": "string",
-                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                        "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                     },
                     "solarPlants": {
                         "description": "Solar Plant Data object selector. (see solarData.schema.json)",
                         "type": "string",
-                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                        "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                     }
                 }
+            },
+            "redis_cache": {
+                "description": "Redis cache parameters.",
+                "$ref": "/schemas/redis_cache"
             },
             "inputs": {
                 "description": "Block inputs.",
@@ -48,16 +52,16 @@
                 "additionalProperties": false,
                 "properties" : {
                     "serial": {
-                        "description": "Array of serial AppConector input block",
-                        "$ref": "/schemas/serial"
+                        "description": "Array of serial AppConnector input block",
+                        "$ref": "/schemas/serial_input"
                     },
                     "redis": {
-                        "description": "Array of redis AppConector input block",
-                        "$ref": "/schemas/redis"
+                        "description": "Array of redis AppConnector input block",
+                        "$ref": "/schemas/redis_input"
                     },
                     "influxDb2": {
-                        "description": "Array of influxDb2 AppConector input block",
-                        "$ref": "/schemas/influxDb2"
+                        "description": "Array of influxDb2 AppConnector input block",
+                        "$ref": "/schemas/influxDb2_input"
                     }
                 }
             },
@@ -67,37 +71,77 @@
                 "maxProperties": 3,
                 "additionalProperties": false,
                 "properties" : {
+                    "emoncms": {
+                        "description": "Array of serial AppConnector output block",
+                        "$ref": "/schemas/emoncms_output"
+                    },
                     "serial": {
-                        "description": "Array of serial AppConector output block",
-                        "$ref": "/schemas/serial"
+                        "description": "Array of serial AppConnector output block",
+                        "$ref": "/schemas/serial_output"
                     },
                     "redis": {
-                        "description": "Array of redis AppConector output block",
-                        "$ref": "/schemas/redis"
+                        "description": "Array of redis AppConnector output block",
+                        "$ref": "/schemas/redis_output"
                     },
                     "influxDb2": {
-                        "description": "Array of influxDb2 AppConector output block",
-                        "$ref": "/schemas/influxDb2"
+                        "description": "Array of influxDb2 AppConnector output block",
+                        "$ref": "/schemas/influxDb2_output"
                     }
                 }
             }
         }
     },
     "$defs": {
-        "serial": {
-            "$id": "/schemas/serial",
+        "serial_input": {
+            "$id": "/schemas/serial_input",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Array of serial AppConector output block",
+            "description": "Array of serial AppConnector input block",
             "type" : "array",
             "minItems": 1,
-            "maxItems": 5,
+            "maxItems": 20,
             "items" : {
-                "description": "Serial AppConector output block",
+                "description": "Serial AppConnector input block",
                 "type": "object",
                 "minProperties": 3,
                 "maxProperties": 6,
                 "additionalProperties": false,
-                "required": [ "source", "material", "columns" ],
+                "required": [ "name", "source", "device", "time_interval", "columns" ],
+                "properties" : {
+                    "name": {
+                        "$ref": "/schemas/name"
+                    },
+                    "source": {
+                        "$ref": "/schemas/source"
+                    },
+                    "time_interval": {
+                        "$ref": "/schemas/time_interval"
+                    },
+                    "device": {
+                        "$ref": "/schemas/device"
+                    },
+                    "ref_cols": {
+                        "$ref": "/schemas/ref_cols"
+                    },
+                    "columns": {
+                        "$ref": "/schemas/input_columns"
+                    }
+                }
+            }
+        },
+        "serial_output": {
+            "$id": "/schemas/serial_output",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Array of serial AppConnector output block",
+            "type" : "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items" : {
+                "description": "Serial AppConnector output block",
+                "type": "object",
+                "minProperties": 3,
+                "maxProperties": 6,
+                "additionalProperties": false,
+                "required": [ "source", "device", "time_interval", "columns" ],
                 "properties" : {
                     "source": {
                         "$ref": "/schemas/source"
@@ -105,33 +149,72 @@
                     "time_interval": {
                         "$ref": "/schemas/time_interval"
                     },
-                    "material": {
-                        "$ref": "/schemas/material"
+                    "cache_interval": {
+                        "$ref": "/schemas/cache_interval"
+                    },
+                    "device": {
+                        "$ref": "/schemas/device"
                     },
                     "ref_cols": {
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/columns"
+                        "$ref": "/schemas/output_columns"
                     }
                 }
             }
         },
-        "redis": {
-            "$id": "/schemas/redis",
+        "emoncms_output": {
+            "$id": "/schemas/emoncms_output",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Array of redis AppConector output block",
+            "description": "Array of emoncms AppConnector output block",
             "type" : "array",
             "minItems": 1,
             "maxItems": 5,
             "items" : {
-                "description": "Redis AppConector output block",
+                "description": "Emoncms AppConnector output block",
                 "type": "object",
-                "minProperties": 3,
+                "minProperties": 4,
                 "maxProperties": 6,
                 "additionalProperties": false,
-                "required": [ "source", "redis_node", "columns" ],
+                "required": [ "name", "source", "time_interval", "columns" ],
                 "properties" : {
+                    "name": {
+                        "$ref": "/schemas/name"
+                    },
+                    "source": {
+                        "$ref": "/schemas/source"
+                    },
+                    "time_interval": {
+                        "$ref": "/schemas/time_interval"
+                    },
+                    "cache_interval": {
+                        "$ref": "/schemas/cache_interval"
+                    },
+                    "columns": {
+                        "$ref": "/schemas/output_columns"
+                    }
+                }
+            }
+        },
+        "redis_input": {
+            "$id": "/schemas/redis_input",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Array of redis AppConnector input block",
+            "type" : "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items" : {
+                "description": "Redis AppConnector input block",
+                "type": "object",
+                "minProperties": 3,
+                "maxProperties": 7,
+                "additionalProperties": false,
+                "required": [ "name", "source", "redis_node", "time_interval", "columns" ],
+                "properties" : {
+                    "name": {
+                        "$ref": "/schemas/name"
+                    },
                     "source": {
                         "$ref": "/schemas/source"
                     },
@@ -148,26 +231,68 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/columns"
+                        "$ref": "/schemas/input_columns"
                     }
                 }
             }
         },
-        "influxDb2": {
-            "$id": "/schemas/influxDb2",
+        "redis_output": {
+            "$id": "/schemas/redis_output",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Array of influxDb2 AppConector output block",
+            "description": "Array of redis AppConnector output block",
             "type" : "array",
             "minItems": 1,
             "maxItems": 5,
             "items" : {
-                "description": "influxDb2 AppConector output block",
+                "description": "Redis AppConnector output block",
+                "type": "object",
+                "minProperties": 3,
+                "maxProperties": 7,
+                "additionalProperties": false,
+                "required": [ "source", "redis_node", "time_interval", "columns" ],
+                "properties" : {
+                    "source": {
+                        "$ref": "/schemas/source"
+                    },
+                    "time_interval": {
+                        "$ref": "/schemas/time_interval"
+                    },
+                    "cache_interval": {
+                        "$ref": "/schemas/cache_interval"
+                    },
+                    "redis_node": {
+                        "$ref": "/schemas/redis_node"
+                    },
+                    "max_items": {
+                        "$ref": "/schemas/max_items"
+                    },
+                    "ref_cols": {
+                        "$ref": "/schemas/ref_cols"
+                    },
+                    "columns": {
+                        "$ref": "/schemas/output_columns"
+                    }
+                }
+            }
+        },
+        "influxDb2_input": {
+            "$id": "/schemas/influxDb2_input",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Array of influxDb2 AppConnector input block",
+            "type" : "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items" : {
+                "description": "influxDb2 AppConnector input block",
                 "type": "object",
                 "minProperties": 5,
                 "maxProperties": 7,
                 "additionalProperties": false,
-                "required": [ "source", "time_interval", "db", "mesurement", "columns" ],
+                "required": [ "name", "source", "time_interval", "db", "measurement", "columns" ],
                 "properties" : {
+                    "name": {
+                        "$ref": "/schemas/name"
+                    },
                     "source": {
                         "$ref": "/schemas/source"
                     },
@@ -177,8 +302,8 @@
                     "db": {
                         "$ref": "/schemas/db"
                     },
-                    "mesurement": {
-                        "$ref": "/schemas/mesurement"
+                    "measurement": {
+                        "$ref": "/schemas/measurement"
                     },
                     "tags": {
                         "$ref": "/schemas/tags"
@@ -187,7 +312,49 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/columns"
+                        "$ref": "/schemas/input_columns"
+                    }
+                }
+            }
+        },
+        "influxDb2_output": {
+            "$id": "/schemas/influxDb2_output",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Array of influxDb2 AppConnector output block",
+            "type" : "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items" : {
+                "description": "influxDb2 AppConnector output block",
+                "type": "object",
+                "minProperties": 5,
+                "maxProperties": 8,
+                "additionalProperties": false,
+                "required": [ "source", "time_interval", "db", "measurement", "columns" ],
+                "properties" : {
+                    "source": {
+                        "$ref": "/schemas/source"
+                    },
+                    "time_interval": {
+                        "$ref": "/schemas/time_interval"
+                    },
+                    "cache_interval": {
+                        "$ref": "/schemas/cache_interval"
+                    },
+                    "db": {
+                        "$ref": "/schemas/db"
+                    },
+                    "measurement": {
+                        "$ref": "/schemas/measurement"
+                    },
+                    "tags": {
+                        "$ref": "/schemas/tags"
+                    },
+                    "ref_cols": {
+                        "$ref": "/schemas/ref_cols"
+                    },
+                    "columns": {
+                        "$ref": "/schemas/output_columns"
                     }
                 }
             }
@@ -195,63 +362,102 @@
         "source": {
             "$id": "/schemas/source",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "AppConector source key",
+            "description": "AppConnector source key",
             "type": "string",
-            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "name": {
+            "$id": "/schemas/name",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "AppBlock input name key",
+            "type": "string",
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
         "time_interval": {
             "$id": "/schemas/time_interval",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Time interval to send or get data on appConector",
+            "description": "Time interval to send or get data on appConnector",
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 345600
+        },
+        "cache_interval": {
+            "$id": "/schemas/cache_interval",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Cache interval to send data on appConnector",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3600
+        },
+        "max_data_points": {
+            "$id": "/schemas/max_data_points",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Max data points parameter",
             "type": "integer",
             "minimum": 1,
             "maximum": 345600
         },
-        "material": {
-            "$id": "/schemas/material",
+        "device": {
+            "$id": "/schemas/device",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Material key to obtain list of keys available for this item",
             "type": "string",
-            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "redis_cache": {
+            "$id": "/schemas/redis_cache",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Redis cache parameters",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 2,
+            "properties" : {
+                "source": {
+                    "$ref": "/schemas/source"
+                },
+                "max_data_points": {
+                    "$ref": "/schemas/max_data_points"
+                }
+            }
         },
         "redis_node": {
             "$id": "/schemas/redis_node",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Redis hmap key, or list key, or value key, to set or get on redis appConector",
+            "description": "Redis hmap key, or list key, or value key, to set or get on redis appConnector",
             "type": "string",
-            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
         "max_items": {
             "$id": "/schemas/max_items",
-            "description": "Used to limit number of items, getted or setted on appConector",
+            "description": "Used to limit number of items, got or set on appConnector",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "type": "integer"
         },
         "db": {
             "$id": "/schemas/db",
-            "description": "Db name of influxDb2 appConector, to set or get data on.",
+            "description": "Db name of influxDb2 appConnector, to set or get data on.",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "type": "string",
-            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
-        "mesurement": {
-            "$id": "/schemas/mesurement",
-            "description": "Mesurement name of influxDb2 appConector, to set or get data on.",
+        "measurement": {
+            "$id": "/schemas/measurement",
+            "description": "Measurement name of influxDb2 appConnector, to set or get data on.",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "type": "string",
-            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
         "tags": {
             "$id": "/schemas/tags",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Tags array, to set or get data from influxDb2 appConector.",
+            "description": "Tags array, to set or get data from influxDb2 appConnector.",
             "type": "array",
             "minItems": 1,
             "maxItems": 20,
             "items" : {
-                "description": "InfluxDb2 appConector Tag value.",
+                "description": "InfluxDb2 appConnector Tag value.",
                 "type": "string",
-                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             }
         },
         "ref_cols": {
@@ -270,7 +476,7 @@
                     {
                         "description": "Key from app object who is equal to columns key.",
                         "type": "string",
-                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                        "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                     },
                     {
                         "description": "Key from columns who is equal to app object key.",
@@ -280,8 +486,15 @@
                 ]
             }
         },
-        "columns": {
-            "$id": "/schemas/columns",
+        "column_key": {
+            "$id": "/schemas/column_key",
+            "description": "Input/output column key.",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "type": "string",
+            "pattern": "(?=[a-zA-Z0-9_#]{1,30}$)^([a-zA-Z0-9#]+(?:_[a-zA-Z0-9#]+)*)$"
+        },
+        "input_columns": {
+            "$id": "/schemas/input_columns",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Array of input/output column keys.",
             "type": "array",
@@ -289,9 +502,28 @@
             "maxItems": 1000,
             "uniqueItems": true,
             "items" : {
-                "description": "Input/output column key.",
-                "type": "string",
-                "pattern": "(?=[a-zA-Z0-9_#]{1,30}$)^([a-zA-Z0-9#]+(?:_[a-zA-Z0-9#]+)*)$"
+                "$ref": "/schemas/column_key"
+            }            
+        },
+        "output_columns": {
+            "$id": "/schemas/output_columns",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Output columns identified by input name.", 
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 20,
+            "propertyNames": {
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            },
+            "additionalProperties": {
+                "description": "Array of input column keys.",
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 50,
+                "uniqueItems": true,
+                "items" : {
+                    "$ref": "/schemas/column_key"
+                }
             }
         }
     }

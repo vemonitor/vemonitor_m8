@@ -5,7 +5,7 @@
     "description": "AppConnectors properties.",
     "type" : "object",
     "minProperties": 1,
-    "maxProperties": 3,
+    "maxProperties": 4,
     "additionalProperties": false,
     "properties" : {
         "serial": {
@@ -14,44 +14,39 @@
             "minProperties": 1,
             "maxProperties": 20,
             "propertyNames": {
-                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             },
             "additionalProperties" : {
-                "description": "Serial AppConnector itmem properties.",
+                "description": "Serial AppConnector item properties.",
                 "type": "object",
                 "minProperties": 1,
                 "maxProperties": 5,
                 "additionalProperties": false,
                 "properties" : {
                     "active": {
-                        "description": "Is AppConnector itmem active.",
+                        "description": "Is AppConnector item active.",
                         "type": "boolean"
                     },
                     "onError": {
-                        "description": "Serial AppConnector itmem onError action.",
+                        "description": "Serial AppConnector item onError action.",
                         "type": "string",
-                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
-                    },
-                    "serialpath": {
-                        "description": "Serial AppConnector itmem path.",
-                        "type": "string",
-                        "pattern": "^([a-zA-Z0-9_\\-/.]{1,30})$"
+                        "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                     },
                     "serialPort": {
-                        "description": "Serial AppConnector itmem port.",
+                        "description": "Serial AppConnector item port.",
                         "type": "string",
                         "pattern": "^([a-zA-Z0-9_\\-/.]{1,30})$"
                     },
                     "serialTest": {
-                        "description": "Serial AppConnector itmem test items.",
+                        "description": "Serial AppConnector item test items.",
                         "type": "object",
                         "minProperties": 1,
                         "maxProperties": 10,
                         "propertyNames": {
-                            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                         },
                         "additionalProperties" : {
-                            "description": "Serial AppConnector itmem test block.",
+                            "description": "Serial AppConnector item test block.",
                             "type": "object",
                             "minProperties": 3,
                             "maxProperties": 3,
@@ -59,17 +54,17 @@
                             "required": [ "typeTest", "key", "value"],
                             "properties" : {
                                 "typeTest": {
-                                    "description": "Serial AppConnector itmem test block typeTest.",
+                                    "description": "Serial AppConnector item test block typeTest.",
                                     "type": "string",
-                                    "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                                    "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                                 },
                                 "key": {
-                                    "description": "Serial AppConnector itmem test block key.",
+                                    "description": "Serial AppConnector item test block key.",
                                     "type": "string",
                                     "pattern": "(?=[a-zA-Z0-9_#]{1,30}$)^([a-zA-Z0-9#]+(?:_[a-zA-Z0-9#]+)*)$"
                                 },
                                 "value": {
-                                    "description": "Serial AppConnector itmem test block value.",
+                                    "description": "Serial AppConnector item test block value.",
                                     "type": "string",
                                     "pattern": "^(\\S+)$"
                                 }
@@ -87,10 +82,10 @@
             "minProperties": 1,
             "maxProperties": 20,
             "propertyNames": {
-                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             },
             "additionalProperties" : {
-                "description": "Redis AppConnector itmem properties.",
+                "description": "Redis AppConnector item properties.",
                 "type": "object",
                 "minProperties": 2,
                 "maxProperties": 4,
@@ -98,20 +93,53 @@
                 "required": [ "host", "port" ],
                 "properties" : {
                     "active": {
-                        "description": "Redis AppConnector itmem active.",
+                        "description": "Redis AppConnector item active.",
                         "type": "boolean"
                     },
                     "host": {
-                        "description": "Redis AppConnector itmem host.",
+                        "description": "Redis AppConnector item host.",
                         "type": "string",
-                        "pattern": "^((?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4][0-9])|(?:25[0-5])))$"
+                        "pattern": "^((?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5])\\.(?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5])\\.(?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5])\\.(?:[0-1]?\\d?\\d|[0-2][0-4][0-9]|25[0-5]))$"
                     },
                     "port": {
-                        "description": "Redis AppConnector itmem port.",
+                        "description": "Redis AppConnector item port.",
                         "type": "integer"
                     },
-                    "auth": {
-                        "description": "Redis AppConnector itmem auth.",
+                    "password": {
+                        "description": "Redis AppConnector item password.",
+                        "type": "string",
+                        "pattern": "^(\\S+)$"
+                    }
+                }
+            }
+        },
+        "emoncms": {
+            "description": "Emoncms AppConnectors properties.",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 20,
+            "propertyNames": {
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+            },
+            "additionalProperties" : {
+                "description": "Emoncms AppConnector item properties.",
+                "type": "object",
+                "minProperties": 2,
+                "maxProperties": 3,
+                "additionalProperties": false,
+                "required": [ "addr", "apikey" ],
+                "properties" : {
+                    "active": {
+                        "description": "Redis AppConnector item active.",
+                        "type": "boolean"
+                    },
+                    "addr": {
+                        "description": "Emoncms AppConnector item url.",
+                        "type": "string",
+                        "pattern": "^https?://((?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5]){1}(?:\\.(?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5])){3}|(([a-zA-Z]+[a-zA-Z0-9\\-]*\\.)?[^.:]+\\.[a-zA-Z]+[a-zA-Z0-9\\-]*))(:(?:6553[0-5]|655[0-2]\\d|654\\d{2}|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{2,3}|[1-9]\\d|\\d))?(?:\/[^&:?]+)?$"
+                    },
+                    "apikey": {
+                        "description": "Emoncms AppConnector item password.",
                         "type": "string",
                         "pattern": "^(\\S+)$"
                     }
@@ -124,10 +152,10 @@
             "minProperties": 1,
             "maxProperties": 20,
             "propertyNames": {
-                "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             },
             "additionalProperties" : {
-                "description": "influxDb2 AppConnector itmem properties.",
+                "description": "influxDb2 AppConnector item properties.",
                 "type": "object",
                 "minProperties": 3,
                 "maxProperties": 6,
@@ -135,30 +163,30 @@
                 "required": [ "host", "org", "auth" ],
                 "properties" : {
                     "active": {
-                        "description": "influxDb2 AppConnector itmem active.",
+                        "description": "influxDb2 AppConnector item active.",
                         "type": "boolean"
                     },
                     "host": {
-                        "description": "influxDb2 AppConnector itmem host.",
+                        "description": "influxDb2 AppConnector item host.",
                         "type": "string",
-                        "pattern": "^(?:https?:\/\/)((?P<ipaddr>(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5])){1}(?:\\.(?:(?:[0-1]?\\d?\\d)|(?:[0-2][0-4]\\d)|(?:25[0-5]))){3})|(([a-zA-Z]+[a-zA-Z0-9\\-]*\\.)?[^\\.:]+\\.[a-zA-Z]+[a-zA-Z0-9\\-]*))(:(?:(?:6553[0-5])|(?:655[0-2]\\d)|(?:654\\d{2})|(?:6[0-4]\\d{3})|(?:[1-5]\\d{4})|(?:[1-9]\\d{2,3})|(?:[1-9]\\d)|(?:\\d)))?(?:\/[^&:?]+)?$"
+                        "pattern": "^https?://((?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5]){1}(?:\\.(?:[0-1]?\\d?\\d|[0-2][0-4]\\d|25[0-5])){3}|(([a-zA-Z]+[a-zA-Z0-9\\-]*\\.)?[^.:]+\\.[a-zA-Z]+[a-zA-Z0-9\\-]*))(:(?:6553[0-5]|655[0-2]\\d|654\\d{2}|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{2,3}|[1-9]\\d|\\d))?(?:\/[^&:?]+)?$"
                     },
                     "org": {
-                        "description": "influxDb2 AppConnector itmem org.",
+                        "description": "influxDb2 AppConnector item org.",
                         "type": "string",
-                        "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                        "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
                     },
                     "auth": {
-                        "description": "influxDb2 AppConnector itmem auth.",
+                        "description": "influxDb2 AppConnector item auth.",
                         "type": "string",
                         "pattern": "^(\\S+)$"
                     },
                     "timeout": {
-                        "description": "influxDb2 AppConnector itmem timeout.",
+                        "description": "influxDb2 AppConnector item timeout.",
                         "type": "integer"
                     },
                     "verify_ssl": {
-                        "description": "influxDb2 AppConnector itmem verify_ssl.",
+                        "description": "influxDb2 AppConnector item verify_ssl.",
                         "type": "boolean"
                     }
                 }
