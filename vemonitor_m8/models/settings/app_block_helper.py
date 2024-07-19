@@ -123,6 +123,20 @@ class AppBlockHelper:
             if selector in ['all', 'outputs']:
                 sources = AppBlockHelper.get_app_block_sources_from_inout(
                     block.get('outputs'), sources)
+            
+            if Ut.is_dict(block.get("redis_cache"), not_null=True)\
+                    and Ut.is_str(
+                        block['redis_cache'].get("source"), not_null=True
+                    ):
+                redis_source = block['redis_cache'].get("source")
+                if Ut.is_dict(sources):
+                    if not Ut.is_list(sources.get('redis')):
+                        sources.update({'redis': [redis_source]})
+                    elif Ut.is_list(sources.get('redis'), not_null=True)\
+                            and redis_source not in sources.get('redis'):
+                        sources['redis'].append(redis_source)
+                else:
+                    sources = {'redis': [redis_source]}
         return sources
 
     @staticmethod
