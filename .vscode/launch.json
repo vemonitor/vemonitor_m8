@@ -4,11 +4,29 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        
+        
         {
             "name": "Python Debugger: Module",
             "type": "debugpy",
             "request": "launch",
-            "module": "vemonitor_m8"
+            "module": "vemonitor_m8",
+            "args": [
+                "app=batSerialMonitor",
+                "block=bmvFakeSerial",
+                "debug=True"
+            ]
+        },
+        {
+            "name": "Python : veMonitor redBattery",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/__main__.py",
+            "args": [
+                "--debug",
+                "--app=redBattery"
+            ],
+            "jinja": true
         }
     ]
 }
