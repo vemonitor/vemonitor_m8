@@ -4,8 +4,7 @@ import logging
 from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.models.settings.item_dict import DictOfObject
-from vemonitor_m8.models.settings.workers import InputWorker
-from vemonitor_m8.models.settings.workers import OutputWorker
+from vemonitor_m8.models.settings.workers import InputWorker, OutputWorker
 from vemonitor_m8.models.settings.workers import Workers
 from vemonitor_m8.models.settings.workers import WorkersHelper
 from vemonitor_m8.workers.vedirect_worker import VedirectWorker
@@ -91,6 +90,7 @@ class WorkersManager(Workers):
                           item: dict
                           ) -> Optional[InputWorker]:
         """Initialise input worker."""
+        result = None
         worker_name = WorkersHelper.get_worker_name(worker_key, item)
         if not self.has_input_worker_key(worker_name):
             logger.info("[WorkersManager]---> new input worker %s",
@@ -120,14 +120,20 @@ class WorkersManager(Workers):
             elif worker_key == "tuya":
                 pass
 
-            if WorkersHelper.is_input_worker(worker):
-                self.add_input_worker(
-                    key=worker_name,
-                    worker=worker
+            if not WorkersHelper.is_input_worker(worker):
+                raise WorkerException(
+                    """Fatal Error: "
+                    f"Unable to Initialyse Input Worker {worker_name}"""
                 )
-                return worker
+
+            self.add_input_worker(
+                key=worker_name,
+                worker=worker
+            )
+            result = worker
         else:
-            return self.get_input_worker(worker_name)
+            result = self.get_input_worker(worker_name)
+        return result
 
     def init_output_worker(self,
                            connector: dict,
@@ -136,6 +142,7 @@ class WorkersManager(Workers):
                            item: dict
                            ) -> Optional[OutputWorker]:
         """Initialise output worker."""
+        result = None
         worker_name = WorkersHelper.get_worker_name(worker_key, item)
         if not self.has_output_worker_key(worker_name):
             logger.info("[WorkersManager]---> new output worker %s",
@@ -165,15 +172,21 @@ class WorkersManager(Workers):
             elif worker_key == "tuya":
                 pass
 
-            if WorkersHelper.is_output_worker(worker):
-                self.add_output_worker(
-                    key=worker_name,
-                    worker=worker
+            if not WorkersHelper.is_output_worker(worker):
+                raise WorkerException(
+                    """Fatal Error: "
+                    f"Unable to Initialyse Output Worker {worker_name}"""
                 )
-                return worker
+            self.add_output_worker(
+                key=worker_name,
+                worker=worker
+            )
+            result = worker
 
         else:
-            return self.get_output_worker(worker_name)
+            result = self.get_output_worker(worker_name)
+            self.add_output_worker_status(
+        return result
 
     @staticmethod
     def init_vedirect_worker(connector: dict,

@@ -67,7 +67,7 @@ class EmoncmsApi:
         """
         result = None
         if self.is_ready() and Ut.is_str(address, not_null=True):
-            req = "%s%s" % (self.addr, address)
+            req = f"{self.addr}{address}"
             if Ut.is_dict(params, not_null=True):
                 params['apikey'] = self.apikey
             else:
@@ -76,9 +76,9 @@ class EmoncmsApi:
             try:
                 response = None
                 if req_type == 'get':
-                    response = requests.get(req, params=params)
+                    response = requests.get(req, params=params, timeout=2)
                 elif req_type == 'post':
-                    response = requests.post(req, params=params, data=data)
+                    response = requests.post(req, params=params, data=data, timeout=2)
                 else:
                     logger.debug(
                         "[EmoncmsApi] Invalid request type %s, must be get or post.",
@@ -105,7 +105,7 @@ class EmoncmsApi:
     def post_inputs(self,
                     node: str,
                     data: dict,
-                    timestamp: float or None = None
+                    timestamp: Optional[float] = None
                     ) -> Optional[dict]:
         """
         Post inputs using fulljson request on emoncms.
@@ -149,9 +149,9 @@ class EmoncmsApi:
 
     def input_bulk(self,
                    data: list,
-                   timestamp: int or None = None,
-                   sentat: int or None = None,
-                   offset: int or None = None,
+                   timestamp: Optional[int] = None,
+                   sentat: Optional[int] = None,
+                   offset: Optional[int] = None,
                    ) -> Optional[dict]:
         """Post inputs using bulk request on emoncms"""
         result, params = False, None
@@ -331,7 +331,7 @@ class EmoncmsApi:
         return result
 
     def get_feeds_list(self,
-                       user_id: int or None = None
+                       user_id: Optional[int] = None
                        ):
         """
         Get feed list data from emoncms Api.
@@ -429,7 +429,7 @@ class EmoncmsApi:
 
     def get_sorted_feeds_list(self,
                               sort_data: dict,
-                              user_id: int or None = None,
+                              user_id: Optional[int] = None,
                               ) -> Optional[list]:
         """
         Get sorted feed list data from emoncms Api.

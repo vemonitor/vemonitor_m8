@@ -24,7 +24,7 @@ keys:
         ]
 
 points:
-    V: 
+    V:
         name: "Main (battery) voltage"
         input_type: 'int'
         output_type: 'float'

@@ -81,7 +81,7 @@ class VedirectWorker(InputWorker):
             if Ut.is_dict(conf.get('connector'), not_null=True):
                 connector = conf.get('connector')
                 result = {
-                    "serial_conf": dict(),
+                    "serial_conf": {},
                     "serial_test": connector.get('serialTest'),
                     "source_name": "VedirectWorker",
                     "auto_start": False,

@@ -70,7 +70,7 @@ class RedisCache(RedisConnector, InputsCache):
         InputsCache.__init__(self,
                              max_rows=max_rows)
         self.cache_name = "inputs_cache"
-        self._nodes = list()
+        self._nodes = []
         if reset_at_start is True:
             self.reset_data_cache()
 
