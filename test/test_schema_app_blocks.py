@@ -55,7 +55,7 @@ class TestAppBlocksSchema:
                 ('redis_node', schema_manager.obj[0]['outputs']['redis'][0]),
                 ('source', schema_manager.obj[0]['outputs']['influxDb2'][0]),
                 ('db', schema_manager.obj[0]['outputs']['influxDb2'][0]),
-                ('mesurement', schema_manager.obj[0]['outputs']['influxDb2'][0]),
+                ('measurement', schema_manager.obj[0]['outputs']['influxDb2'][0]),
 
                 ('name', schema_manager.obj[1]),
                 ('app', schema_manager.obj[1], 'bad'),
@@ -64,7 +64,7 @@ class TestAppBlocksSchema:
                 ('redis_node', schema_manager.obj[1]['inputs']['redis'][0]),
                 ('source', schema_manager.obj[1]['outputs']['influxDb2'][0]),
                 ('db', schema_manager.obj[1]['outputs']['influxDb2'][0]),
-                ('mesurement', schema_manager.obj[1]['outputs']['influxDb2'][0]),
+                ('measurement', schema_manager.obj[1]['outputs']['influxDb2'][0]),
             ]
         schema_manager.run_test_values(datas = datas, key = "string_key")
 

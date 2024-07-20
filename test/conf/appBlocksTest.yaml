@@ -18,9 +18,10 @@
       # dict : {AppConector key: list of conector inputs}
       inputs:
           serial:
-              - source: "bmv700" # test ok
+              - name: "bmv700"
+                source: "bmv700" # test ok
                 time_interval: 1
-                material: "BMV" # test ok
+                device: "BMV" # test ok
                 ref_cols: [ # test ok
                             ['bat_voltage', 'V'], 
                             ['bat_current', 'I'],
@@ -28,10 +29,16 @@
                             ['bat_temperature', 't_bat'],
                             ['loc_temperature', 't_int']
                 ]
-                columns: [ # test ok
-                          'V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay', 
-                          'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12'
-                          ]
+                columns: 
+                    bmv700: [
+                        'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                        'AR', 'Relay','H2', 'H17', 'H18'
+                    ]
+                    smart_solar: [
+                        'V', 'I', 'VPV', 'PPV', 'H19', 'H20',
+                        'H21', 'H22','H23', 'Relay', 'ERR', 'CS', 'HSDS'
+                    ]
+                    rel_monitor: [ 'r_pmp', 'r_wat', 'r_sec', 'r_ge' ]
       outputs:
           redis:
               - source: "local" # test ok
@@ -44,7 +51,8 @@
                             ['bat_temperature', 't_bat'],
                             ['loc_temperature', 't_int']
                 ]
-                columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+                columns:
+                    bmv700: [ 'V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay' ]
               - source: "local"
                 redis_node: "sim_BMV"
                 time_interval: 5
@@ -55,11 +63,12 @@
                             ['bat_temperature', 't_bat'],
                             ['loc_temperature', 't_int']
                 ]
-                columns: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12']
+                columns:
+                    bmv700: [ 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12' ]
           influxDb2:
               - source: "local"
                 db: 'telegraf_z'
-                mesurement: 'solar'
+                measurement: 'solar'
                 tags: ['BMV700']
                 time_interval: 1
                 ref_cols: [
@@ -69,7 +78,8 @@
                             ['bat_temperature', 't_bat'],
                             ['loc_temperature', 't_int']
                 ]
-                columns: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
+                columns:
+                    bmv700: [ 'V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay' ]
 
     - name: "monitFakeProject1"
       app: "redisBatMonitor"
@@ -77,7 +87,8 @@
           batteryBanks: "project1"
       inputs:
           redis:
-              - source: "local"
+              - name: "sim_BMV_1"
+                source: "local"
                 redis_node: "sim_BMV"
                 time_interval: 1
                 max_items: 300
@@ -102,11 +113,13 @@
                       ['capacity_by_temp', 'vm_cap_t'],
                       ['real_capacity', 'vm_real_cap']
                 ]
-                columns: ['stat_bat', 'stat_chrg', 'stat_dschrg', 'vm_cap', 'vm_cap_t', 'vm_real_cap']
+                columns:
+                    bmv700: [ 'stat_bat', 'stat_chrg', 'stat_dschrg', 'vm_cap', 'vm_cap_t', 'vm_real_cap' ]
           influxDb2:
               - source: "local"
                 time_interval: 1
                 db: 'telegraf_z'
-                mesurement: 'solar'
+                measurement: 'solar'
                 tags: ['BMV700']
-                columns: ['V', 'I', 'P', 't_bat', 't_int']
+                columns:
+                    bmv700: [ 'V', 'I', 'P', 't_bat', 't_int' ]
