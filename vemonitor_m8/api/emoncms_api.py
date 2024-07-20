@@ -43,6 +43,21 @@ class EmoncmsApi:
             and Ut.is_str(self.apikey, not_null=True) \
             and Ut.is_str(self.name, not_null=True)
 
+    def ping(self) -> bool:
+        """Test if Emoncms web app is reachable."""
+        result = False
+        if self.is_ready():
+            try:
+                response = requests.get(self.addr, timeout=2)
+                if response is not None and response.status_code in [200, 201]:
+                    result = True
+            except (
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout
+                ):
+                result = False
+        return result
+
     def _execute_request(self,
                          address: str,
                          req_type: str = 'get',

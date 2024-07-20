@@ -30,7 +30,14 @@ class EmoncmsApp:
 
     def is_ready(self):
         """Test if is ready."""
-        return self.api.is_ready()
+        return isinstance(self.api, EmoncmsApi) and self.api.is_ready()
+
+    def ping(self):
+        """Ping Emoncms Server."""
+        result = False
+        if self.is_ready():
+            result = self.api.ping()
+        return result
 
     @staticmethod
     def get_data_time(point: dict):
