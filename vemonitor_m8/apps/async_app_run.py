@@ -16,7 +16,8 @@ from vemonitor_m8.core.data_checker import DataChecker
 from vemonitor_m8.models.settings.config import Config
 from vemonitor_m8.models.settings.workers import WorkersHelper
 from vemonitor_m8.workers.workers_manager import WorkersManager
-from vemonitor_m8.core.exceptions import SettingInvalidException
+from vemonitor_m8.core.exceptions import RedisConnectionException
+from vemonitor_m8.core.exceptions import SettingInvalidException, WorkerException
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -233,6 +234,13 @@ class AppBlockRun:
                     result = False
             else:
                 result = False
+        if not self.workers.get_workers_status():
+            raise WorkerException(
+                "Fatal Error: Some Input workers fails. "
+                "Unable to open a connexion with some input connectors. "
+                f"Workers Status : {self.workers.get_input_workers_status()}"
+            )
+
         self.inputs_data.set_interval_min(min_interval)
         self._threads.start_timers()
         return result
@@ -299,9 +307,18 @@ class AppBlockRun:
         """Run Block inputs and outputs."""
         if AppBlockRun.is_conf(self.conf):
             # self.events.subscribe_worker_data_ready(self.run_output_item)
-
+            # inputs workers blocks run on background (Threads), executed by a timer
             self.add_input_items_timer()
+            # inputs workers blocks run
             self.setup_outputs_workers()
+            if not self.workers.get_workers_status():
+                self._threads.cancel_all_timers()
+                time.sleep(2)
+                raise WorkerException(
+                    "Fatal Error: Some output workers fails. "
+                    "Unable to open a connexion with some output connectors. "
+                    f"Workers Status : {self.workers.get_output_workers_status()}"
+                )
             time.sleep(1)
             while self._run:
                 self.run_output_workers()

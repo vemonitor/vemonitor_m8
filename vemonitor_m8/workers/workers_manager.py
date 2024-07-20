@@ -9,6 +9,7 @@ from vemonitor_m8.models.settings.workers import Workers
 from vemonitor_m8.models.settings.workers import WorkersHelper
 from vemonitor_m8.workers.vedirect_worker import VedirectWorker
 from vemonitor_m8.workers.emoncms_worker import EmoncmsWorker
+from vemonitor_m8.core.exceptions import WorkerException
 
 
 __author__ = "Eli Serra"
@@ -67,6 +68,9 @@ class WorkersManager(Workers):
     def __init__(self):
         Workers.__init__(self)
         self.active_connectors = ActiveConnectors()
+        self._inputs_status = {}
+        self._output_status = {}
+        self._workers_status = True
 
     def get_active_connector(self, connector_key: tuple):
         """Get active connector from workers."""
@@ -82,6 +86,37 @@ class WorkersManager(Workers):
                     worker = self.get_output_worker(worker_name)
                     result = worker.worker
         return result
+
+    def get_workers_status(self)-> bool:
+        """Add Worker status error"""
+        return self._workers_status is True
+
+    def set_workers_status(self, status: bool):
+        """Add Worker status error"""
+        if self._workers_status is True and status is False:
+            self._workers_status = False
+
+    def get_input_workers_status(self)-> dict:
+        """Add Worker status error"""
+        return self._inputs_status
+
+    def add_input_worker_status(self,
+                                      worker_name: str,
+                                      worker_status: bool):
+        """Add Input Worker status error"""
+        self._inputs_status[worker_name] = worker_status
+        self.set_workers_status(worker_status)
+
+    def get_output_workers_status(self)-> dict:
+        """Add Worker status error"""
+        return self._output_status
+
+    def add_output_worker_status(self,
+                                       worker_name: str,
+                                       worker_status: bool):
+        """Add Output Worker status error"""
+        self._output_status[worker_name] = worker_status
+        self.set_workers_status(worker_status)
 
     def init_input_worker(self,
                           connector: dict,
@@ -131,8 +166,17 @@ class WorkersManager(Workers):
                 worker=worker
             )
             result = worker
+            self.add_input_worker_status(
+                worker_name=worker_name,
+                worker_status=worker.get_worker_status()
+            )
+
         else:
             result = self.get_input_worker(worker_name)
+            self.add_input_worker_status(
+                worker_name=worker_name,
+                worker_status=result.get_worker_status()
+            )
         return result
 
     def init_output_worker(self,
@@ -182,10 +226,17 @@ class WorkersManager(Workers):
                 worker=worker
             )
             result = worker
+            self.add_output_worker_status(
+                worker_name=worker_name,
+                worker_status=result.get_worker_status()
+            )
 
         else:
             result = self.get_output_worker(worker_name)
             self.add_output_worker_status(
+                worker_name=worker_name,
+                worker_status=result.get_worker_status()
+            )
         return result
 
     @staticmethod
