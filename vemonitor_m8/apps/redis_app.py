@@ -16,3 +16,7 @@ class RedisApp:
     def is_ready(self) -> bool:
         """Test if cli is redis client instance and if redis ping return True"""
         return self.api.is_ready()
+
+    def ping(self) -> bool:
+        """Test if cli is redis client instance and if redis ping return True"""
+        return self.api.is_ready() and self.api.is_connected()
