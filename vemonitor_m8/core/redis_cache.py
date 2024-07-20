@@ -74,6 +74,10 @@ class RedisCache(RedisConnector, InputsCache):
         if reset_at_start is True:
             self.reset_data_cache()
 
+    def is_ready(self):
+        """Init inputs data cache"""
+        return self.app.ping() and self.app.is_ready()
+
     def has_data(self):
         """Init inputs data cache"""
         return True
