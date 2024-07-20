@@ -123,7 +123,7 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/input_columns"
+                        "$ref": "/schemas/inout_array_columns"
                     }
                 }
             }
@@ -159,7 +159,7 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/output_columns"
+                        "$ref": "/schemas/inout_object_columns"
                     }
                 }
             }
@@ -192,7 +192,7 @@
                         "$ref": "/schemas/cache_interval"
                     },
                     "columns": {
-                        "$ref": "/schemas/output_columns"
+                        "$ref": "/schemas/inout_object_columns"
                     }
                 }
             }
@@ -231,7 +231,7 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/input_columns"
+                        "$ref": "/schemas/inout_object_columns"
                     }
                 }
             }
@@ -270,7 +270,7 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/output_columns"
+                        "$ref": "/schemas/inout_object_columns"
                     }
                 }
             }
@@ -312,7 +312,7 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/input_columns"
+                        "$ref": "/schemas/inout_array_columns"
                     }
                 }
             }
@@ -354,7 +354,7 @@
                         "$ref": "/schemas/ref_cols"
                     },
                     "columns": {
-                        "$ref": "/schemas/output_columns"
+                        "$ref": "/schemas/inout_object_columns"
                     }
                 }
             }
@@ -493,8 +493,8 @@
             "type": "string",
             "pattern": "(?=[a-zA-Z0-9_#]{1,30}$)^([a-zA-Z0-9#]+(?:_[a-zA-Z0-9#]+)*)$"
         },
-        "input_columns": {
-            "$id": "/schemas/input_columns",
+        "inout_array_columns": {
+            "$id": "/schemas/inout_array_columns",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Array of input/output column keys.",
             "type": "array",
@@ -505,8 +505,8 @@
                 "$ref": "/schemas/column_key"
             }            
         },
-        "output_columns": {
-            "$id": "/schemas/output_columns",
+        "inout_object_columns": {
+            "$id": "/schemas/inout_object_columns",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Output columns identified by input name.", 
             "type": "object",
