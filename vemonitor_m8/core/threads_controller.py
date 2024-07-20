@@ -42,7 +42,7 @@ class ThreadsController:
     def init_timers(self):
         """Init _timers property."""
         if not Ut.is_dict(self._timers):
-            self._timers = dict()
+            self._timers = {}
 
     def has_timer_key(self, key: str):
         """Test if instance has timer key registered."""
