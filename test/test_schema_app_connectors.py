@@ -145,7 +145,7 @@ class TestAppConnectorsSchema:
     def test_string_auth_pattern(self, schema_manager):
         """Test string_auth values to validate patterns"""
         datas = [
-                ('auth', schema_manager.obj['redis']['local']),
+                ('password', schema_manager.obj['redis']['local']),
                 ('auth', schema_manager.obj['influxDb2']['local'])
             ]
         schema_manager.run_test_values(datas = datas, key = "string_auth")
@@ -153,7 +153,6 @@ class TestAppConnectorsSchema:
     def test_string_path_pattern(self, schema_manager):
         """Test string_path values to validate patterns"""
         datas = [
-                ('serialpath', schema_manager.obj['serial']['bmv700']),
                 ('serialPort', schema_manager.obj['serial']['bmv700'])
             ]
         schema_manager.run_test_values(datas = datas, key = "string_path")
