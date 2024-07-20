@@ -2,6 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "Battery Bank vemonitor configuration",
     "type" : "object",
+    "additionalProperties": false,
     "properties" : {
         "batteryDatas": {
             "description": "Batteries data configuration data.",
