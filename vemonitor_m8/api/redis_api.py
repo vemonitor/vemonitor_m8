@@ -6,6 +6,8 @@ from redis.client import Redis
 from redis.exceptions import RedisError
 from ve_utils.utype import UType as Ut
 
+from vemonitor_m8.core.exceptions import RedisConnectionException
+
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
@@ -67,7 +69,7 @@ class RedisCli:
                 credentials = self._credentials
             self.cli = Redis(**credentials)
 
-            if self.is_ready():
+            if self.is_ready() and self.is_connected():
                 logger.info(
                     "[RedisCli::connect_to_redis] "
                     "Redis Server ready and connection started on host: %s",
@@ -79,6 +81,11 @@ class RedisCli:
                     "[RedisCli::connect_to_redis] "
                     "Failed to connect to redis server. Ping fails on host: %s",
                     credentials.get("host")
+                )
+                raise RedisConnectionException(
+                    "[RedisCli::connect_to_redis] "
+                    "Failed to connect to redis server. "
+                    f"Ping fails on host: {credentials.get('host')}"
                 )
 
         except RedisError as ex:
