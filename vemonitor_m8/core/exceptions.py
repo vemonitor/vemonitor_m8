@@ -64,3 +64,21 @@ class SerialWriteException(Exception):
     """
     VeDirect data conversion error
     """
+
+
+# ----------------
+# Redis
+# ----------------
+class RedisConnectionException(Exception):
+    """
+    Redis Connection error
+    """
+
+
+# ----------------
+# Workers
+# ----------------
+class WorkerException(Exception):
+    """
+    Worker error
+    """
