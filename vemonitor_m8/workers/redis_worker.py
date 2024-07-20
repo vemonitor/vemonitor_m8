@@ -31,6 +31,11 @@ class RedisInputWorker(InputWorker):
         return isinstance(self.worker, RedisApp)\
             and self.worker.is_ready()
 
+    def set_worker_status(self) -> bool:
+        """Test if Worker status is ready."""
+        self._status = self.worker.ping()
+        return self._status
+
     def set_worker(self, worker: Union[dict, RedisApp]) -> bool:
         """Set redis worker"""
         result = False

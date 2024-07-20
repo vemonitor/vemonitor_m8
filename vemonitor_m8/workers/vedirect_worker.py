@@ -28,12 +28,17 @@ class VedirectWorker(InputWorker):
         InputWorker.__init__(self)
         self.min_source_interval = 1
         if self.set_conf(conf):
-            self.worker.try_serial_connection(self.get_name())
+            self.set_worker_status()
 
     def is_ready(self) -> bool:
         """Test if worker is ready."""
         return isinstance(self.worker, VedirectApp)\
             and self.worker.is_ready()
+
+    def set_worker_status(self) -> bool:
+        """Test if Worker status is ready."""
+        self._status = self.worker.try_serial_connection(self.get_name())
+        return self._status
 
     def set_worker(self, worker: Union[dict, VedirectApp]) -> bool:
         """Set vedirect worker"""

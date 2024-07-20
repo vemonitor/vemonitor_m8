@@ -36,6 +36,11 @@ class Worker(ABC):
         self.columns = None
         self.ref_cols = None
         self.worker = None
+        self._status = False
+
+    def get_worker_status(self) -> bool:
+        """Test if instance has name property."""
+        return self._status is True
 
     def has_info(self) -> bool:
         """Test if instance has _info properties."""
@@ -148,6 +153,10 @@ class Worker(ABC):
     @abstractmethod
     def is_ready(self) -> bool:
         """Test if Worker is ready."""
+
+    @abstractmethod
+    def set_worker_status(self) -> bool:
+        """Test if Worker status is ready."""
 
     @abstractmethod
     def set_worker(self, worker: dict) -> bool:

@@ -39,6 +39,11 @@ class EmoncmsWorker(OutputWorker):
         return isinstance(self.worker, EmoncmsApp)\
             and self.worker.is_ready()
 
+    def set_worker_status(self) -> bool:
+        """Test if Worker status is ready."""
+        self._status = self.worker.ping()
+        return self._status
+
     def set_worker(self, worker: Union[dict, EmoncmsApp]) -> bool:
         """Set vedirect worker"""
         result = False
