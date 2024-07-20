@@ -119,7 +119,7 @@ class ConfigLoaderHelper:
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get appConnectors from sources, "
-                "conector key {key} is not valid. "
+                "conectors and/or sources list are empty. "
             )
         return res
 
@@ -247,13 +247,13 @@ class ConfigLoaderHelper:
             else:
                 raise SettingInvalidException(
                     "Fatal Error: unable to get batteryBank data, "
-                    "from arg {arg}."
+                    f"from arg {arg}."
                 )
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get batteryBank data, "
                 "validation fails or bad root key. "
-                "arg: {arg}." 
+                f"arg: {arg}." 
             )
 
     @classmethod
