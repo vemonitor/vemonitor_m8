@@ -61,21 +61,45 @@ class AppBlockRun:
         """Test if class instance have valid battery_bank property."""
         return self._run is True
 
-    def init_data_cache(self) -> bool:
-        """Init dataCache object."""
+    def init_redis_cache(self) -> bool:
+        """Init redis cache object."""
         result = False
         if AppBlockRun.is_conf(self.conf):
             result = True
             redis_cache = self.conf.app_blocks[0].get('redis_cache')
             if Ut.is_dict(redis_cache, not_null=True):
-                self.inputs_data = RedisCache(
-                    max_rows=redis_cache.get("max_data_points"),
-                    connector=self.get_app_connector_by_key_item(
-                        item_key="redis",
-                        source=redis_cache.get("source")
+                try:
+                    self.inputs_data = RedisCache(
+                        max_rows=redis_cache.get("max_data_points"),
+                        connector=self.get_app_connector_by_key_item(
+                            item_key="redis",
+                            source=redis_cache.get("source")
+                        )
                     )
-                )
+                    result = True
+                    logger.info(
+                        "Redis Cache is enabled and active"
+                    )
+                except RedisConnectionException:
+                    result = False
+                    logger.error(
+                        "Error Redis Cache is enabled, "
+                        "but we are unable to connect to Redis server."
+                        "Please check Redis App Connectors Configuration."
+                    )
+        return result
+
+    def init_data_cache(self) -> bool:
+        """Init dataCache object."""
+        result = False
+        if AppBlockRun.is_conf(self.conf):
+            result = True
+            if self.init_redis_cache() is True:
+                result = True
             else:
+                logger.info(
+                    "Start Memory Data Cache..."
+                )
                 self.inputs_data = DataCache(max_rows=15)
         return result
 
