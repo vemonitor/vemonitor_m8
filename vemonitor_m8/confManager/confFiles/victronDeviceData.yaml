@@ -2,7 +2,7 @@
 # This file is the root configuation file for vemonitor package.
 # Use YAML syntax
 # ---------------------------
-keys:
+devices:
     BMV: [
             'V', 'VS', 'VM', 'DM', 'T', 'I', 'P', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay',
             'PID', 'FW', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 

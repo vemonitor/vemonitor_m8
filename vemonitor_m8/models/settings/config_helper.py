@@ -122,7 +122,7 @@ class ConfigHelper(AppBlockHelper):
     def is_data_structures(data_structures) -> bool:
         """Test if is valid Data Structure conf"""
         return Ut.is_dict(data_structures) and\
-            Ut.is_dict(data_structures.get('keys'), not_null=True) and\
+            Ut.is_dict(data_structures.get('devices'), not_null=True) and\
             Ut.is_dict(data_structures.get('points'), not_null=True)
 
     @staticmethod
