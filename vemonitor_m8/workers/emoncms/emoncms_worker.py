@@ -10,7 +10,7 @@ import logging
 import time
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.apps.emoncms_app import EmoncmsApp
+from vemonitor_m8.workers.emoncms.emoncms_app import EmoncmsApp
 from vemonitor_m8.models.settings.workers import OutputWorker
 from vemonitor_m8.models.settings.workers import WorkersHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException

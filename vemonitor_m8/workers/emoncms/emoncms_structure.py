@@ -4,8 +4,8 @@
 import logging
 from typing import Optional
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.api.emon_data_helper import EmoncmsHelper
-from vemonitor_m8.api.emoncms_set_api import EmoncmsSetApi
+from vemonitor_m8.workers.emoncms.emon_data_helper import EmoncmsHelper
+from vemonitor_m8.workers.emoncms.emoncms_set_api import EmoncmsSetApi
 from vemonitor_m8.models.emoncms.delta_structure import DeltaStructure
 from vemonitor_m8.conf_manager.loader import Loader
 from vemonitor_m8.conf_manager.schema_validate import SchemaValidate as sValid

@@ -6,7 +6,7 @@ from typing import Optional, Union
 from ve_utils.ujson import UJson
 from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.models.core.inputs_cache import InputsCache
-from vemonitor_m8.apps.redis_app import RedisApp
+from vemonitor_m8.workers.redis.redis_app import RedisApp
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"

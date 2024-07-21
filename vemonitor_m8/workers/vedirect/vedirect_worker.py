@@ -5,7 +5,7 @@ import logging
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 
-from vemonitor_m8.apps.vedirect_app import VedirectApp
+from vemonitor_m8.workers.vedirect.vedirect_app import VedirectApp
 from vemonitor_m8.models.settings.workers import InputWorker
 from vemonitor_m8.models.settings.workers import WorkersHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException

@@ -5,7 +5,7 @@ import logging
 import time
 
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.api.emoncms_api import EmoncmsApi
+from vemonitor_m8.workers.emoncms.emoncms_api import EmoncmsApi
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2020, Eli Serra"

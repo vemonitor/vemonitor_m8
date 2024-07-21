@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Redis vemonitor Helper"""
 import logging
-from vemonitor_m8.api.redis_api import RedisApi
+from vemonitor_m8.workers.redis.redis_api import RedisApi
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")

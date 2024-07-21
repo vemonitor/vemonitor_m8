@@ -11,7 +11,7 @@ from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.core.threads_controller import ThreadsController
 from vemonitor_m8.events.app_block_events import AppBlockEvents
 from vemonitor_m8.core.data_cache import DataCache
-from vemonitor_m8.core.redis_cache import RedisCache
+from vemonitor_m8.workers.redis.redis_cache import RedisCache
 from vemonitor_m8.core.data_checker import DataChecker
 from vemonitor_m8.models.settings.config import Config
 from vemonitor_m8.models.settings.workers import WorkersHelper

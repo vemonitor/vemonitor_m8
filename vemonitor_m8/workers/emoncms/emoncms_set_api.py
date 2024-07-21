@@ -8,8 +8,8 @@ from urllib.parse import quote
 
 from ve_utils.utype import UType as Ut
 from ve_utils.ujson import UJson
-from vemonitor_m8.api.emoncms_api import EmoncmsApi
-from vemonitor_m8.api.emon_data_helper import EmoncmsHelper
+from vemonitor_m8.workers.emoncms.emoncms_api import EmoncmsApi
+from vemonitor_m8.workers.emoncms.emon_data_helper import EmoncmsHelper
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2020, Eli Serra"
