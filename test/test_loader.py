@@ -41,7 +41,10 @@ class TestLoader:
         """Test get_app_blocks_by_app_or_name method """
         file_names = ['dummy_conf_dict.yaml']
         obj = Loader(file_names, file_path=helper_manager.test_path)
-        obj.set_file_path(file_name=file_names, path=helper_manager.test_path)
+        obj.set_file_path(
+            file_name=file_names,
+            base_path=helper_manager.test_path
+        )
 
         conf = obj.get_yaml_config()
         assert Ut.is_dict(conf) and len(conf) == 7 and \

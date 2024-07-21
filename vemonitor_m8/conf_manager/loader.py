@@ -37,16 +37,19 @@ class Loader():
     This Class is used to be 
     """
     def __init__(self,
-                 file_names: Optional[Union[str, list, tuple]],
+                 file_names: Union[str, list, tuple],
                  file_path: Optional[str]=None
                  ):
         self.settings = None
         self.file_path = None
-        self.set_file_path(file_names, file_path)
+        self.set_file_path(
+            file_name= file_names,
+            base_path=file_path
+        )
 
     def set_file_path(self,
-                      file_name: Optional[Union[str, list, tuple]],
-                      path: Optional[str]=None
+                      file_name: Union[str, list, tuple],
+                      base_path: Optional[str]=None
                       ):
         """
             Used to set the file path of a given file.
@@ -75,12 +78,12 @@ class Loader():
             :doc-author: Trelent
         """
         self.file_path = None
-        if Ut.is_str(path) and not os.path.isdir(path):
-            path = None
+        if not Ut.is_str(base_path, not_null=True) or not os.path.isdir(base_path):
+            base_path = None
 
         if Ut.is_str(file_name):
-            if Ut.is_str(path):
-                gpath = os.path.join(path, file_name)
+            if Ut.is_str(base_path):
+                gpath = os.path.join(base_path, file_name)
                 if os.path.isfile(gpath):
                     self.file_path = gpath
 
@@ -90,8 +93,8 @@ class Loader():
         elif Ut.is_tuple(file_name) or Ut.is_list(file_name):
             tmp = None
             for name in file_name:
-                if Ut.is_str(path):
-                    tmp = os.path.join(path, name)
+                if Ut.is_str(base_path):
+                    tmp = os.path.join(base_path, name)
                     if os.path.isfile(tmp):
                         self.file_path = tmp
                         break
