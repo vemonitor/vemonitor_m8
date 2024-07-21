@@ -5,8 +5,8 @@ import pytest
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.conf_manager.config_loader import ConfigLoader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
-from vemonitor_m8.models.settings.config import Config
-from vemonitor_m8.models.settings.config_helper import ConfigHelper
+from vemonitor_m8.models.config import Config
+from vemonitor_m8.models.config_helper import ConfigHelper
 
 
 @pytest.fixture(name="helper_manager", scope="class")

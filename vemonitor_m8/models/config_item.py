@@ -6,7 +6,7 @@ Config Item Model Class
 from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.conf_manager.shema_validate_selector import SchemaValidateSelector as jValid
-from vemonitor_m8.models.settings.config_helper import ConfigHelper
+from vemonitor_m8.models.config_helper import ConfigHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException
 
 class ConfigItem(ConfigHelper):

@@ -13,8 +13,8 @@ from vemonitor_m8.events.app_block_events import AppBlockEvents
 from vemonitor_m8.core.data_cache import DataCache
 from vemonitor_m8.workers.redis.redis_cache import RedisCache
 from vemonitor_m8.core.data_checker import DataChecker
-from vemonitor_m8.models.settings.config import Config
-from vemonitor_m8.models.settings.workers import WorkersHelper
+from vemonitor_m8.models.config import Config
+from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.workers.workers_manager import WorkersManager
 from vemonitor_m8.core.exceptions import RedisConnectionException
 from vemonitor_m8.core.exceptions import SettingInvalidException, WorkerException

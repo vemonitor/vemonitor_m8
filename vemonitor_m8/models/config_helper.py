@@ -7,7 +7,7 @@ from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.conf_manager.shema_validate_selector import SchemaValidateSelector as jValid
 from vemonitor_m8.core.exceptions import SettingInvalidException
-from vemonitor_m8.models.settings.app_block_helper import AppBlockHelper
+from vemonitor_m8.models.app_block_helper import AppBlockHelper
 
 
 class ConfigHelper(AppBlockHelper):
