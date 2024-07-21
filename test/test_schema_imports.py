@@ -81,7 +81,7 @@ def schema_manager_fixture():
     return SchemaManager()
 
 
-class TestImportsSchema(SchemaTestHelper):
+class TestImportsSchema:
     """Test Imports json schema validation."""
 
     def test_bad_file_key(self):
@@ -89,10 +89,10 @@ class TestImportsSchema(SchemaTestHelper):
         with pytest.raises(SchemaError):
             SchemaValidate.load_schema("bad_key")
 
-    def test_data_validation(self):
+    def test_data_validation(self, schema_manager):
         """Test data validation"""
         assert Ut.is_list(
-            SchemaValidate.validate_data(self.obj, "imports"),
+            SchemaValidate.validate_data(schema_manager.obj, "imports"),
             not_null=True
         )
 
