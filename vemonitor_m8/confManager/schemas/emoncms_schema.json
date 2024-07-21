@@ -1,0 +1,81 @@
+{
+    "$id": "https://example.com/schemas/appBlocks_schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Emoncms structure configuration",
+    "description": "Emoncms Inputs/Feeds structure.",
+    "type": "object",
+    "minProperties": 1,
+    "maxProperties": 20,
+    "propertyNames": {
+        "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+    },
+   "additionalProperties": {
+       "description": "Emoncms Inputs/Feeds structure",
+       "type": "object",
+       "minProperties": 1,
+       "maxProperties": 50,
+       "propertyNames": {
+           "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+       },
+       "additionalProperties": {
+           "description": "Emoncms Input structure",
+           "type": "object",
+           "minProperties": 1,
+           "maxProperties": 2,
+           "required": [
+               "feeds"
+           ],
+           "properties": {
+               "description": {
+                   "description": "Emoncms Input description.",
+                   "type": "string",
+                   "pattern": "^([^$&#:;?=*µ+§/\\\\]+)$"
+               },
+               "feeds": {
+                   "description": "Emoncms Feeds structure",
+                   "type": "object",
+                   "minProperties": 1,
+                   "maxProperties": 50,
+                   "propertyNames": {
+                       "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+                   },
+                   "additionalProperties": {
+                       "description": "Emoncms Input structure",
+                       "type": "object",
+                       "minProperties": 1,
+                       "maxProperties": 5,
+                       "properties": {
+                           "process": {
+                               "description": "Feed process value.",
+                               "type": "integer",
+                               "minimum": 1,
+                               "maximum": 100
+                           },
+                           "engine": {
+                               "description": "Feed engine value.",
+                               "type": "integer",
+                               "minimum": 1,
+                               "maximum": 100
+                           },
+                           "time_interval": {
+                               "description": "Feed time interval value.",
+                               "type": "integer",
+                               "minimum": 1,
+                               "maximum": 100
+                           },
+                           "unit": {
+                               "description": "Feed unit value.",
+                               "type": "string",
+                               "pattern": "^([^$&#:;?=*µ+§]+)$"
+                           },
+                           "public": {
+                               "description": "Feed public status.",
+                               "type": "boolean"
+                           }
+                       }
+                   }
+               }
+           }
+       }
+   }
+}

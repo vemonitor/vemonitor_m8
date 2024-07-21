@@ -229,9 +229,12 @@ class IncludeImport:
             # os.path.isabs returns True if the path is absolute
             if not os.path.isabs(file_path):
                 # get the parent dir. will be used in case of relative path
-                parent_dir = os.path.normpath(main_path + os.sep + os.pardir)
+                parent_dir = os.path.normpath(
+                    os.path.join(main_path, os.pardir)
+                )
                 logger.debug(
-                   "File path %s is relative, adding the root path",
+                   "File path %s is relative path, adding the root path %s",
+                   file_path,
                    parent_dir
                 )
                 file_path = os.path.join(parent_dir, file_path)

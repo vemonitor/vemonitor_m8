@@ -50,12 +50,12 @@ class TestAppBlocksSchema:
                 ('app', schema_manager.obj[0], 'bad'),
                 ('batteryBanks', schema_manager.obj[0]['args']),
                 ('source', schema_manager.obj[0]['inputs']['serial'][0]),
-                ('material', schema_manager.obj[0]['inputs']['serial'][0]),
+                ('device', schema_manager.obj[0]['inputs']['serial'][0]),
                 ('source', schema_manager.obj[0]['outputs']['redis'][0]),
                 ('redis_node', schema_manager.obj[0]['outputs']['redis'][0]),
                 ('source', schema_manager.obj[0]['outputs']['influxDb2'][0]),
                 ('db', schema_manager.obj[0]['outputs']['influxDb2'][0]),
-                ('mesurement', schema_manager.obj[0]['outputs']['influxDb2'][0]),
+                ('measurement', schema_manager.obj[0]['outputs']['influxDb2'][0]),
 
                 ('name', schema_manager.obj[1]),
                 ('app', schema_manager.obj[1], 'bad'),
@@ -64,7 +64,7 @@ class TestAppBlocksSchema:
                 ('redis_node', schema_manager.obj[1]['inputs']['redis'][0]),
                 ('source', schema_manager.obj[1]['outputs']['influxDb2'][0]),
                 ('db', schema_manager.obj[1]['outputs']['influxDb2'][0]),
-                ('mesurement', schema_manager.obj[1]['outputs']['influxDb2'][0]),
+                ('measurement', schema_manager.obj[1]['outputs']['influxDb2'][0]),
             ]
         schema_manager.run_test_values(datas = datas, key = "string_key")
 
@@ -75,14 +75,14 @@ class TestAppBlocksSchema:
             ]
         schema_manager.run_test_values(datas = datas, key = "string_column")
 
-    def test_positive_integer_pattern(self, schema_manager):
-        """Test positive_integer values to validate patterns"""
+    def test_positive_number_pattern(self, schema_manager):
+        """Test positive_number values to validate patterns"""
         datas = [
                 ('time_interval', schema_manager.obj[0]['inputs']['serial'][0]),
                 ('time_interval', schema_manager.obj[0]['outputs']['redis'][0]),
                 ('time_interval', schema_manager.obj[0]['outputs']['influxDb2'][0])
             ]
-        schema_manager.run_test_values(datas = datas, key = "positive_integer")
+        schema_manager.run_test_values(datas = datas, key = "positive_number")
 
     def test_block_required(self, schema_manager):
         """Test block data"""
@@ -205,7 +205,12 @@ class TestAppBlocksSchema:
 
         # test block serial unique columns
         val = obj['columns']
-        obj['columns'].append('V')
+        if Ut.is_list(obj['columns'], not_null=True):
+            obj['columns'].append('V')
+        elif Ut.is_dict(obj['columns'], not_null=True):
+            keys = list(obj['columns'].keys())
+            key = keys[0]
+            obj['columns'][key].append(obj['columns'][key][0])
         with pytest.raises(ValidationError):
             SchemaValidate.validate_data_from_schema(schema_manager.obj, schema_manager.schema)
         obj['columns'] = val

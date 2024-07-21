@@ -91,7 +91,7 @@ class ConfigItem(ConfigHelper):
     def set_data_structures(self, data_structures: dict) -> None:
         """Set Data Structure Conf"""
         cols = self.get_app_block_columns()
-        if ConfigHelper.is_missing_data_structure(data_structures, cols)\
+        if not ConfigHelper.is_missing_data_structure(data_structures, cols)\
                 and jValid.is_valid_data_structure_conf(
                     conf_item=data_structures
                 ):

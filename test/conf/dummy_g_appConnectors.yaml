@@ -21,8 +21,7 @@ appConnectors:
           onError: "waitConnection"
           # path of serial port
           # -> required with devTty if no serialTest setting present
-          serialpath: "/tmp"
-          serialPort: '/tmp/vmodem1'
+          serialPort: '/home/tepochtli/vmodem1'
           # Serial test to determine if serial readed data corespond with this serial item.
           # -> usefull for conection issues, serial port change.
           # -> eg. changing usb port, and serial port name devTty not be updated by user.
@@ -41,7 +40,7 @@ appConnectors:
           active: True
           host: "0.0.0.0"
           port: 8080
-          auth: "my_very_large_auth"
+          password: "my_very_large_auth"
   # ---------------------------
   # InfluxDb 2 Api configuarations
   # ---------------------------

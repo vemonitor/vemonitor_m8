@@ -2,7 +2,7 @@
 # This file is the root configuation file for vemonitor package.
 # Use YAML syntax
 # ---------------------------
-keys:
+devices:
     BMV: [
             'V', 'VS', 'VM', 'DM', 'T', 'I', 'P', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay',
             'PID', 'FW', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10', 
@@ -24,7 +24,7 @@ keys:
         ]
 
 points:
-    V: 
+    V:
         name: "Main (battery) voltage"
         input_type: 'int'
         output_type: 'float'
@@ -95,7 +95,7 @@ points:
         name: "State-of-charge"
         input_type: 'int'
         output_type: 'float'
-        floatpoint: 0.001
+        floatpoint: 0.1
         unit: '%'
     TTG:
         name: "Time-to-go"
@@ -161,7 +161,7 @@ points:
     H9:
         name: "Number of seconds since last full charge"
         input_type: 'int'
-        output_type: 'float'
+        output_type: 'int'
         unit: 'S'
     H10:
         name: "Number of automatic synchronizations"
@@ -285,6 +285,14 @@ points:
         name: "Warning reason"
         input_type: 'int'
         output_type: 'int'
+    time:
+        name: "data point time"
+        input_type: 'float'
+        output_type: 'int'
+    time_ref:
+        name: "data point time ref"
+        input_type: 'float'
+        output_type: 'int'
     t_int:
         name: "Battery room temperature"
         input_type: 'int'
@@ -303,6 +311,26 @@ points:
         output_type: 'float'
         floatpoint: 0.001
         unit: '°C'
+    r_pmp:
+        name: "Pump Relay status"
+        input_type: 'onOff'
+        output_type: 'intBool'
+    r_wat:
+        name: "Pump Relay status"
+        input_type: 'onOff'
+        output_type: 'intBool'
+    r_sec:
+        name: "Pump Relay status"
+        input_type: 'onOff'
+        output_type: 'intBool'
+    r_ge:
+        name: "Pump Relay status"
+        input_type: 'onOff'
+        output_type: 'intBool'
+    hy_int:
+        name: "Relative humidity int"
+        input_type: 'onOff'
+        output_type: 'intBool'
     bat_voltage:
         name: "Battery voltage"
         input_type: 'int'
@@ -321,8 +349,8 @@ points:
         output_type: 'float'
         floatpoint: 0.01
         unit: 'Ah'
-    vm_cap_t:
-        name: "Current real battery capacity"
+    vm_real_cap:
+        name: "Battery real discharge capacity"
         input_type: 'int'
         output_type: 'float'
         floatpoint: 0.01
@@ -339,9 +367,9 @@ points:
         name: "Battery discharge status (...)"
         input_type: 'int'
         output_type: 'int'
-    vm_real_cap:
-        name: "Battery real discharge capacity"
+    vm_cap_t:
+        name: "Current real battery capacity"
         input_type: 'int'
-        output_type: 'int'
-
-
+        output_type: 'float'
+        floatpoint: 0.01
+        unit: 'Ah'

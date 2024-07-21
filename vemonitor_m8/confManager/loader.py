@@ -177,6 +177,7 @@ class Loader():
         """Get Paths order to load config."""
         return [
             # Only linux
+            os.path.join(os.path.sep, "opt", "vemonitor_m8", "conf"),
             os.path.join(os.path.sep, "opt", "vemonitor", "conf"),
             # Linux  and/or windows
             Usys.get_current_file_parent_parent_path(

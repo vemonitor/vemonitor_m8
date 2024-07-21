@@ -4,7 +4,7 @@
 import logging
 import sys
 import argparse
-from ve_utils.utype import UType as Ut
+from vemonitor_m8.app_run import AppRun
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -24,6 +24,10 @@ def parse_args(args):
     """
     # create arguments
     parser = argparse.ArgumentParser(description='Monitor From VE.Direct protocol')
+    parser.add_argument('--block', help='Main block name to run in your configuration file.')
+    parser.add_argument('--app', help='Main app to run')
+    parser.add_argument('--conf_path', help='Main Configuration file path')
+    parser.add_argument('--log_path', help='Console log file path')
     parser.add_argument("--debug", action='store_true',
                         help="Show debug output")
     parser.add_argument('-v', '--version', action='version',
@@ -45,10 +49,10 @@ def main():
 
     logger.debug("VeMonitor args: %s", parser)
 
-    try:
-        main_app = 2
-    except SystemExit:
-        sys.exit(1)
+    AppRun(
+        block=parser.block,
+        app=parser.app
+    )
 
 
 class AppFilter(logging.Filter):

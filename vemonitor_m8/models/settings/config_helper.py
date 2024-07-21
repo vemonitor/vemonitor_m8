@@ -122,7 +122,7 @@ class ConfigHelper(AppBlockHelper):
     def is_data_structures(data_structures) -> bool:
         """Test if is valid Data Structure conf"""
         return Ut.is_dict(data_structures) and\
-            Ut.is_dict(data_structures.get('keys'), not_null=True) and\
+            Ut.is_dict(data_structures.get('devices'), not_null=True) and\
             Ut.is_dict(data_structures.get('points'), not_null=True)
 
     @staticmethod
@@ -142,16 +142,19 @@ class ConfigHelper(AppBlockHelper):
     @staticmethod
     def is_missing_data_structure(data_structures, cols) -> bool:
         """Test if is missing Data Structure conf"""
+        result = False
         if not ConfigHelper.is_all_data_structures_covered(data_structures, cols):
+            result = True
             missing = []
             for i in cols:
                 if data_structures['points'].get(i) is None:
                     missing.append(i)
-
-            raise SettingInvalidException(
-                "Error on checkColumns configuration, "
-                "unable to retrieve all appBlock columns checks. "
-                "Add missing columns to victronDeviceData.yaml or userColumnsChecks.yaml "
-                f"Missing columns list : {missing}"
-            )
-        return True
+            if len(missing) > 0:
+                raise SettingInvalidException(
+                    "Error on checkColumns configuration, "
+                    "unable to retrieve all appBlock columns checks. "
+                    "Add missing columns to victronDeviceData.yaml or userColumnsChecks.yaml "
+                    f"Missing columns list : {missing}"
+                )
+            result = False
+        return result

@@ -1,6 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-"""Test Imports json schema validation."""
+"""Test AppBlock jsonschema."""
 import pytest
 from ve_utils.utype import UType as Ut
 from jsonschema.exceptions import SchemaError
@@ -20,14 +18,15 @@ def schema_manager_fixture():
 
         def init_data(self):
             """Init data"""
-            self.schema = SchemaValidate.load_schema("imports")
-            loader = Loader("test/conf/dummy_conf_dict.yaml")
-            conf = loader.get_yaml_config()
-            self.obj = conf.get('Imports')
+            self.schema = SchemaValidate.load_schema("emoncms")
+            loader = Loader("test/conf/emoncmsTest.yaml")
+            self.obj = loader.get_yaml_config()
+            self.obj = self.obj.get("Structure")
 
-        def get_string_import_values_helper(self, choice: str) -> list:
+        @staticmethod
+        def get_string_description_values_helper(choice: str) -> list:
             """
-            Return a list of string_import values to test jsonschema validation.
+            Return a list of string_auth values to test jsonschema validation.
 
             The function returns different lists depending on the choice parameter,
             which is either good or bad.
@@ -35,17 +34,16 @@ def schema_manager_fixture():
             then strings that are expected to be valid will be returned.
             If choice is set to bad,
             then strings that are expected not to be valid will be returned
-            :param self: Allow a function to refer to itself
             :param choice: Determine which list of values to return
-            :return: A list of values that are bad or good string_import.
+            :return: A list of values that are bad or good string_auth.
             """
             if choice == "good":
-                return["a.yaml", "a_b.yaml", "H1eL2lO.yaml", "0H1L_2lO.yaml"]
-            else:
-                return[0, -1, -0.1, 0.1, 2.2, "_hel lo",
-                    "_hello.yaml", "hel lo.yaml", "hello.dev", ".hello.yaml", ".hell.o.yaml",
+                return ["h_ello", "H,eLlO", "H1.eL2lO", "0H1eL2lO.dev", "0H1e_L2lO@.-"]
+
+            return [0, -1, -0.1, 0.1, 2.2, "_hel?lo", "_hel$lo", "_hel#lo", "_hel&lo",
                     False, None, dict(), tuple()
                     ]
+
 
         def get_values_helper(self, key: str, choice: str) -> list:
             """
@@ -70,35 +68,59 @@ def schema_manager_fixture():
                     result = self.get_string_columns_values_helper(choice)
                 elif key == "string_text":
                     result = self.get_string_text_values_helper(choice)
-                elif key == "string_import":
-                    result = self.get_string_import_values_helper(choice)
+                elif key == "string_description":
+                    result = SchemaManager.get_string_description_values_helper(choice)
                 elif key == "positive_number":
                     result = self.get_positive_number_values_helper(choice)
                 elif key == "positive_integer":
                     result = self.get_positive_integer_values_helper(choice)
             return result
 
+        def run_test_values(self, datas: list, key: str):
+            """Run test values helper"""
+            self.run_test_values_data(
+                datas=datas,
+                list_values=self.get_values_helper(key, 'good'),
+                choice='good'
+            )
+
+            self.run_test_values_data(
+                datas=datas,
+                list_values=self.get_values_helper(key, 'bad'),
+                choice='bad'
+            )
+
     return SchemaManager()
 
 
-class TestImportsSchema:
-    """Test Imports json schema validation."""
-
-    def test_bad_file_key(self):
-        """Test bad file key"""
+class TestEmoncmsSchemas:
+    """Test AppBlock jsonschema."""
+    @staticmethod
+    def test_bad_file_key():
+        """Test load_schema method."""
         with pytest.raises(SchemaError):
-            SchemaValidate.load_schema("bad_key")
+            SchemaValidate.load_schema("hallo")
 
     def test_data_validation(self, schema_manager):
-        """Test data validation"""
-        assert Ut.is_list(
-            SchemaValidate.validate_data(schema_manager.obj, "imports"),
+        """Test validate_data method."""
+        assert Ut.is_dict(schema_manager.obj, not_null=True)
+        assert Ut.is_dict(
+            SchemaValidate.validate_data(schema_manager.obj, "emoncms"),
             not_null=True
         )
 
-    def test_string_import_pattern(self, schema_manager):
-        """Test string_import values to validate patterns"""
+    def test_string_description_pattern(self, schema_manager):
+        """Test string_description values to validate patterns."""
         datas = [
-                (0, schema_manager.obj)
+                ('description', schema_manager.obj['unittest_api']['V']),
             ]
-        schema_manager.run_test_values(datas = datas, key = "string_import")
+        schema_manager.run_test_values(datas=datas, key="string_description")
+
+    def test_positive_integer_pattern(self, schema_manager):
+        """Test positive_integer values to validate patterns."""
+        datas = [
+                ('process', schema_manager.obj['unittest_api']['V']['feeds']['V']),
+                ('engine', schema_manager.obj['unittest_api']['V']['feeds']['V']),
+                ('time_interval', schema_manager.obj['unittest_api']['V']['feeds']['V'])
+            ]
+        schema_manager.run_test_values(datas=datas, key="positive_integer")

@@ -129,7 +129,7 @@ class Config(ConfigHelper):
     def set_data_structures(self, data_structures: dict) -> None:
         """Set Data Structures Conf"""
         cols = self.get_app_blocks_columns()
-        if ConfigHelper.is_missing_data_structure(data_structures, cols)\
+        if not ConfigHelper.is_missing_data_structure(data_structures, cols)\
                 and jValid.is_valid_data_structure_conf(
                                             conf_item=data_structures):
             self.data_structures = data_structures

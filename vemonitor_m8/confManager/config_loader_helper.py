@@ -112,15 +112,14 @@ class ConfigLoaderHelper:
                         item_key in sources: # and\
                         # key == item_key:
                     res[item_key] = item
-            # if not Ut.is_dict(res, not_null=True):
-                else:
-                    raise SettingInvalidException(
-                        "Fatal Error: unable to get appConnectors from sources, "
-                        "validation fails or bad root key. ")
+            if not Ut.is_dict(res, not_null=True):
+                raise SettingInvalidException(
+                    "Fatal Error: unable to get appConnectors from sources, "
+                    "validation fails or bad root key. ")
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get appConnectors from sources, "
-                "conector key {key} is not valid. "
+                "conectors and/or sources list are empty. "
             )
         return res
 
@@ -248,13 +247,13 @@ class ConfigLoaderHelper:
             else:
                 raise SettingInvalidException(
                     "Fatal Error: unable to get batteryBank data, "
-                    "from arg {arg}."
+                    f"from arg {arg}."
                 )
         else:
             raise SettingInvalidException(
                 "Fatal Error: unable to get batteryBank data, "
                 "validation fails or bad root key. "
-                "arg: {arg}." 
+                f"arg: {arg}." 
             )
 
     @classmethod
@@ -291,18 +290,18 @@ class ConfigLoaderHelper:
                             res[key].append(item_key)
                         else:
                             raise SettingInvalidException(
-                                "Error on checkColumns configuration, "
+                                "Error on Device Data Structure configuration, "
                                 f"checks Key {key} is not valid: {item}"
                             )
                 else:
                     raise SettingInvalidException(
-                            "Error on checkColumns configuration, "
+                            "Error on Device Data Structure configuration, "
                             f"column key {key} is not valid"
                             f"and/or check keys not a list. type(checksKeys): {type(item)}"
                         )
         else:
             raise SettingInvalidException(
-                "Error on checkColumns configuration, empty columns keys data: "
+                "Error on Device Data Structure configuration, empty columns keys data: "
             )
 
         return res
@@ -349,8 +348,8 @@ class ConfigLoaderHelper:
         res = None
         if jValid.is_valid_data_structure_conf(data_structure):
             res = {}
-            res['keys'] = cls._check_column_keys(
-                data = data_structure.get('keys'),
+            res['devices'] = cls._check_column_keys(
+                data = data_structure.get('devices'),
                 check_keys = check_keys)
 
             res['points'] = cls._check_column_points(

@@ -55,7 +55,7 @@ class TestSchemaDataStructure:
     def test_string_column_pattern(self, schema_manager):
         """Test string_column values to validate patterns"""
         datas = [
-                (0, schema_manager.obj['keys']['BMV']),
+                (0, schema_manager.obj['devices']['BMV']),
             ]
         schema_manager.run_test_values(datas = datas, key = "string_column")
 
