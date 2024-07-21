@@ -338,6 +338,11 @@ class AppBlockRun:
             if not self.workers.get_workers_status():
                 self._threads.cancel_all_timers()
                 time.sleep(2)
+                logger.error(
+                    "Fatal Error: Some output workers fails. "
+                    "Please control all outputs conectors, "
+                    "are up and ready."
+                )
                 raise WorkerException(
                     "Fatal Error: Some output workers fails. "
                     "Unable to open a connexion with some output connectors. "
