@@ -32,16 +32,28 @@ class EmoncmsWorker(OutputWorker):
         OutputWorker.__init__(self)
         self.cache_interval = 5
         self.set_min_req_interval(1)
-        self.set_conf(conf)
+        if self.set_conf(conf):
+            self.set_worker_status()
 
     def is_ready(self) -> bool:
         """Test if worker is ready."""
         return isinstance(self.worker, EmoncmsApp)\
             and self.worker.is_ready()
 
+    def notify_worker_error(self) -> bool:
+        """Add message to logger if worker is not ready."""
+        if self._status is False:
+            logger.warning(
+                "EmonCms Connection Error: "
+                "Vedirect worker is not ready. "
+                "Worker Name: %s",
+                self.get_name()
+            )
+
     def set_worker_status(self) -> bool:
         """Test if Worker status is ready."""
         self._status = self.worker.ping()
+        self.notify_worker_error()
         return self._status
 
     def set_worker(self, worker: Union[dict, EmoncmsApp]) -> bool:
@@ -57,6 +69,7 @@ class EmoncmsWorker(OutputWorker):
 
     def set_conf(self, conf: dict) -> bool:
         """Set Configuration data."""
+        result = False
         connector = EmoncmsWorker.prepare_connector_data(conf)
         if self.set_worker(connector) \
                 and self.set_worker_conf(

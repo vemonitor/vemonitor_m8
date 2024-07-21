@@ -24,16 +24,28 @@ class RedisInputWorker(InputWorker):
     """Redis reader app Helper"""
     def __init__(self, conf: dict):
         InputWorker.__init__(self)
-        self.set_conf(conf)
+        if self.set_conf(conf):
+            self.set_worker_status()
 
     def is_ready(self) -> bool:
         """Test if worker is ready."""
         return isinstance(self.worker, RedisApp)\
             and self.worker.is_ready()
 
+    def notify_worker_error(self) -> bool:
+        """Add message to logger if worker is not ready."""
+        if self._status is False:
+            logger.warning(
+                "Redis Connection Error: "
+                "Vedirect worker is not ready. "
+                "Worker Name: %s",
+                self.get_name()
+            )
+
     def set_worker_status(self) -> bool:
         """Test if Worker status is ready."""
         self._status = self.worker.ping()
+        self.notify_worker_error()
         return self._status
 
     def set_worker(self, worker: Union[dict, RedisApp]) -> bool:
@@ -49,6 +61,7 @@ class RedisInputWorker(InputWorker):
 
     def set_conf(self, conf: dict) -> bool:
         """Set Configuration data."""
+        result = False
         connector = RedisInputWorker.prepare_connector_data(conf)
         if RedisInputWorker.is_connector(connector)\
                 and self.set_worker_conf(

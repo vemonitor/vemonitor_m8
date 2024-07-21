@@ -35,9 +35,20 @@ class VedirectWorker(InputWorker):
         return isinstance(self.worker, VedirectApp)\
             and self.worker.is_ready()
 
+    def notify_worker_error(self) -> bool:
+        """Add message to logger if worker is not ready."""
+        if self._status is False:
+            logger.warning(
+                "Serial Connection Error: "
+                "Vedirect worker is not ready. "
+                "Worker Name: %s",
+                self.get_name()
+            )
+
     def set_worker_status(self) -> bool:
         """Test if Worker status is ready."""
         self._status = self.worker.try_serial_connection(self.get_name())
+        self.notify_worker_error()
         return self._status
 
     def set_worker(self, worker: Union[dict, VedirectApp]) -> bool:
