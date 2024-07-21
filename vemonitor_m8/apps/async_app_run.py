@@ -256,6 +256,8 @@ class AppBlockRun:
                         result = False
                 else:
                     result = False
+
+                time.sleep(0.5)
             else:
                 result = False
         if not self.workers.get_workers_status():
