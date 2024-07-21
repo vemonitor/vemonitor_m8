@@ -13,31 +13,29 @@ setup(name='vemonitor_m8',
     url='https://github.com/vemonitor/vemonitor_m8',
     author='Eli Serra',
     author_email='eli.serra173@gmail.com',
-    description='Victron Serial VeDirect Monitoring App.',
     long_description=README,
     long_description_content_type="text/markdown",
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     license='Apache',
-    packages=['tests', 'vemonitor_m8'],
+    packages=['test', 'vemonitor_m8'],
     package_dir={
-        'vemonitor_m8': 'imgtools_m8',
-        'tests': 'tests'
+        'vemonitor_m8': 'vemonitor_m8',
+        'test': 'test'
     },
     package_data={
         'vemonitor_m8': [
             'confManager/confFiles/*.yaml',
             'confManager/confFiles/*.yml'
         ],
-        'tests': [
+        'test': [
             'conf/*.yaml',
             'conf/*.yml'
         ]
