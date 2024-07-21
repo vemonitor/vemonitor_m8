@@ -1,5 +1,5 @@
 # ---------------------------
-# redBatteryData default pytest settings
+# Unit test conf
 # Use YAML syntax
 # ---------------------------
 Imports:

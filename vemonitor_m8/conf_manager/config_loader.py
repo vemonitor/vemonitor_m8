@@ -157,7 +157,8 @@ class ConfigLoader(DataStructureLoader):
             data_structure=data_structure,
             points = app_blocks_columns
             )
-
+        # ToDo: userColumnsChecks.yaml must be appended to victronDeviceData.yaml
+        # ToDo: userColumnsChecks.yaml must be loaded from defined conf path
         try:
             # get columns checks from user file
             data_structure = self.get_yaml_data_structure(file_path="userColumnsChecks.yaml")

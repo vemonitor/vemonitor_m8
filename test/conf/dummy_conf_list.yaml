@@ -1,14 +1,16 @@
 # ---------------------------
-# redBatteryData default pytest settings
+# Unit test conf
 # Use YAML syntax
 # ---------------------------
-- "Includes battery.yaml"
+- Imports:
+  - "dummy_conf_list1.yaml"
+  - "dummy_conf_list2.yaml"
     
 
-- Dummy 1:
+- Dummy_1:
   - 1
   - 2
 
-- Dummy 2:
+- Dummy_2:
   - 2
   - 3

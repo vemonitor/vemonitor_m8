@@ -3,14 +3,12 @@
 # Use YAML syntax
 # ---------------------------
 Imports:
-    - "dummy_conf_dict1.yaml"
-    - "dummy_conf_dict2.yaml"
-    
+    - "empty.yaml"
 
-Dummy_1:
+Dummy 1:
   - 1
   - 2
 
-Dummy_2:
+Dummy 2:
   - 2
-  - 3
+  - 3 

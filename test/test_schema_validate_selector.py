@@ -37,7 +37,7 @@ class TestSchemaValidateSelector:
 
         with pytest.raises(ValidationError):
             jValid.is_valid_app_blocks_conf(conf_item={})
-        
+
         with pytest.raises(ValidationError):
             jValid.is_valid_app_blocks_conf(conf_item=None)
 

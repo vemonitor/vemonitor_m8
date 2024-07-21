@@ -2,15 +2,13 @@
 # Unit test conf
 # Use YAML syntax
 # ---------------------------
-Imports:
-    - "dummy_conf_dict1.yaml"
-    - "dummy_conf_dict2.yaml"
+- Imports: "dummy_conf_list1.yaml"
     
 
-Dummy_1:
+- Dummy_1:
   - 1
   - 2
 
-Dummy_2:
+- Dummy_2:
   - 2
   - 3

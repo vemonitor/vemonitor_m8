@@ -284,20 +284,27 @@ class IncludeImport:
         :doc-author: Trelent
         """
         imports = None
-        if Ut.is_dict(self.data) and\
-                Ut.is_list(self.data.get('Imports'), not_null=True):
+        if Ut.is_dict(self.data)\
+            and "Imports" in self.data:
 
+            if not Ut.is_list(self.data.get('Imports'), not_null=True):
+                raise YAMLFileError(
+                    "Error: Imports must be array/list type."
+                )
             imports = self.data.get('Imports')
 
         elif Ut.is_list(self.data, not_null=True):
-            imports = list()
-            for element in self.data:
-                if "includes" in element:
-                    for inc in element["includes"]:
-                        imports.append(inc)
 
-            if not Ut.is_list(imports, not_null=True):
-                imports = None
+            for element in self.data:
+                if Ut.is_dict(element) and "Imports" in element:
+                    if not Ut.is_list(element.get('Imports'), not_null=True):
+                        raise YAMLFileError(
+                            "Error: Imports must be array/list type."
+                        )
+                    imports = element.get('Imports')
+
+        if not Ut.is_list(imports, not_null=True):
+            imports = None
 
         return imports
 
