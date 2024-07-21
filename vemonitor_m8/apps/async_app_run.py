@@ -126,7 +126,7 @@ class AppBlockRun:
         if Ut.is_dict(data, not_null=True):
             result = DataChecker.check_columns(
                 data,
-                self.conf.columns_checks.get('points')
+                self.conf.data_structures.get('points')
             )
         return result
 
@@ -256,6 +256,8 @@ class AppBlockRun:
                         result = False
                 else:
                     result = False
+
+                time.sleep(0.5)
             else:
                 result = False
         if not self.workers.get_workers_status():
@@ -338,6 +340,11 @@ class AppBlockRun:
             if not self.workers.get_workers_status():
                 self._threads.cancel_all_timers()
                 time.sleep(2)
+                logger.error(
+                    "Fatal Error: Some output workers fails. "
+                    "Please control all outputs conectors, "
+                    "are up and ready."
+                )
                 raise WorkerException(
                     "Fatal Error: Some output workers fails. "
                     "Unable to open a connexion with some output connectors. "
