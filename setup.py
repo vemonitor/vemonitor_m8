@@ -1,3 +1,4 @@
+"""Vemonitor_m8 Setup"""
 import pathlib
 from setuptools import setup
 

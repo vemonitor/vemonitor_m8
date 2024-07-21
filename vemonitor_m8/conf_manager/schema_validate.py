@@ -108,8 +108,8 @@ class SchemaValidate():
 
     @classmethod
     def load_schema(cls,
-                      file_key: str
-                      ):
+                    file_key: str
+                    ):
         """
         Load json schema from file_key, and return parsed content.
 
@@ -139,33 +139,33 @@ class SchemaValidate():
         .. raises:: ValidationError, SchemaError, ErrorTree
         .. warnings:: Class Method and Private
         """
-        if Ut.is_str(file_key) and not Opath.isabs(file_key):
-            current_script_path = Opath.dirname(
-                Opath.abspath(inspect.getfile(inspect.currentframe()))
-            )
-            file_path = f"{file_key}_schema.json"
-            path = Opath.join(current_script_path, 'schemas', file_path)
-            if Opath.isfile(path):
-                file_size = Opath.getsize(path)
-                if file_size <= cls.MAX_FILE_SIZE:
-                    data = None
-                    # load the yaml file
-                    with open(path, "r", encoding="utf-8") as f:
-                        data = UJson.load_json(f)
-
-                    return data
-                else:
-                    raise SchemaError(
-                        "Fatal error jsonschema file is too big, "
-                        f"file size : {file_size}/{cls.MAX_FILE_SIZE}"
-                    )
-            else:
-                raise SchemaError(
-                    f"Fatal error, unable to load jsonschema for key {file_key}."
-                    f"Path : {path}"
-                )
-        else:
+        if not Ut.is_str(file_key, not_null=True) or Opath.isabs(file_key):
             raise SchemaError(
                 f"Fatal error, jsonschema for key {file_key}."
                 "is not valid"
             )
+
+        current_script_path = Opath.dirname(
+            Opath.abspath(inspect.getfile(inspect.currentframe()))
+        )
+        file_path = f"{file_key}_schema.json"
+        path = Opath.join(current_script_path, 'schemas', file_path)
+        if not Opath.isfile(path):
+            raise SchemaError(
+                f"Fatal error, unable to load jsonschema for key {file_key}."
+                f"Path : {path}"
+            )
+
+        file_size = Opath.getsize(path)
+        if file_size > cls.MAX_FILE_SIZE:
+            raise SchemaError(
+                "Fatal error jsonschema file is too big, "
+                f"file size : {file_size}/{cls.MAX_FILE_SIZE}"
+            )
+
+        data = None
+        # load the yaml file
+        with open(path, "r", encoding="utf-8") as f:
+            data = UJson.load_json(f)
+
+        return data
