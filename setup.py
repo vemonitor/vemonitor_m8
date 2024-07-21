@@ -9,7 +9,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(name='vemonitor_m8',
-    version='0.0.1',
+    version='0.0.2',
     description='Solar Plant Monitoring',
     url='https://github.com/vemonitor/vemonitor_m8',
     author='Eli Serra',
