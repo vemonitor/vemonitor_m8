@@ -25,7 +25,7 @@ def schema_manager_fixture():
             self.schema = SchemaValidate.load_schema("appConnectors")
             loader = Loader("test/conf/appConnectorsTest.yaml")
             self.obj = loader.get_yaml_config()
-        
+
         def get_string_auth_values_helper(self, choice: str) -> list:
             """
             Return a list of string_auth values to test jsonschema validation.

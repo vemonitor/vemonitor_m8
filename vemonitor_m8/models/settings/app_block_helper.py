@@ -123,7 +123,7 @@ class AppBlockHelper:
             if selector in ['all', 'outputs']:
                 sources = AppBlockHelper.get_app_block_sources_from_inout(
                     block.get('outputs'), sources)
-            
+
             if Ut.is_dict(block.get("redis_cache"), not_null=True)\
                     and Ut.is_str(
                         block['redis_cache'].get("source"), not_null=True
