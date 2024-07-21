@@ -84,3 +84,16 @@ class TestLoader:
         """Test get_paths_order method """
         path_order = Loader.get_paths_order()
         assert Ut.is_list(path_order, not_null=True)
+
+    def test_set_file_path(self, helper_manager):
+        """Test set_file_path method """
+        file_names = ['dummy_conf_dict.yaml']
+        obj = Loader(file_names, file_path=helper_manager.test_path)
+
+        assert Ut.is_str(obj.file_path, not_null=True)
+
+        with pytest.raises(YAMLFileNotFound):
+            obj.set_file_path(
+                file_name=file_names,
+                base_path=''
+            ) 
