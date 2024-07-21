@@ -3,12 +3,12 @@
 import logging
 from typing import Optional
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.models.settings.item_dict import DictOfObject
-from vemonitor_m8.models.settings.workers import InputWorker, OutputWorker
-from vemonitor_m8.models.settings.workers import Workers
-from vemonitor_m8.models.settings.workers import WorkersHelper
-from vemonitor_m8.workers.vedirect_worker import VedirectWorker
-from vemonitor_m8.workers.emoncms_worker import EmoncmsWorker
+from vemonitor_m8.models.item_dict import DictOfObject
+from vemonitor_m8.models.workers import InputWorker, OutputWorker
+from vemonitor_m8.models.workers import Workers
+from vemonitor_m8.models.workers import WorkersHelper
+from vemonitor_m8.workers.vedirect.vedirect_worker import VedirectWorker
+from vemonitor_m8.workers.emoncms.emoncms_worker import EmoncmsWorker
 from vemonitor_m8.core.exceptions import WorkerException
 
 

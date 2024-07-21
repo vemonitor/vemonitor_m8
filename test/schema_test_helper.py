@@ -5,7 +5,7 @@ from typing import Optional, Union
 import pytest
 from ve_utils.utype import UType as Ut
 from jsonschema.exceptions import ValidationError
-from vemonitor_m8.confManager.schema_validate import SchemaValidate
+from vemonitor_m8.conf_manager.schema_validate import SchemaValidate
 
 
 class SchemaTestHelper:

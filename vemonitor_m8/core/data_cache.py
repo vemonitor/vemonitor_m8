@@ -3,7 +3,7 @@
 import logging
 from typing import Optional
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.models.core.inputs_cache import InputsCache
+from vemonitor_m8.models.inputs_cache import InputsCache
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"

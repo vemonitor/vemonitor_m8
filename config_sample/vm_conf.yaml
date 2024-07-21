@@ -1,0 +1,129 @@
+# ---------------------------
+# This file is the root configuration file for vemonitor package.
+# Use YAML syntax
+# ---------------------------
+Imports:
+    - "vm_batteryBank.yaml"
+    - "vm_appConnectors.yaml"
+
+
+appBlocks:
+    # Define a block item
+    - # block item name
+        # str : (required, must be unique)
+        name: "bmvFakeSerial"
+        # app name of the block item
+        # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
+        app: "batSerialMonitor"
+        # args add extra data to app.
+        # related to batteryBank and/or solarPlant sections.
+        # dict :
+        #       -> {extra object names: extra object item names}
+        #       -> {['batteryBanks', 'solar_plant']: extra object item names}
+        args:
+            batteryBanks: "project1"
+        # inputs of app block item.
+        # Used to get data from variety of AppConnectors.
+        # Every AppConnector, has different type of configuration parameters.
+        # dict : {AppConnector key: list of connector inputs}
+        redis_cache:
+            source: "local"
+            max_data_points: 120
+        inputs:
+            serial:
+                -   name: "bmv700"
+                    source: "bmv700"
+                    time_interval: 1
+                    device: "BMV"
+                    ref_cols: [
+                        [ 'bat_voltage', 'V' ],
+                        [ 'bat_current', 'I' ],
+                        [ 'bat_power', 'P' ],
+                        [ 'bat_temperature', 't_bat' ],
+                        [ 'loc_temperature', 't_int' ]
+                    ]
+                    columns: [
+                        'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                        'AR', 'Relay','H2', 'H17', 'H18'
+                    ]
+                -   name: "bmv_extra"
+                    source: "bmv700"
+                    time_interval: 2
+                    device: "BMV"
+                    columns: [
+                        'TTG', 'H1', 'H3', 'H4', 'H5'
+                    ]
+                -   name: "bmv_extra2"
+                    source: "bmv700"
+                    time_interval: 5
+                    device: "BMV"
+                    columns: [
+                        'H6', 'H7', 'H8', 'H9', 'H10'
+                    ]
+                -   name: "bmv_extra3"
+                    source: "bmv700"
+                    time_interval: 10
+                    device: "BMV"
+                    columns: [
+                        'H11', 'H12', 'H13', 'H14', 'H15', 'H16'
+                    ]
+                -   name: "smart_solar"
+                    source: "blueSolar"
+                    time_interval: 1
+                    device: "MPTT"
+                    ref_cols: [
+                        [ 'bat_voltage', 'V' ],
+                        [ 'pv_voltage', 'VPV' ],
+                        [ 'pv_power', 'PPV' ],
+                        [ 'pv_current', 'I' ],
+                        [ 'charger_state', 'CS' ],
+                        [ 'pv_max_power', 'H21' ],
+                        [ 'pv_yield', 'H20' ]
+                    ]
+                    columns: [
+                        'V', 'I', 'VPV', 'PPV', 'H19', 'H22','H23', 'ERR', 'CS'
+                    ]
+                -   name: "mppt_extra"
+                    source: "blueSolar"
+                    time_interval: 10
+                    device: "MPTT"
+                    ref_cols: [
+                        [ 'bat_voltage', 'V' ],
+                        [ 'pv_voltage', 'VPV' ],
+                        [ 'pv_power', 'PPV' ],
+                        [ 'pv_current', 'I' ],
+                        [ 'charger_state', 'CS' ],
+                        [ 'pv_max_power', 'H21' ],
+                        [ 'pv_yield', 'H20' ]
+                    ]
+                    columns: [
+                        'Relay', 'H19', 'H20', 'H21', 'HSDS'
+                    ]
+
+        outputs:
+            emoncms:
+                -   name: "solar_plant_t1"
+                    source: "local"
+                    columns:
+                        bmv700: [
+                            'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                            'AR', 'Relay','H2', 'H17', 'H18', 'time_ref'
+                        ]
+                        bmv_extra: [
+                            'TTG', 'H1', 'H3', 'H4', 'H5', 'time_ref'
+                        ]
+                        bmv_extra2: [
+                            'H6', 'H7', 'H8', 'H9', 'H10', 'time_ref'
+                        ]
+                        bmv_extra3: [
+                            'H11', 'H12', 'H13', 'H14', 'H15', 'H16', 'time_ref'
+                        ]
+                        smart_solar: [
+                            'V', 'I', 'VPV', 'PPV', 'H19', 'H22','H23', 'ERR', 'CS', 'time_ref'
+                        ]
+                        mppt_extra: [
+                            'Relay', 'H19', 'H20', 'H21', 'HSDS', 'time_ref'
+                        ]
+                        rel_monitor: ['r_pmp', 'r_wat', 'r_sec', 'r_ge']
+                    time_interval: 1
+                    cache_interval: 5 # number of items to send at same time

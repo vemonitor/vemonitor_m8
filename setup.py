@@ -1,3 +1,4 @@
+"""Vemonitor_m8 Setup"""
 import pathlib
 from setuptools import setup
 
@@ -8,7 +9,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(name='vemonitor_m8',
-    version='0.0.1',
+    version='0.0.2',
     description='Solar Plant Monitoring',
     url='https://github.com/vemonitor/vemonitor_m8',
     author='Eli Serra',
@@ -32,8 +33,8 @@ setup(name='vemonitor_m8',
     },
     package_data={
         'vemonitor_m8': [
-            'confManager/confFiles/*.yaml',
-            'confManager/confFiles/*.yml'
+            'conf_manager/confFiles/*.yaml',
+            'conf_manager/confFiles/*.yml'
         ],
         'test': [
             'conf/*.yaml',

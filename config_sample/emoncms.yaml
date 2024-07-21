@@ -1,0 +1,154 @@
+# ---------------------------
+# This file is the Emoncms structure configuration file for vemonitor package.
+# Use YAML syntax
+# ---------------------------
+
+Structure:
+    localPv:
+        Text:
+            description: "Temperatura exterior"
+            feeds:
+                Tint:
+                    process: 1
+                    engine: 2
+                    unit: '°C'
+                    public: false
+                    time_interval: 30
+        Tint:
+            description: "Temperatura del local"
+            feeds:
+                Tint:
+                    process: 1
+                    engine: 2
+                    unit: '°C'
+                    public: false
+                    time_interval: 30
+        Hint:
+            description: "Humedad del local"
+            feeds:
+                Hint:
+                    process: 1
+                    engine: 2
+                    unit: '%'
+                    public: false
+                    time_interval: 30
+        DewP:
+            description: "Punto de rocio en el local"
+            feeds:
+                DewP:
+                    process: 1
+                    engine: 2
+                    unit: '°C'
+                    public: false
+                    time_interval: 30
+        Hmx:
+            description: "Humidex en el local"
+            feeds:
+                Hmx:
+                    process: 1
+                    engine: 2
+                    unit: '°C'
+                    public: false
+                    time_interval: 30
+        RelPump:
+            description: "Marcha Bomba sondeo"
+            feeds:
+                Hmx:
+                    process: 1
+                    engine: 2
+                    public: false
+                    time_interval: 1
+        RelWater:
+            description: "Relé de Nivel del sondeo"
+            feeds:
+                Hmx:
+                    process: 1
+                    engine: 2
+                    public: false
+                    time_interval: 1
+        RelGc:
+            description: "Marcha del grupo de gazolina"
+            feeds:
+                Hmx:
+                    process: 1
+                    engine: 2
+                    public: false
+                    time_interval: 1
+
+    batteries:
+        V:
+            description: "Battery voltage"
+            feeds:
+                V:
+                    process: 1
+                    engine: 2
+                    unit: 'V'
+                    public: false
+                    time_interval: 1
+        I:
+            description: "Battery current"
+            feeds:
+                I:
+                    process: 1
+                    time_interval: 1
+                    unit: 'A'
+        P:
+            description: "Instantaneous power"
+            feeds:
+                P:
+                    process: 1
+                    time_interval: 1
+                    unit: 'W'
+        CE:
+            description: "Consumed Amp Hours"
+            feeds:
+                CE:
+                    process: 1
+                    time_interval: 10
+                    unit: 'Ah'
+        SOC:
+            description: "State-of-charge"
+            feeds:
+                SOC:
+                    process: 1
+                    time_interval: 10
+                    unit: '%'
+        Alarm:
+            description: "Alarm condition active"
+            feeds:
+                Alarm:
+                    process: 1
+                    time_interval: 1
+        Relay:
+            description: "Relay state"
+            feeds:
+                Relay:
+                    process: 1
+                    time_interval: 1
+        AR:
+            description: "Alarm reason"
+            feeds:
+                AR:
+                    process: 1
+                    time_interval: 1
+        H2:
+            description: "Depth of the last discharge"
+            feeds:
+                H2:
+                    process: 1
+                    time_interval: 60
+                    unit: 'Ah'
+        H17:
+            description: "Amount of discharged energy"
+            feeds:
+                H17:
+                    process: 1
+                    time_interval: 10
+                    unit: 'Kwh'
+        H18:
+            description: "Amount of charged energy"
+            feeds:
+                H18:
+                    process: 1
+                    time_interval: 10
+                    unit: 'Kwh'

@@ -2,8 +2,8 @@
 import logging
 from ve_utils.utype import UType as Ut
 
-from vemonitor_m8.apps.async_app_run import AppBlockRun
-from vemonitor_m8.confManager.config_loader import ConfigLoader
+from vemonitor_m8.core.async_app_run import AppBlockRun
+from vemonitor_m8.conf_manager.config_loader import ConfigLoader
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
