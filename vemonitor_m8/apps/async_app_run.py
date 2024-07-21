@@ -126,7 +126,7 @@ class AppBlockRun:
         if Ut.is_dict(data, not_null=True):
             result = DataChecker.check_columns(
                 data,
-                self.conf.columns_checks.get('points')
+                self.conf.data_structures.get('points')
             )
         return result
 
