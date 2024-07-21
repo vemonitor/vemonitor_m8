@@ -5,7 +5,7 @@ import inspect
 from os import path as Opath
 import pytest
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.confManager.loader import Loader
+from vemonitor_m8.conf_manager.loader import Loader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
 
 

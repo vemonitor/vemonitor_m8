@@ -19,8 +19,8 @@ import logging
 from typing import Optional, Union
 from os import path as Opath
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.confManager.yaml_loader import YmlConfLoader
-from vemonitor_m8.confManager.loader import Loader
+from vemonitor_m8.conf_manager.yaml_loader import YmlConfLoader
+from vemonitor_m8.conf_manager.loader import Loader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
 
 

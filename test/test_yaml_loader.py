@@ -5,7 +5,7 @@ import os
 import inspect
 import pytest
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.confManager.yaml_loader import YmlConfLoader
+from vemonitor_m8.conf_manager.yaml_loader import YmlConfLoader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound, YAMLFileError
 
 

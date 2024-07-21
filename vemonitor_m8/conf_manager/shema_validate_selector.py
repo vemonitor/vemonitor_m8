@@ -17,7 +17,7 @@ Or if no error occurs, return data tested object
 
 import logging
 from typing import Union
-from vemonitor_m8.confManager.schema_validate import SchemaValidate
+from vemonitor_m8.conf_manager.schema_validate import SchemaValidate
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")

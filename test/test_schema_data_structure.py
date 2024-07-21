@@ -6,8 +6,8 @@ Test data_structure json schema validation.
 import pytest
 from ve_utils.utype import UType as Ut
 from jsonschema.exceptions import SchemaError
-from vemonitor_m8.confManager.schema_validate import SchemaValidate
-from vemonitor_m8.confManager.data_structure_loader import DataStructureLoader
+from vemonitor_m8.conf_manager.schema_validate import SchemaValidate
+from vemonitor_m8.conf_manager.data_structure_loader import DataStructureLoader
 from .schema_test_helper import SchemaTestHelper
 
 @pytest.fixture(name="schema_manager", scope="class")
@@ -19,7 +19,7 @@ def schema_manager_fixture():
             SchemaTestHelper.__init__(self)
             self.schema = SchemaValidate.load_schema("data_structure")
             loader = DataStructureLoader(
-                "vemonitor_m8/confManager/confFiles/victronDeviceData.yaml"
+                "vemonitor_m8/conf_manager/confFiles/victronDeviceData.yaml"
             )
             self.obj = loader.get_yaml_data_structure(
                 file_path="victronDeviceData.yaml"

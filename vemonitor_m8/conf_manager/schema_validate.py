@@ -118,7 +118,7 @@ class SchemaValidate():
         Then use the current script path to locate the schema directory path.
         And finaly, if path is a file on disck,
         read and parse the file content.
-            > ...vemonitor/confManager/schemas/[file_key]_schema.json
+            > ...vemonitor/conf_manager/schemas/[file_key]_schema.json
         
         If any error occurs, raise exception.
         Or if no error occurs, return parsed json schema.

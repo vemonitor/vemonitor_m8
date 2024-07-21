@@ -32,8 +32,8 @@ setup(name='vemonitor_m8',
     },
     package_data={
         'vemonitor_m8': [
-            'confManager/confFiles/*.yaml',
-            'confManager/confFiles/*.yml'
+            'conf_manager/confFiles/*.yaml',
+            'conf_manager/confFiles/*.yml'
         ],
         'test': [
             'conf/*.yaml',

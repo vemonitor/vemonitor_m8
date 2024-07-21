@@ -3,7 +3,7 @@ import inspect
 from os import path as Opath
 import pytest
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.confManager.config_loader import ConfigLoader
+from vemonitor_m8.conf_manager.config_loader import ConfigLoader
 from vemonitor_m8.core.exceptions import YAMLFileNotFound
 from vemonitor_m8.models.settings.config import Config
 from vemonitor_m8.models.settings.config_helper import ConfigHelper

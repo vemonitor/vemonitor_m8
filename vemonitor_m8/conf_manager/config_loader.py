@@ -23,9 +23,9 @@ import time
 from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.models.settings.config import Config
-from vemonitor_m8.confManager.schema_validate import SchemaValidate as sValid
-from vemonitor_m8.confManager.config_loader_helper import ConfigLoaderHelper as cHelp
-from vemonitor_m8.confManager.data_structure_loader import DataStructureLoader
+from vemonitor_m8.conf_manager.schema_validate import SchemaValidate as sValid
+from vemonitor_m8.conf_manager.config_loader_helper import ConfigLoaderHelper as cHelp
+from vemonitor_m8.conf_manager.data_structure_loader import DataStructureLoader
 from vemonitor_m8.core.exceptions import NullSettingException, YAMLFileNotFound
 
 logging.basicConfig()

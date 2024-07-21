@@ -4,8 +4,8 @@ from os import path as Opath
 import pytest
 from ve_utils.utype import UType as Ut
 from jsonschema.exceptions import ValidationError
-from vemonitor_m8.confManager.config_loader_helper import ConfigLoaderHelper as clh
-from vemonitor_m8.confManager.config_loader import ConfigLoader
+from vemonitor_m8.conf_manager.config_loader_helper import ConfigLoaderHelper as clh
+from vemonitor_m8.conf_manager.config_loader import ConfigLoader
 from vemonitor_m8.core.exceptions import SettingInvalidException
 
 
