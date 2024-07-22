@@ -2,15 +2,27 @@
 """
 Exceptions classes
 """
-# ----------------
-# Settings Loader Conf
-# ----------------
-class SettingFileNotFound(Exception):
+class VeMonitorError(Exception):
     """
     Settings file has not been found
     """
 
-class SettingInvalidException(Exception):
+# ----------------
+# Settings Loader Conf
+# ----------------
+class SettingsError(VeMonitorError):
+    """
+    Settings Error
+    """
+
+
+class SettingFileNotFound(SettingsError):
+    """
+    Settings file has not been found
+    """
+
+
+class SettingInvalidException(SettingsError):
     """
     Some data must match the expected value/type
 
@@ -18,7 +30,7 @@ class SettingInvalidException(Exception):
     """
 
 
-class NullSettingException(Exception):
+class NullSettingException(SettingsError):
     """
     Some Attributes can not be Null
 
@@ -26,7 +38,7 @@ class NullSettingException(Exception):
     """
 
 
-class SettingNotFound(Exception):
+class SettingNotFound(SettingsError):
     """
     Some Attributes are missing
 
@@ -36,31 +48,67 @@ class SettingNotFound(Exception):
 # ----------------
 # YAML Loader Conf
 # ----------------
-class YAMLFileNotFound(Exception):
+class LoadYamlError(VeMonitorError):
+    """
+    Settings Error
+    """
+class YAMLFileNotFound(LoadYamlError):
     """
     YAML file has not been found
     """
 
 
-class YAMLFileEmpty(Exception):
+class YAMLFileEmpty(LoadYamlError):
     """
     YAML file empty
     """
 
-class YAMLFileError(Exception):
+class YAMLFileError(LoadYamlError):
     """
     YAML file empty
     """
 
+# ----------------
+# Device data check configuration
+# ----------------
+class DeviceDataError(VeMonitorError):
+    """
+    Device data check error
+    """
+
+
+class DeviceDataConfError(DeviceDataError):
+    """
+    Device data check configuration error
+    """
+
+
+class DeviceInputValueError(DeviceDataError):
+    """
+    Device Input Value Error
+    """
+
+
+class DeviceOutputValueError(DeviceDataError):
+    """
+    Device Output Value Error
+    """
 # ----------------
 # Serial Com
 # ----------------
-class SerialConnectionException(Exception):
+class SerialError(VeMonitorError):
+    """
+    Serial error
+    """
+
+
+class SerialConnectionException(SerialError):
     """
     Serial Connection error
     """
 
-class SerialWriteException(Exception):
+
+class SerialWriteException(SerialError):
     """
     VeDirect data conversion error
     """
@@ -69,7 +117,12 @@ class SerialWriteException(Exception):
 # ----------------
 # Redis
 # ----------------
-class RedisConnectionException(Exception):
+class RedisError(VeMonitorError):
+    """
+    Redis error
+    """
+
+class RedisConnectionException(RedisError):
     """
     Redis Connection error
     """
@@ -78,7 +131,7 @@ class RedisConnectionException(Exception):
 # ----------------
 # Workers
 # ----------------
-class WorkerException(Exception):
+class WorkerException(VeMonitorError):
     """
     Worker error
     """
