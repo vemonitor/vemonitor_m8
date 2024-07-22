@@ -1,0 +1,73 @@
+# ---------------------------
+# This file is the root configuation file for vemonitor package.
+# Use YAML syntax
+# ---------------------------
+
+appConnectors:
+  # ---------------------------
+  # Serial Conector configuarations
+  # ---------------------------
+  serial:
+      bmv700:
+        active: True
+        # Number max of inputs sended per block 
+        #blockLengthInputs: 18
+        # time interval to send all blocks on serial by device
+        #intervalDataSend: 1000
+        #baud: 19200
+        #timeout: 10
+        #delimiters: {header1: "\r", header2: "\n", delimiter: "\t"}
+        # path of serial port
+        # -> required with devTty if no serialTest setting present
+        #serialpath: "/tmp"
+        serialPort: '/home/tepochtli/vmodem1'
+        # Serial test to determine if serial readed data corespond with this serial item.
+        # -> usefull if more than one serial item is readed or if serial port change.
+        # -> eg. changing usb port, and serial port name devTty not be updated by user.
+        # -> scan all serial ports on serial path devPath or in ['/dev', '/tmp'] and search corresponding serial
+        serialTest:
+          PIDTest:
+            typeTest: "value"
+            key: "PID"
+            value: "0x203"
+      blueSolar:
+        active: True
+        # Number max of inputs sended per block 
+        #blockLengthInputs: 18
+        # time interval to send all blocks on serial by device
+        #intervalDataSend: 1000
+        #baud: 19200
+        #timeout: 10
+        #delimiters: {header1: "\r", header2: "\n", delimiter: "\t"}
+        # path of serial port
+        # -> required with devTty if no serialTest setting present
+        serialPort: '/home/tepochtli/vmodem3'
+        # Serial test to determine if serial readed data corespond with this serial item.
+        # -> usefull if more than one serial item is readed or if serial port change.
+        # -> eg. changing usb port, and serial port name devTty not be updated by user.
+        # -> scan all serial ports on serial path devPath or in ['/dev', '/tmp'] and search corresponding serial
+        serialTest:
+          PIDTest:
+            typeTest: "value"
+            key: "PID"
+            value: "0xA042"
+  # ---------------------------
+  # Redis Server configurations
+  # ---------------------------
+  redis:
+      local:
+        active: True
+        host: "127.0.0.1"
+        port: 6379
+  # ---------------------------
+  # Emoncms Server configurations
+  # ---------------------------
+  emoncms:
+    local:
+      active: True
+      addr: "http://127.0.0.1:8080"
+      apikey: "My_EmonCms_ApiKey" # Must be replaced by your Read/Write Api Key
+    devHost:
+      active: True
+      addr: "http://192.168.1.4:8081" 
+      apikey: "My_EmonCms_ApiKey"
