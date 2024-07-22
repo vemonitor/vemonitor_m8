@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Test Utils class."""
-import pytest
-from ve_utils.utype import UType as Ut
 from vemonitor_m8.core.utils import Utils as Utvm
 
 class TestUtils:
