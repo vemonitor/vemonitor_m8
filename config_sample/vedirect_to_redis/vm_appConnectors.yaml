@@ -20,7 +20,7 @@ appConnectors:
         # path of serial port
         # -> required with devTty if no serialTest setting present
         #serialpath: "/tmp"
-        serialPort: '/home/tepochtli/vmodem1'
+        serialPort: '/${HOME}/vmodem1'
         # Serial test to determine if serial readed data corespond with this serial item.
         # -> usefull if more than one serial item is readed or if serial port change.
         # -> eg. changing usb port, and serial port name devTty not be updated by user.
@@ -41,7 +41,7 @@ appConnectors:
         #delimiters: {header1: "\r", header2: "\n", delimiter: "\t"}
         # path of serial port
         # -> required with devTty if no serialTest setting present
-        serialPort: '/home/tepochtli/vmodem3'
+        serialPort: '/${HOME}/vmodem3'
         # Serial test to determine if serial readed data corespond with this serial item.
         # -> usefull if more than one serial item is readed or if serial port change.
         # -> eg. changing usb port, and serial port name devTty not be updated by user.

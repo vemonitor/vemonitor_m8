@@ -22,13 +22,19 @@ appBlocks:
         #       -> {['batteryBanks', 'solar_plant']: extra object item names}
         args:
             batteryBanks: "project1"
+        # Redis Cache (Optional)
+        # if not defined data is cached by Memory
+        # Define the Redis server used for cache. (View appConnectors)
+        # And max_data_points for length max of cache data
+        # When max_data_points is reached, 
+        # the oldest item is deleted and the new one is added. 
+        redis_cache:
+            source: "local"
+            max_data_points: 120
         # inputs of app block item.
         # Used to get data from variety of AppConnectors.
         # Every AppConnector, has different type of configuration parameters.
         # dict : {AppConnector key: list of connector inputs}
-        redis_cache:
-            source: "local"
-            max_data_points: 120
         inputs:
             serial:
                 -   name: "bmv700"

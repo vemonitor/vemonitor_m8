@@ -15,7 +15,7 @@
           onError: "waitConnection"
           # path of serial port
           # -> required with devTty if no serialTest setting present
-          serialPort: '/home/tepochtli/vmodem1'
+          serialPort: '/${HOME}/vmodem1'
           # Serial test to determine if serial readed data corespond with this serial item.
           # -> usefull for conection issues, serial port change.
           # -> eg. changing usb port, and serial port name devTty not be updated by user.
