@@ -1,0 +1,71 @@
+# ---------------------------
+# This file is the root configuration file for vemonitor package.
+# Get data from Victron BMV700 battery monitor via VeDirect protocol
+# Then Save data from BMV700 on local redis server db.
+# Use YAML syntax
+# ---------------------------
+Imports:
+    - "vm_batteryBank.yaml"
+    - "vm_appConnectors.yaml"
+
+
+appBlocks:
+    # Define a block item
+    - # block item name
+        # str : (required, must be unique)
+        name: "bmvFakeSerial"
+        # app name of the block item
+        # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
+        app: "batSerialMonitor"
+        # args add extra data to app.
+        # related to batteryBank and/or solarPlant sections.
+        # dict :
+        #       -> {extra object names: extra object item names}
+        #       -> {['batteryBanks', 'solar_plant']: extra object item names}
+        args:
+            batteryBanks: "project1"
+        # Redis Cache (Optional)
+        # if not defined data is cached by Memory
+        # Define the Redis server used for cache. (View appConnectors)
+        # And max_data_points for length max of cache data
+        # When max_data_points is reached, 
+        # the oldest item is deleted and the new one is added. 
+        redis_cache:
+            source: "local"
+            max_data_points: 120
+        # inputs of app block item.
+        # Used to get data from variety of AppConnectors.
+        # Every AppConnector, has different type of configuration parameters.
+        # dict : {AppConnector key: list of connector inputs}
+        inputs:
+            serial:
+                -   name: "bmv700"
+                    source: "bmv700"
+                    time_interval: 1
+                    device: "BMV"
+                    ref_cols: [
+                        [ 'bat_voltage', 'V' ],
+                        [ 'bat_current', 'I' ],
+                        [ 'bat_power', 'P' ],
+                        [ 'bat_temperature', 't_bat' ],
+                        [ 'loc_temperature', 't_int' ]
+                    ]
+                    columns: [
+                        'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                        'AR', 'Relay','H2', 'H17', 'H18'
+                    ]
+        outputs:
+            redis:
+              - source: "local"
+                time_interval: 1
+                redis_node: "bmv700"
+                ref_cols:  [
+                    ['bat_voltage', 'V'],
+                    ['bat_current', 'I'],
+                    ['bat_power', 'P']
+                ]
+                columns: 
+                    bmv700: [
+                        'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                        'AR', 'Relay','H2', 'H17', 'H18'
+                    ]
