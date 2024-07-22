@@ -16,8 +16,10 @@ from vemonitor_m8.core.data_checker import DataChecker
 from vemonitor_m8.models.config import Config
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.workers.workers_manager import WorkersManager
+from vemonitor_m8.core.exceptions import DeviceInputValueError
 from vemonitor_m8.core.exceptions import RedisConnectionException
 from vemonitor_m8.core.exceptions import SettingInvalidException, WorkerException
+from vemonitor_m8.core.exceptions import DeviceDataConfError
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -53,8 +55,7 @@ class AppBlockRun:
             signum
         )
         self._run = False
-        self._threads.cancel_all_timers()
-        time.sleep(2)
+        self.cancel_all_timers()
         sys.exit(1)
 
     def is_ready(self) -> bool:
@@ -116,6 +117,11 @@ class AppBlockRun:
             )
         return result
 
+    def cancel_all_timers(self) -> bool:
+        """Set Cancell all Thread timers."""
+        self._threads.cancel_all_timers()
+        time.sleep(3)
+
     def format_input_data(self,
                           data: dict,
                           columns: Optional[list] = None
@@ -124,10 +130,23 @@ class AppBlockRun:
         result = None
         data = Ut.get_items_from_dict(data, columns)
         if Ut.is_dict(data, not_null=True):
-            result = DataChecker.check_columns(
-                data,
-                self.conf.data_structures.get('points')
-            )
+            try:
+                result = DataChecker.check_input_columns(
+                    data,
+                    self.conf.data_structures.get('points')
+                )
+            except (
+                DeviceDataConfError,
+                DeviceInputValueError
+                ) as ex:
+                self.cancel_all_timers()
+                raise DeviceDataConfError(
+                    "Fatal Error: Device Data Error. "
+                    "See Your device data configuration. "
+                    "Or some ipnut value is bad type"
+                    f"data checked: {data}"
+                ) from ex
+
         return result
 
     def get_app_connector_by_key_item(self, item_key: str, source: str):
@@ -338,8 +357,7 @@ class AppBlockRun:
             # inputs workers blocks run
             self.setup_outputs_workers()
             if not self.workers.get_workers_status():
-                self._threads.cancel_all_timers()
-                time.sleep(2)
+                self.cancel_all_timers()
                 logger.error(
                     "Fatal Error: Some output workers fails. "
                     "Please control all outputs conectors, "
