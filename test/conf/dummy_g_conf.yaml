@@ -85,14 +85,6 @@ appBlocks:
                 time_interval: 5
                 columns: 
                     sim_BMV: ['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'H7', 'H8', 'H9', 'H10','H11', 'H12']
-          influxDb2:
-              - source: "local"
-                db: 'telegraf_z'
-                measurement: 'solar'
-                tags: ['BMV700']
-                time_interval: 1
-                columns: 
-                    sim_BMV: ['V', 'I', 'P', 'H17', 'H18', 'CE', 'SOC', 'TTG', 'Alarm', 'AR', 'Relay']
 
     - name: "monitFakeProject1"
       app: "redisBatMonitor"
