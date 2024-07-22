@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Inputs data cache Helper"""
 import logging
@@ -32,13 +33,13 @@ class DataCache(InputsCache):
     def init_data(self):
         """Init inputs data cache"""
         if not Ut.is_dict(self.data):
-            self.data = dict()
+            self.data = {}
 
     def init_data_key(self, key):
         """Init inputs data cache key"""
         self.init_data()
         if not Ut.is_dict(self.data.get(key)):
-            self.data[key] = dict()
+            self.data[key] = {}
 
     def control_data_len(self):
         """Control inputs data cache length"""
@@ -68,7 +69,7 @@ class DataCache(InputsCache):
         """Get data cache extract."""
         result, last_time, max_time = None, 0, 0
         if self.has_data():
-            result = dict()
+            result = {}
             keys = list(self.data.keys())
             keys.sort()
             max_time = max(keys)

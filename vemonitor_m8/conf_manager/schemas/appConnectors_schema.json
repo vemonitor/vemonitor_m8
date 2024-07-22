@@ -35,7 +35,7 @@
                     "serialPort": {
                         "description": "Serial AppConnector item port.",
                         "type": "string",
-                        "pattern": "^([a-zA-Z0-9_\\-/.]{1,30})$"
+                        "pattern": "^(\/[$]{HOME})?([a-zA-Z0-9_\\\/.-]{1,30})$"
                     },
                     "serialTest": {
                         "description": "Serial AppConnector item test items.",

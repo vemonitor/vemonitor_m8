@@ -96,4 +96,4 @@ class TestLoader:
             obj.set_file_path(
                 file_name=file_names,
                 base_path=''
-            ) 
+            )
