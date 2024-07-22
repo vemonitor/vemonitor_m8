@@ -51,7 +51,7 @@ class ThreadsController:
     def cancel_all_timers(self):
         """Cancel all timers running"""
         if self.has_timers():
-            for key, timer in self._timers.items():
+            for timer in self._timers.values():
                 timer.cancel()
 
     def start_timers(self):
