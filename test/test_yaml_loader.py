@@ -44,7 +44,7 @@ class TestYmlConfLoader():
                     "import_not_found.yaml"
                 )
             )
-        
+
         # test import file exist but empty
         with pytest.raises(YAMLFileNotFound):
             YmlConfLoader.get_config(
