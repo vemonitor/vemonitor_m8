@@ -102,8 +102,8 @@ class VedirectWorker(InputWorker):
                     "serial_test": connector.get('serialTest'),
                     "source_name": "VedirectWorker",
                     "auto_start": False,
-                    "wait_connection": False,
-                    "wait_timeout": 1
+                    "wait_connection": True,
+                    "wait_timeout": 2
                 }
                 serial_conf = {}
                 if Ut.is_str(connector.get('serialPort'), not_null=True):
