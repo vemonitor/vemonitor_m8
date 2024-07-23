@@ -191,7 +191,7 @@ class RedisOutputWorker(OutputWorker):
         if Ut.is_dict(conf, not_null=True):
             if Ut.is_dict(conf.get('connector'), not_null=True):
                 result = conf.get('connector')
-                result.pop("active")
+                # result.pop("active")
             elif isinstance(conf.get('connector'), RedisApp):
                 result = conf.get('connector')
         return result
@@ -201,5 +201,5 @@ class RedisOutputWorker(OutputWorker):
         """Test if is configuration data."""
         return (Ut.is_dict(data)
                 and Ut.is_str(data.get('host'), not_null=True)
-                and Ut.is_str(data.get('port'), not_null=True)) \
+                and Ut.is_int(data.get('port'), not_null=True)) \
             or isinstance(data, RedisApp)
