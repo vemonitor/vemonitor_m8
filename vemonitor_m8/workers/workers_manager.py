@@ -7,6 +7,8 @@ from vemonitor_m8.models.item_dict import DictOfObject
 from vemonitor_m8.models.workers import InputWorker, OutputWorker
 from vemonitor_m8.models.workers import Workers
 from vemonitor_m8.models.workers import WorkersHelper
+from vemonitor_m8.workers.redis.redis_worker import RedisInputWorker
+from vemonitor_m8.workers.redis.redis_worker import RedisOutputWorker
 from vemonitor_m8.workers.vedirect.vedirect_worker import VedirectWorker
 from vemonitor_m8.workers.emoncms.emoncms_worker import EmoncmsWorker
 from vemonitor_m8.core.exceptions import WorkerException
@@ -203,7 +205,12 @@ class WorkersManager(Workers):
                     value=('input', worker_name)
                 )
             if worker_key == "redis":
-                pass
+                worker = WorkersManager.init_redis_output_worker(
+                    connector=connector,
+                    worker_key=worker_key,
+                    enum_key=enum_key,
+                    item=item
+                )
             elif worker_key == "influxDb2":
                 pass
             elif worker_key == "emoncms":
@@ -246,6 +253,36 @@ class WorkersManager(Workers):
                              item: dict) -> VedirectWorker:
         """Initialise Serial vedirect worker."""
         return VedirectWorker(
+            WorkersHelper.format_worker_conf(
+                connector=connector,
+                worker_key=worker_key,
+                enum_key=enum_key,
+                item=item
+            )
+        )
+
+    @staticmethod
+    def init_redis_input_worker(connector: dict,
+                                worker_key: str,
+                                enum_key: int,
+                                item: dict) -> RedisInputWorker:
+        """Initialise Serial vedirect worker."""
+        return RedisInputWorker(
+            WorkersHelper.format_worker_conf(
+                connector=connector,
+                worker_key=worker_key,
+                enum_key=enum_key,
+                item=item
+            )
+        )
+
+    @staticmethod
+    def init_redis_output_worker(connector: dict,
+                                worker_key: str,
+                                enum_key: int,
+                                item: dict) -> RedisOutputWorker:
+        """Initialise Serial vedirect worker."""
+        return RedisOutputWorker(
             WorkersHelper.format_worker_conf(
                 connector=connector,
                 worker_key=worker_key,
