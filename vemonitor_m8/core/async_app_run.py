@@ -12,6 +12,7 @@ from vemonitor_m8.core.threads_controller import ThreadsController
 from vemonitor_m8.events.app_block_events import AppBlockEvents
 from vemonitor_m8.core.data_cache import DataCache
 from vemonitor_m8.workers.redis.redis_cache import RedisCache
+from vemonitor_m8.models.inputs_cache import InputsCache
 from vemonitor_m8.core.data_checker import DataChecker
 from vemonitor_m8.models.config import Config
 from vemonitor_m8.models.workers import WorkersHelper
@@ -46,7 +47,6 @@ class AppBlockRun:
         if self.set_conf(conf)\
                 and self.init_data_cache():
             self._run = True
-            self.run_block()
 
     def sig_handler(self, signum, frame):
         """Signal handler"""
@@ -60,13 +60,22 @@ class AppBlockRun:
 
     def is_ready(self) -> bool:
         """Test if class instance have valid battery_bank property."""
-        return self._run is True
+        return self.is_conf_ready()\
+            and self.is_cache_ready()\
+            and self._run is True
+
+    def is_conf_ready(self) -> bool:
+        """Test if class instance have valid battery_bank property."""
+        return isinstance(self.conf, Config)
+
+    def is_cache_ready(self) -> bool:
+        """Test if class instance have valid battery_bank property."""
+        return isinstance(self.inputs_data, InputsCache)
 
     def init_redis_cache(self) -> bool:
         """Init redis cache object."""
         result = False
         if AppBlockRun.is_conf(self.conf):
-            result = True
             redis_cache = self.conf.app_blocks[0].get('redis_cache')
             if Ut.is_dict(redis_cache, not_null=True):
                 try:
@@ -81,12 +90,14 @@ class AppBlockRun:
                     logger.info(
                         "Redis Cache is enabled and active"
                     )
-                except RedisConnectionException:
+                except RedisConnectionException as ex:
                     result = False
                     logger.error(
                         "Error Redis Cache is enabled, "
                         "but we are unable to connect to Redis server."
                         "Please check Redis App Connectors Configuration."
+                        "Exception: {%s}",
+                        ex
                     )
         return result
 
@@ -94,7 +105,6 @@ class AppBlockRun:
         """Init dataCache object."""
         result = False
         if AppBlockRun.is_conf(self.conf):
-            result = True
             if self.init_redis_cache() is True:
                 result = True
             else:
@@ -102,6 +112,7 @@ class AppBlockRun:
                     "Start Memory Data Cache..."
                 )
                 self.inputs_data = DataCache(max_rows=15)
+                result = True
         return result
 
     def set_conf(self, conf) -> bool:

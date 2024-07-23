@@ -199,6 +199,28 @@ class InputWorker(Worker):
         """Get input data from Worker class instance."""
 
 
+class InputDictWorker(InputWorker):
+    """
+    Input Worker model helper.
+    Used by simple inputs workers
+    """
+
+    def __init__(self):
+        InputWorker.__init__(self)
+
+    def has_columns(self) -> bool:
+        """Test if instance has columns property."""
+        return Ut.is_dict(self.columns, not_null=True)
+
+    def set_columns(self, value: dict) -> bool:
+        """Set time_interval property."""
+        result = False
+        if Ut.is_dict(value, not_null=True):
+            self.columns = value
+            result = True
+        return result
+
+
 class OutputWorker(Worker):
     """Output Worker model helper"""
 
@@ -300,11 +322,11 @@ class OutputWorker(Worker):
         """
         result = False
         if Ut.is_dict(conf)\
-                and self.set_name(conf.get('name'))\
                 and self.set_worker_key(conf.get('worker_key'))\
                 and self.set_enum_key(conf.get('enum_key'))\
                 and self.set_time_interval(conf.get('time_interval'))\
                 and self.set_columns(conf.get('columns')):
+            self.set_name(conf.get('name'))
             self.set_cache_interval(conf.get('cache_interval'))
             self.set_ref_cols(conf.get('ref_cols'))
             result = True

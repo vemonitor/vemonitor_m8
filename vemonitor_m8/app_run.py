@@ -44,3 +44,4 @@ class AppRun:
                 "Starting app blocks workers"
             )
             self.app = AppBlockRun(self.conf)
+            self.app.run_block()

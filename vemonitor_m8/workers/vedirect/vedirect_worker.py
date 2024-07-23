@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """Vedirect reader app Helper"""
 import logging
+import os
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 
@@ -101,12 +102,15 @@ class VedirectWorker(InputWorker):
                     "serial_test": connector.get('serialTest'),
                     "source_name": "VedirectWorker",
                     "auto_start": False,
-                    "wait_connection": False,
-                    "wait_timeout": 1
+                    "wait_connection": True,
+                    "wait_timeout": 2
                 }
-                serial_conf = dict()
+                serial_conf = {}
                 if Ut.is_str(connector.get('serialPort'), not_null=True):
-                    serial_conf["serial_port"] = connector.get('serialPort')
+                    serial_port = connector.get('serialPort')
+                    if '/${HOME}' in serial_port:
+                        serial_port = serial_port.replace('/${HOME}', os.getenv("HOME"))
+                    serial_conf["serial_port"] = serial_port
 
                 if Ut.is_int(connector.get('baud'), positive=True):
                     serial_conf["baud"] = connector.get('baud')

@@ -4,7 +4,7 @@ import logging
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.workers.redis.redis_app import RedisApp
-from vemonitor_m8.models.workers import InputWorker
+from vemonitor_m8.models.workers import InputDictWorker
 from vemonitor_m8.models.workers import OutputWorker
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException
@@ -20,10 +20,10 @@ logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
 
-class RedisInputWorker(InputWorker):
+class RedisInputWorker(InputDictWorker):
     """Redis reader app Helper"""
     def __init__(self, conf: dict):
-        InputWorker.__init__(self)
+        InputDictWorker.__init__(self)
         if self.set_conf(conf):
             self.set_worker_status()
 
@@ -37,7 +37,7 @@ class RedisInputWorker(InputWorker):
         if self._status is False:
             logger.warning(
                 "Redis Connection Error: "
-                "Vedirect worker is not ready. "
+                "Redis worker is not ready. "
                 "Worker Name: %s",
                 self.get_name()
             )
@@ -136,6 +136,22 @@ class RedisOutputWorker(OutputWorker):
         return isinstance(self.worker, RedisApp)\
             and self.worker.is_ready()
 
+    def notify_worker_error(self) -> bool:
+        """Add message to logger if worker is not ready."""
+        if self._status is False:
+            logger.warning(
+                "Redis Connection Error: "
+                "Redis worker is not ready. "
+                "Worker Name: %s",
+                self.get_name()
+            )
+
+    def set_worker_status(self) -> bool:
+        """Test if Worker status is ready."""
+        self._status = self.worker.ping()
+        self.notify_worker_error()
+        return self._status
+
     def set_worker(self, worker: dict) -> bool:
         """Set redis worker"""
         result = False
@@ -175,7 +191,7 @@ class RedisOutputWorker(OutputWorker):
         if Ut.is_dict(conf, not_null=True):
             if Ut.is_dict(conf.get('connector'), not_null=True):
                 result = conf.get('connector')
-                result.pop("active")
+                # result.pop("active")
             elif isinstance(conf.get('connector'), RedisApp):
                 result = conf.get('connector')
         return result
@@ -185,5 +201,5 @@ class RedisOutputWorker(OutputWorker):
         """Test if is configuration data."""
         return (Ut.is_dict(data)
                 and Ut.is_str(data.get('host'), not_null=True)
-                and Ut.is_str(data.get('port'), not_null=True)) \
+                and Ut.is_int(data.get('port'), not_null=True)) \
             or isinstance(data, RedisApp)
