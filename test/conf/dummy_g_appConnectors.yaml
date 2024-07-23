@@ -38,16 +38,15 @@ appConnectors:
   redis:
       local:
           active: True
-          host: "0.0.0.0"
-          port: 8080
-          password: "my_very_large_auth"
+          host: "127.0.0.1"
+          port: 6379
   # ---------------------------
   # InfluxDb 2 Api configuarations
   # ---------------------------
   influxDb2:
       local:
           active: True
-          host: "http://1.1.1.1:8080"
+          host: "http://127.0.0.1:8080"
           org: 'vemonitor'
           auth: "my_very_large_auth"
           timeout: 6000
