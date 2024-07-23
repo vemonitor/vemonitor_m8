@@ -159,7 +159,12 @@ class WorkersManager(Workers):
                     item=item
                 )
             elif worker_key == "redis":
-                pass
+                worker = WorkersManager.init_redis_input_worker(
+                    connector=connector,
+                    worker_key=worker_key,
+                    enum_key=enum_key,
+                    item=item
+                )
             elif worker_key == "influxDb2":
                 pass
             elif worker_key == "tuya":
