@@ -1,6 +1,4 @@
 """Test AppBlockEvents method."""
-
-
 import pytest
 from vemonitor_m8.events.app_block_events import AppBlockEvents
 
