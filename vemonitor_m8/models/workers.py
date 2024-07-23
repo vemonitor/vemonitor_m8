@@ -322,11 +322,11 @@ class OutputWorker(Worker):
         """
         result = False
         if Ut.is_dict(conf)\
-                and self.set_name(conf.get('name'))\
                 and self.set_worker_key(conf.get('worker_key'))\
                 and self.set_enum_key(conf.get('enum_key'))\
                 and self.set_time_interval(conf.get('time_interval'))\
                 and self.set_columns(conf.get('columns')):
+            self.set_name(conf.get('name'))
             self.set_cache_interval(conf.get('cache_interval'))
             self.set_ref_cols(conf.get('ref_cols'))
             result = True
