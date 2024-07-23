@@ -4,7 +4,7 @@ import logging
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.workers.redis.redis_app import RedisApp
-from vemonitor_m8.models.workers import InputWorker
+from vemonitor_m8.models.workers import InputDictWorker
 from vemonitor_m8.models.workers import OutputWorker
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException
@@ -20,10 +20,10 @@ logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
 
-class RedisInputWorker(InputWorker):
+class RedisInputWorker(InputDictWorker):
     """Redis reader app Helper"""
     def __init__(self, conf: dict):
-        InputWorker.__init__(self)
+        InputDictWorker.__init__(self)
         if self.set_conf(conf):
             self.set_worker_status()
 
@@ -37,7 +37,7 @@ class RedisInputWorker(InputWorker):
         if self._status is False:
             logger.warning(
                 "Redis Connection Error: "
-                "Vedirect worker is not ready. "
+                "Redis worker is not ready. "
                 "Worker Name: %s",
                 self.get_name()
             )
