@@ -136,6 +136,22 @@ class RedisOutputWorker(OutputWorker):
         return isinstance(self.worker, RedisApp)\
             and self.worker.is_ready()
 
+    def notify_worker_error(self) -> bool:
+        """Add message to logger if worker is not ready."""
+        if self._status is False:
+            logger.warning(
+                "Redis Connection Error: "
+                "Redis worker is not ready. "
+                "Worker Name: %s",
+                self.get_name()
+            )
+
+    def set_worker_status(self) -> bool:
+        """Test if Worker status is ready."""
+        self._status = self.worker.ping()
+        self.notify_worker_error()
+        return self._status
+
     def set_worker(self, worker: dict) -> bool:
         """Set redis worker"""
         result = False
