@@ -89,6 +89,13 @@ class WorkersManager(Workers):
                     result = worker.worker
         return result
 
+    def add_active_connector(self, key: str, value: tuple)-> bool:
+        """Add Worker status error"""
+        return self.active_connectors.add_item(
+            key=key,
+            value=value
+        )
+
     def get_workers_status(self)-> bool:
         """Add Worker status error"""
         return self._workers_status is True
@@ -139,10 +146,11 @@ class WorkersManager(Workers):
             if active_connector is not None:
                 connector = active_connector
             else:
-                self.active_connectors.add_item(
+                self.add_active_connector(
                     key=connector_key,
                     value=('input', worker_name)
                 )
+            # init worker type
             if worker_key == "serial":
                 worker = WorkersManager.init_vedirect_worker(
                     connector=connector,
@@ -200,7 +208,7 @@ class WorkersManager(Workers):
             if active_connector is not None:
                 connector = active_connector
             else:
-                self.active_connectors.add_item(
+                self.add_active_connector(
                     key=connector_key,
                     value=('input', worker_name)
                 )
