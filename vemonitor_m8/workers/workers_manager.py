@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
 """Workers manager helper"""
 import logging
 from typing import Optional
 from vemonitor_m8.models.workers import InputWorker, OutputWorker
 from vemonitor_m8.models.workers import Workers
 from vemonitor_m8.models.workers import WorkersHelper
-from vemonitor_m8.workers.redis.redis_worker import RedisInputWorker
-from vemonitor_m8.workers.redis.redis_worker import RedisOutputWorker
-from vemonitor_m8.workers.vedirect.vedirect_worker import VedirectWorker
-from vemonitor_m8.workers.emoncms.emoncms_worker import EmoncmsWorker
+from vemonitor_m8.workers.active_connectors import ActiveConnectors
 from vemonitor_m8.core.exceptions import WorkerException
 from vemonitor_m8.workers.workers_loader import WorkersLoader
 
@@ -22,45 +18,6 @@ __version__ = "1.0.0"
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
-
-
-class ActiveConnectors(DictOfObject):
-    """ActiveConnectors model helper"""
-    def __init__(self):
-        DictOfObject.__init__(self)
-
-    def has_item_key(self, key: tuple) -> bool:
-        """Test if instance has item key defined."""
-        return self.has_items()\
-            and ActiveConnectors.is_valid_item_type(key)\
-            and ActiveConnectors.is_valid_item_type(self.items.get(key))
-
-    def add_item(self,
-                 key: tuple,
-                 value: tuple
-                 ) -> bool:
-        """Add item item."""
-        result = False
-        if ActiveConnectors.is_valid_item_type(key)\
-                and ActiveConnectors.is_valid_item_type(value):
-            self.init_item()
-            self.items[key] = value
-            result = True
-        return result
-
-    def get_item(self, key: tuple) -> Optional[object]:
-        """Get item key."""
-        result = None
-        if self.has_item_key(key):
-            result = self.items.get(key)
-        return result
-
-    @staticmethod
-    def is_valid_item_type(item: tuple):
-        """Test if is valid item type"""
-        return Ut.is_tuple(item, eq=2)\
-            and Ut.is_str(item[0], not_null=True) \
-            and Ut.is_str(item[1], not_null=True)
 
 
 class WorkersManager(Workers):
