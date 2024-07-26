@@ -3,10 +3,10 @@
 import logging
 from typing import Optional, Union
 from redis.client import Redis
+from redis.commands.timeseries import TimeSeries
 from redis.exceptions import RedisError
-from ve_utils.utype import UType as Ut
-
-from vemonitor_m8.core.exceptions import RedisConnectionException
+from vemonitor_m8.core.utils import Utils as Ut
+from vemonitor_m8.core.exceptions import RedisConnectionException, RedisVeError
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
@@ -33,6 +33,10 @@ class RedisCli:
     def is_ready(self) -> bool:
         """Test if cli is redis client instance and if redis ping return True"""
         return RedisCli.is_redis_client(self.cli)
+
+    def has_timeseries(self) -> bool:
+        """Test if timeseries is available"""
+        return isinstance(self.cli.ts(), TimeSeries)
 
     def is_connected(self) -> bool:
         """Test if cli is redis client instance and if redis ping return True"""
@@ -69,31 +73,34 @@ class RedisCli:
                 credentials = self._credentials
             self.cli = Redis(**credentials)
 
-            if self.is_ready() and self.is_connected():
-                logger.info(
-                    "[RedisCli::connect_to_redis] "
-                    "Redis Server ready and connection started on host: %s",
-                    credentials.get("host")
-                )
-                result = True
-            else:
+            if not self.is_ready() or not self.is_connected():
                 logger.error(
                     "[RedisCli::connect_to_redis] "
-                    "Failed to connect to redis server. Ping fails on host: %s",
+                    "Failed to connect to redis server. host: %s",
                     credentials.get("host")
                 )
                 raise RedisConnectionException(
                     "[RedisCli::connect_to_redis] "
                     "Failed to connect to redis server. "
-                    f"Ping fails on host: {credentials.get('host')}"
+                    f"host: {credentials.get('host')}"
                 )
 
-        except RedisError as ex:
+            logger.info(
+                "[RedisCli::connect_to_redis] "
+                "Redis Server ready and connection started on host: %s",
+                credentials.get("host")
+            )
+            result = True
+        except (RedisError, TypeError) as ex:
             logger.error(
                 "[RedisCli::connect_to_redis] "
                 "Failed to connect to redis server, ex : %s",
                 ex
             )
+            raise RedisConnectionException(
+                "[RedisCli::connect_to_redis] "
+                "Failed to connect to redis server."
+            ) from ex
         return result
 
     def set_pipeline(self) -> bool:
@@ -102,43 +109,57 @@ class RedisCli:
         """
         result = False
         try:
-            if self.is_ready():
-                self.pipe = self.cli.pipeline()
-                result = True
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi:set_pipeline] Fatal Error : Unable to set pipeline, "
+                    "Redis connection is down, try to reconnect."
+                )
+            self.pipe = self.cli.pipeline()
+            result = True
         except RedisError as ex:
             logger.debug(
-                "[RedisApi] Fatal Error : Unable to set pipeline. ex : %s",
+                "[RedisApi:set_pipeline] Fatal Error : Unable to set pipeline. ex : %s",
                 ex
             )
+            raise RedisVeError(
+                "[RedisApi:set_pipeline] Fatal Error : Unable to set pipeline."
+            ) from ex
+
         return result
 
-    def _flush(self, flush_db: bool = True) -> bool:
+    def flush(self) -> bool:
         """
-        Delete all data on actual db
-        Todo : This is very dangerous method
+        Delete all data on actual db.
         """
         result = False
         try:
-            if self.is_ready():
-                if flush_db is True:
-                    self.cli.flushdb()
-                else:
-                    self.cli.flushall()
-                result = True
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi:flush] "
+                    "Fatal Error : Unable to flush redis db, "
+                    "Redis connection is down, try to reconnect."
+                )
+            self.cli.flushdb()
+            result = True
         except RedisError as ex:
             logger.debug(
                 "[RedisCli:flush] "
-                "Fatal Error : Unable to flush redis data. ex : %s",
+                "Fatal Error : Unable to flush redis db. ex : %s",
                 ex
             )
+            raise RedisVeError(
+                "[RedisCli:flush] "
+                "Fatal Error : Unable to flush redis db."
+            ) from ex
+
         return result
 
     @staticmethod
     def is_redis_credentials(credentials) -> bool:
         """Test if client is redis client instance"""
         return Ut.is_dict(credentials, not_null=True)\
-            and Ut.is_str(credentials.get("host")) \
-            and Ut.is_int(credentials.get("port"))
+            and Ut.is_valid_host(credentials.get("host")) \
+            and Ut.is_valid_port(credentials.get("port"))
 
     @staticmethod
     def is_redis_client(client: Redis) -> bool:
@@ -153,7 +174,7 @@ class RedisCli:
             result = RedisCli.is_redis_client(client) and client.ping()
         except RedisError as ex:
             logger.debug(
-                "Ping failed from redis server, ex : %s",
+                "[RedisCli:is_redis_client_connected] Ping failed from redis server, ex : %s",
                 ex
             )
         return result
@@ -175,16 +196,26 @@ class RedisBase(RedisCli):
         """
         result = None
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                result = client.type(key)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi:get_key_type] "
+                    "Fatal Error : Unable to get key type, "
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            result = client.type(key)
+        except (RedisError, TypeError) as ex:
             logger.debug(
                 "[RedisBase::get_key_type] "
                 "Failed to get key type. "
                 "(key: %s) ex : %s",
                 key, ex
             )
+            raise RedisVeError(
+                "[RedisBase::get_key_type] "
+                "Failed to get key type. "
+                f"key: {key}."
+            ) from ex
         return result
 
     def save_redis_data_on_disk(self) -> bool:
@@ -210,8 +241,13 @@ class RedisBase(RedisCli):
         """
         result = False
         try:
-            if self.is_ready():
-                result = self.cli.bgsave()
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisBase::save_redis_data_on_disk] "
+                    "Fatal Error : Failed to save redis data on disk."
+                    "Redis connection is down, try to reconnect."
+                )
+            result = self.cli.bgsave()
         except RedisError as ex:
             logger.debug(
                 "[RedisBase::save_redis_data_on_disk] "
@@ -219,6 +255,10 @@ class RedisBase(RedisCli):
                 " ex : %s",
                 ex
             )
+            raise RedisVeError(
+                "[RedisBase::save_redis_data_on_disk] "
+                "Fatal Error : Failed to save redis data on disk."
+            ) from ex
         return result
 
     def get_redis_info_usage(self,
@@ -253,21 +293,26 @@ class RedisBase(RedisCli):
         """
         result = None
         try:
-            if self.is_ready():
-                if Ut.is_str(section, not_null=True):
-                    info = self.cli.info(section)
-                else:
-                    info = self.cli.info()
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisBase::get_redis_info_usage] "
+                    "Fatal Error : Unable to get redis info."
+                    "Redis connection is down, try to reconnect."
+                )
+            if Ut.is_str(section, not_null=True):
+                info = self.cli.info(section)
+            else:
+                info = self.cli.info()
 
-                if full is False:
-                    if Ut.is_dict(info, not_null=True):
-                        default_keys = RedisBase.get_info_default_keys()
-                        if Ut.is_list(keys, not_null=True):
-                            result = Ut.get_items_from_dict(info, keys)
-                        else:
-                            result = Ut.get_items_from_dict(info, default_keys)
-                else:
-                    result = info
+            if full is False:
+                if Ut.is_dict(info, not_null=True):
+                    default_keys = RedisBase.get_info_default_keys()
+                    if Ut.is_list(keys, not_null=True):
+                        result = Ut.get_items_from_dict(info, keys)
+                    else:
+                        result = Ut.get_items_from_dict(info, default_keys)
+            else:
+                result = info
         except RedisError as ex:
             logger.debug(
                 "[RedisBase::get_redis_info_usage] "
@@ -275,6 +320,10 @@ class RedisBase(RedisCli):
                 "ex : %s",
                 ex
             )
+            raise RedisVeError(
+                "[RedisBase::get_redis_info_usage] "
+                "Fatal Error : Unable to get redis info."
+            ) from ex
         return result
 
     @staticmethod
@@ -308,16 +357,26 @@ class RedisApi(RedisBase):
         """
         result = None
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                result = client.hlen(key)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::get_hmap_len] "
+                    "Fatal Error : Failed to get hmap length."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            result = client.hlen(key)
+        except (RedisError, TypeError) as ex:
             logger.debug(
                 "[RedisApi::get_hmap_len] "
                 "Failed to get hmap length. "
                 "(key: %s) ex : %s",
                 key, ex
             )
+            raise RedisVeError(
+                "[RedisApi::get_hmap_len] "
+                "Failed to get hmap length. "
+                f"(key: {key})."
+            ) from ex
         return result
 
     def is_hmap_key(self,
@@ -332,16 +391,26 @@ class RedisApi(RedisBase):
         """
         result = None
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                result = client.hexists(name, key)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::is_hmap_key] "
+                    "Fatal Error : Failed to test if redis hmap key exist."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            result = client.hexists(name, key)
+        except (RedisError, TypeError) as ex:
             logger.debug(
                 "[RedisApi::is_hmap_key] "
                 "Failed to test if redis hmap key exist. "
-                "(name: %s, key: %s) ex : %s",
+                f"(name: %s, key: %s) ex : %s",
                 name, key, ex
             )
+            raise RedisVeError(
+                "[RedisApi::is_hmap_key] "
+                "Failed to test if redis hmap key exist. "
+                f"(name: {name}, key: {key})."
+            ) from ex
         return result
 
     def get_hmap_keys(self,
@@ -355,23 +424,34 @@ class RedisApi(RedisBase):
         """
         result = None
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                result = client.hkeys(name)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::get_hmap_keys] "
+                    "Fatal Error : Failed to get redis hmap keys."
+                    "Redis connection is down, try to reconnect."
+                )
+
+            client = self.get_redis_client(client)
+            result = client.hkeys(name)
+        except (RedisError, TypeError) as ex:
             logger.debug(
                 "[RedisApi::get_hmap_keys] "
                 "Failed to get redis hmap keys. "
                 "(name: %s) ex : %s",
                 name, ex
             )
+            raise RedisVeError(
+                "[RedisApi::get_hmap_keys] "
+                "Failed to get redis hmap keys. "
+                f"(name: {name})."
+            ) from ex
         return result
 
     def del_hmap_keys(self,
                       name: str,
                       keys: list,
                       client: Redis = None
-                      ) -> Optional[int]:
+                      ) -> int:
         """
         Removes the specified fields from the hash stored at key.
 
@@ -383,21 +463,32 @@ class RedisApi(RedisBase):
         """
         result = 0
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                result = client.hdel(name, *keys)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::del_hmap_keys] "
+                    "Fatal Error : Failed to delete redis hmap keys."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            # Todo: Hdel ever return 0
+            result = client.hdel(name, *keys)
+        except (RedisError, TypeError) as ex:
             logger.debug(
-                "[RedisApi::get_hmap_keys] "
-                "Failed to get redis hmap keys. "
+                "[RedisApi::del_hmap_keys] "
+                "Failed to delete redis hmap keys. "
                 "(name: %s) ex : %s",
                 name, ex
             )
+            raise RedisVeError(
+                "[RedisApi::del_hmap_keys] "
+                "Failed to deleteget redis hmap keys. "
+                f"(name: {name})."
+            ) from ex
         return result
 
     def get_hmap_data(self,
                       name: str,
-                      keys: Optional[Union[list, str]],
+                      keys: Optional[Union[list, str]]=None,
                       client: Redis = None,
                       default=None
                       ) -> Union[list, str, dict]:
@@ -412,21 +503,30 @@ class RedisApi(RedisBase):
         """
         result = default
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                if Ut.is_str(keys, not_null=True):
-                    result = client.hget(name, keys)
-                elif Ut.is_list(keys, not_null=True):
-                    result = client.hmget(name, keys)
-                else:
-                    result = client.hgetall(name)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::get_hmap_data] "
+                    "Fatal Error : Failed to get redis hmap data."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            if Ut.is_str(keys, not_null=True)\
+                    or Ut.is_list(keys, not_null=True):
+                result = client.hget(name, keys)
+            else:
+                result = client.hgetall(name)
+        except (RedisError, TypeError) as ex:
             logger.debug(
                 "[RedisApi::get_hmap_data] "
                 "Failed to get redis hmap data"
-                "(name: %s, key: %s) ex : %s",
+                "(name: %s, keys: %s) ex : %s",
                 name, keys, ex
             )
+            raise RedisVeError(
+                "[RedisApi::get_hmap_data] "
+                "Failed to get redis hmap data"
+                f"(name: {name}, keys: {keys})."
+            ) from ex
         return result
 
     def set_hmap_data(self,
@@ -434,89 +534,110 @@ class RedisApi(RedisBase):
                       key: Optional[str] = None,
                       values: Optional[str] = None,
                       client: Redis = None
-                      ):
+                      )-> int:
         """
         Set hmap data on redis server.
 
         """
-        result = False
+        result = 0
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                if RedisCli.is_redis_client(client)\
-                        and Ut.is_str(name, not_null=True):
-                    key = Ut.get_str(key)
-                    nb_set = 0
-                    if Ut.is_str(key, not_null=True)\
-                            and Ut.is_str(values, not_null=True):
-                        nb_set = client.hset(
-                            name=name,
-                            key=key,
-                            value=values
-                        )
-                    elif Ut.is_dict(values, not_null=True):
-                        nb_set = client.hset(
-                            name=name,
-                            mapping=values
-                        )
-                    result = Ut.is_int(nb_set, positive=True)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::set_hmap_data] "
+                    "Fatal Error : Failed to set redis hmap data."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            if Ut.is_str(key, not_null=True)\
+                    and Ut.is_str(values, not_null=True):
+                result = client.hset(
+                    name=name,
+                    key=key,
+                    value=values
+                )
+            elif Ut.is_dict(values, not_null=True):
+                result = client.hset(
+                    name=name,
+                    mapping=values
+                )
+        except (RedisError, TypeError) as ex:
             logger.debug(
-                "[RedisApi::get_hmap_data] "
+                "[RedisApi::set_hmap_data] "
                 "Failed to set redis hmap data. "
                 "(name: %s, key: %s) ex : %s",
                 name, key, ex
             )
+            raise RedisVeError(
+                "[RedisApi::set_hmap_data] "
+                "Failed to set redis hmap data. "
+                f"(name: {name}, key: {key})."
+            ) from ex
         return result
 
     def add_set_members(self,
                         name: str,
                         values: list,
                         client: Redis = None
-                        ):
+                        )-> int:
         """
         Add members to set key.
 
         """
-        result = False
+        result = 0
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                if RedisCli.is_redis_client(client)\
-                        and Ut.is_list(values, not_null=True):
-                    nb_set = client.sadd(name, *values)
-                    result = Ut.is_int(nb_set, positive=True)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::add_set_members] "
+                    "Fatal Error : Failed to Add members to set key."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            result = client.sadd(name, *values)
+        except (RedisError, TypeError) as ex:
             logger.debug(
+                "[RedisApi::add_set_members] "
                 "Failed to Add members to set key"
                 "(name: %s, values: %s) ex : %s",
                 name, values, ex
             )
+            raise RedisVeError(
+                "[RedisApi::add_set_members] "
+                "Failed to Add members to set key"
+                f"(name: {name}, values: {values})."
+            ) from ex
         return result
 
     def remove_set_members(self,
                            name: str,
-                           values: list,
+                           values: Union[list, tuple, bytes, memoryview, str, int, float],
                            client: Redis = None
                            ):
         """
         Remove members from set key.
 
         """
-        result = False
+        result = 0
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                if RedisCli.is_redis_client(client)\
-                        and Ut.is_list(values, not_null=True):
-                    nb_set = client.srem(name=name, *values)
-                    result = Ut.is_int(nb_set, positive=True)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::remove_set_members] "
+                    "Fatal Error : Failed to Remove members from set key."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            result = client.srem(name, *values)
+        except (RedisError, TypeError) as ex:
             logger.debug(
-                "Remove members from set key"
+                "[RedisApi::remove_set_members] "
+                "Failed to Remove members from set key"
                 "(name: %s, values: %s) ex : %s",
                 name, values, ex
             )
+            raise RedisVeError(
+                "[RedisApi::remove_set_members] "
+                "Failed to Remove members from set key. "
+                f"(name: {name}, values: {values})."
+            ) from ex
         return result
 
     def get_set_members(self,
@@ -529,31 +650,59 @@ class RedisApi(RedisBase):
         """
         result = None
         try:
-            if self.is_ready():
-                client = self.get_redis_client(client)
-                if RedisCli.is_redis_client(client):
-                    result = client.smembers(name=name)
-        except RedisError as ex:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::get_set_members] "
+                    "Fatal Error : Failed to Get members from set key."
+                    "Redis connection is down, try to reconnect."
+                )
+            client = self.get_redis_client(client)
+            result = client.smembers(name=name)
+        except (RedisError, TypeError) as ex:
             logger.debug(
+                "[RedisApi::get_set_members] "
                 "Failed to Get members from set key"
                 "(name: %s) ex : %s",
                 name, ex
             )
+            raise RedisVeError(
+                "[RedisApi::get_set_members] "
+                "Failed to Get members from set key. "
+                f"(name: {name})."
+            ) from ex
         return result
 
-    def add_time_series(self, key, timestamp, value, client: Redis = None, **kwargs):
+    def add_time_series(self,
+                        key,
+                        timestamp,
+                        value,
+                        client: Redis = None,
+                        **kwargs
+                        ):
         """
         Get hmap data from redis server
         """
-
+        result = False
         try:
+            if not self.is_ready():
+                raise RedisConnectionException(
+                    "[RedisApi::add_time_series] "
+                    "Fatal error: Failed to add time series to redis. "
+                    "Redis connection is down, try to reconnect."
+                )
             client = self.get_redis_client(client)
-            if RedisCli.is_redis_client(client):
-                self.cli.ts().add(key, timestamp, value, **kwargs)
-                return True
-        except Exception as ex:
+            self.cli.ts().add(key, timestamp, value, **kwargs)
+            result = True
+        except (RedisError, TypeError) as ex:
             logger.error(
-                "Failed to add time series to redis. (key: %s, timestamp: %s, value: %s) ex : %s",
+                "[RedisApi::add_time_series] "
+                "Failed to add time series to redis. "
+                "(key: %s, timestamp: %s, value: %s) ex : %s",
                 key, timestamp, value, ex
             )
-        return False
+            raise RedisVeError(
+                "[RedisApi::add_time_series] "
+                "Fatal error: Failed to add time series to redis. "
+                f"(key: {key}, key: {timestamp}, value: {value})."
+            ) from ex
+        return result
