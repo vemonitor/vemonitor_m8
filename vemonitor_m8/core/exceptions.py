@@ -117,12 +117,12 @@ class SerialWriteException(SerialError):
 # ----------------
 # Redis
 # ----------------
-class RedisError(VeMonitorError):
+class RedisVeError(VeMonitorError):
     """
     Redis error
     """
 
-class RedisConnectionException(RedisError):
+class RedisConnectionException(RedisVeError):
     """
     Redis Connection error
     """
