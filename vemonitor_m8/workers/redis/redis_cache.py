@@ -208,7 +208,7 @@ class RedisCache(RedisConnector, InputsCache):
             if self.app.api.add_set_members(
                         self.cache_name,
                         [node]
-                    ):
+                    ) == 1:
                 self._nodes.append(node)
                 result = True
         return result
@@ -235,7 +235,7 @@ class RedisCache(RedisConnector, InputsCache):
                             node,
                             time_key,
                             values=data_in
-                        ):
+                        ) == 1:
 
                     result = True
             self.control_node_data_len(node=node)
