@@ -1,6 +1,7 @@
 """Test AppBlockRun method."""
 
 import inspect
+import time
 from os import path as Opath
 import pytest
 from vemonitor_m8.conf_manager.config_loader import ConfigLoader
@@ -49,4 +50,6 @@ class TestAppBlockRun:
 
         assert obj.workers.has_input_workers()
         assert obj.workers.has_output_workers()
+
+        time.sleep(5)
         obj.cancel_all_timers()
