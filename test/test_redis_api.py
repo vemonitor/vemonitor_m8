@@ -9,12 +9,12 @@ from vemonitor_m8.workers.redis.redis_api import RedisBase
 from vemonitor_m8.workers.redis.redis_api import RedisApi
 
 
-
 @pytest.fixture(name="helper_manager", scope="class")
 def helper_manager_fixture():
     """Json Schema test manager fixture"""
     class HelperManager:
         """Json Helper test manager fixture Class"""
+
         def __init__(self):
             self.obj = None
             self.host = '127.0.0.1'
@@ -33,9 +33,9 @@ def helper_manager_fixture():
             """Init RedisBase"""
             self.obj = RedisBase(
                 credentials={
-                    "host":self.host,
-                    "port":self.port,
-                    "db":self.db
+                    "host": self.host,
+                    "port": self.port,
+                    "db": self.db
                 }
             )
 
@@ -43,12 +43,12 @@ def helper_manager_fixture():
             """Init RedisApi"""
             self.obj = RedisApi(
                 credentials={
-                    "host":self.host,
-                    "port":self.port,
-                    "db":self.db
+                    "host": self.host,
+                    "port": self.port,
+                    "db": self.db
                 }
             )
-        
+
         def add_hmap_test(self):
             """Init RedisApi"""
             assert self.obj.flush() is True
@@ -75,6 +75,7 @@ def helper_manager_fixture():
 
     return HelperManager()
 
+
 class TestRedisCli:
     """Test RedisCli module"""
 
@@ -87,10 +88,10 @@ class TestRedisCli:
 
         helper_manager.obj.connect_to_redis(
             credentials={
-                    "host":helper_manager.host,
-                    "port":helper_manager.port,
-                    "db":helper_manager.db
-                }
+                "host": helper_manager.host,
+                "port": helper_manager.port,
+                "db": helper_manager.db
+            }
         )
 
         assert helper_manager.obj.is_ready()
@@ -99,21 +100,21 @@ class TestRedisCli:
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.connect_to_redis(
                 credentials={
-                    "host":"127.9.9.9",
-                    "port":helper_manager.port,
+                    "host": "127.9.9.9",
+                    "port": helper_manager.port,
                 }
             )
 
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.connect_to_redis(
                 credentials={
-                    "host":"127.9.9.9",
-                    "port":helper_manager.port,
+                    "host": "127.9.9.9",
+                    "port": helper_manager.port,
                     "db": "not_int",
                     "bad_prm": "bad_value"
                 }
             )
-    
+
     def test_set_pipeline(self, helper_manager):
         """Test set_pipeline method"""
         helper_manager.init_redis_cli()
@@ -131,7 +132,7 @@ class TestRedisCli:
         helper_manager.init_redis_cli()
         # Add Hmap keys
         helper_manager.add_hmap_test()
-        
+
         data = helper_manager.obj.cli.hget(
             name='data_test',
             key='key_test_0'
@@ -149,37 +150,36 @@ class TestRedisCli:
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.flush()
 
-
     def test_is_redis_credentials(self, helper_manager):
         """Test is_redis_credentials method"""
         helper_manager.init_redis_cli()
-        credentials={
-            "host":"127.9.9.256",
-            "port":6379
+        credentials = {
+            "host": "127.9.9.256",
+            "port": 6379
         }
         assert helper_manager.obj.is_redis_credentials(
             credentials
         ) is False
 
-        credentials={
-            "host":"127.9.9.255",
-            "port":65536
+        credentials = {
+            "host": "127.9.9.255",
+            "port": 65536
         }
         assert helper_manager.obj.is_redis_credentials(
             credentials
         ) is False
 
-        credentials={
-            "host":"127.9.9.255",
-            "port":-1
+        credentials = {
+            "host": "127.9.9.255",
+            "port": -1
         }
         assert helper_manager.obj.is_redis_credentials(
             credentials
         ) is False
 
-        credentials={
-            "host":"127.9.9.9",
-            "port":6379,
+        credentials = {
+            "host": "127.9.9.9",
+            "port": 6379,
             "db": "not_int",
             "bad_prm": "bad_value"
         }
@@ -187,14 +187,14 @@ class TestRedisCli:
             credentials
         ) is True
 
-        credentials={
-            "host":"127.9.9.255",
-            "port":6379
+        credentials = {
+            "host": "127.9.9.255",
+            "port": 6379
         }
         assert helper_manager.obj.is_redis_credentials(
             credentials
         ) is True
-    
+
     def test_is_redis_client_connected(self, helper_manager):
         """Test is_redis_client_connected method"""
         helper_manager.init_redis_cli()
@@ -230,7 +230,7 @@ class TestRedisBase:
             helper_manager.obj.get_key_type(
                 key=['data_test']
             )
-        
+
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_key_type(
@@ -258,7 +258,7 @@ class TestRedisBase:
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.save_redis_data_on_disk()
-    
+
     def test_get_redis_info_usage(self, helper_manager):
         """Test get_redis_info_usage method"""
         helper_manager.init_redis_base()
@@ -286,8 +286,10 @@ class TestRedisBase:
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_redis_info_usage()
 
+
 class TestRedisApi:
     """Test RedisApi module"""
+
     def test_get_hmap_len(self, helper_manager):
         """Test get_hmap_len method"""
         helper_manager.init_redis_api()
@@ -303,7 +305,7 @@ class TestRedisApi:
             nb = helper_manager.obj.get_hmap_len(
                 key=['data_test']
             )
-        
+
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_hmap_len(
@@ -322,11 +324,11 @@ class TestRedisApi:
         ) is True
 
         with pytest.raises(RedisVeError):
-            nb = helper_manager.obj.is_hmap_key(
+            helper_manager.obj.is_hmap_key(
                 name='data_test',
                 key=['data_test']
             )
-        
+
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.is_hmap_key(
@@ -349,7 +351,7 @@ class TestRedisApi:
             helper_manager.obj.get_hmap_keys(
                 name=['data_test']
             )
-        
+
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_hmap_keys(
@@ -406,9 +408,23 @@ class TestRedisApi:
             'key_test_2': 'c'
         }
 
+        data = helper_manager.obj.get_hmap_data(
+            name='data_test',
+            keys=['key_test_0', 'key_test_1']
+        )
+
+        assert data == ['a', 'b']
+
+        data = helper_manager.obj.get_hmap_data(
+            name='data_test',
+            keys='key_test_0'
+        )
+
+        assert data == 'a'
+
         # test bad name type
         with pytest.raises(RedisVeError):
-            nb = helper_manager.obj.get_hmap_data(
+            helper_manager.obj.get_hmap_data(
                 name=['data_test']
             )
 
@@ -418,7 +434,7 @@ class TestRedisApi:
             helper_manager.obj.get_hmap_data(
                 name='data_test'
             )
-    
+
     def test_set_hmap_data(self, helper_manager):
         """Test set_hmap_data method"""
         helper_manager.init_redis_api()
@@ -488,7 +504,7 @@ class TestRedisApi:
             values=['a']
         )
         assert nb == 1
-        
+
         nb = helper_manager.obj.add_set_members(
             name='data_test',
             values=['b', 'c']
@@ -515,7 +531,7 @@ class TestRedisApi:
                 name='data_test',
                 values=['d']
             )
-    
+
     def test_remove_set_members(self, helper_manager):
         """Test remove_set_members method"""
         helper_manager.init_redis_api()
