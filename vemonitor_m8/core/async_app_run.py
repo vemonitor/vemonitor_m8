@@ -19,7 +19,8 @@ from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.workers.workers_manager import WorkersManager
 from vemonitor_m8.core.exceptions import DeviceInputValueError
 from vemonitor_m8.core.exceptions import RedisConnectionException
-from vemonitor_m8.core.exceptions import SettingInvalidException, WorkerException
+from vemonitor_m8.core.exceptions import SettingInvalidException
+from vemonitor_m8.core.exceptions import WorkerException
 from vemonitor_m8.core.exceptions import DeviceDataConfError
 
 __author__ = "Eli Serra"
@@ -35,6 +36,7 @@ logger = logging.getLogger("vemonitor")
 
 class AppBlockRun:
     """Async App block run Helper"""
+
     def __init__(self, conf: Config):
         self._run = False
         self.conf = None
@@ -149,7 +151,7 @@ class AppBlockRun:
             except (
                 DeviceDataConfError,
                 DeviceInputValueError
-                ) as ex:
+            ) as ex:
                 self.cancel_all_timers()
                 raise DeviceDataConfError(
                     "Fatal Error: Device Data Error. "
@@ -163,9 +165,9 @@ class AppBlockRun:
     def get_app_connector_by_key_item(self, item_key: str, source: str):
         """Get connector by key item and source."""
         return self.conf.get_app_connector_by_key_item(
-                    item_key,
-                    source
-                )
+            item_key,
+            source
+        )
 
     def is_worker_data_ready(self):
         """On worker data ready event"""
@@ -193,9 +195,9 @@ class AppBlockRun:
                         if Ut.is_dict(data, not_null=True):
                             data.update({'time': time_key})
                             data.update({
-                                    'time_ref': Ut.get_rounded_float(
+                                'time_ref': Ut.get_rounded_float(
                                         time_key - int(time_key/1000) * 1000, 3
-                                    )
+                                        )
                             })
 
                             self.inputs_data.add_data_cache(
@@ -271,13 +273,13 @@ class AppBlockRun:
                     worker_key = WorkersHelper.get_worker_name(key, item)
                     item.get('columns').sort()
                     if self._threads.add_timer_key(
-                                key=timer_key,
-                                interval=worker.time_interval,
-                                callback=self.read_worker_data,
-                                kwargs={
-                                    'worker_key': worker_key
-                                }
-                            ):
+                        key=timer_key,
+                        interval=worker.time_interval,
+                        callback=self.read_worker_data,
+                        kwargs={
+                            'worker_key': worker_key
+                        }
+                    ):
                         # init nodes in cache data
                         self.inputs_data.register_node(
                             node=worker.get_name()
@@ -343,8 +345,12 @@ class AppBlockRun:
                     structure=worker.columns
                 )
                 interval = max_time - worker.last_saved_time
-                is_time_interval = (worker.last_saved_time == 0
-                               or interval >= (worker.time_interval * worker.cache_interval))
+                is_time_interval = (
+                    worker.last_saved_time == 0
+                    or interval >= (
+                        worker.time_interval * worker.cache_interval
+                    )
+                )
                 is_interval = Ut.is_dict(data, not_null=True)\
                     and len(data) == worker.cache_interval\
                     and is_time_interval
@@ -363,7 +369,8 @@ class AppBlockRun:
         """Run Block inputs and outputs."""
         if AppBlockRun.is_conf(self.conf):
             # self.events.subscribe_worker_data_ready(self.run_output_item)
-            # inputs workers blocks run on background (Threads), executed by a timer
+            # inputs workers blocks run on background (Threads),
+            # executed by a timer
             self.add_input_items_timer()
             # inputs workers blocks run
             self.setup_outputs_workers()
@@ -377,7 +384,8 @@ class AppBlockRun:
                 raise WorkerException(
                     "Fatal Error: Some output workers fails. "
                     "Unable to open a connexion with some output connectors. "
-                    f"Workers Status : {self.workers.get_output_workers_status()}"
+                    "Workers Status : "
+                    f"{self.workers.get_output_workers_status()}"
                 )
             time.sleep(1)
             while self._run:
@@ -388,4 +396,6 @@ class AppBlockRun:
     @staticmethod
     def is_conf(conf: Config) -> bool:
         """Test if valid conf"""
-        return isinstance(conf, Config) and conf.is_valid() and len(conf.app_blocks) == 1
+        return isinstance(conf, Config)\
+            and conf.is_valid()\
+            and len(conf.app_blocks) == 1

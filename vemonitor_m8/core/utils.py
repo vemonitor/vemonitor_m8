@@ -34,19 +34,19 @@ class Utils(Ut):
         """Compare if all iterable values are equal."""
         grouped = groupby(iterable)
         return next(grouped, True) and not next(grouped, False)
-    
+
     @staticmethod
     def is_valid_port(value: int):
         """Compare if all iterable values are equal."""
         return Ut.is_int(value) and 0 < value <= 65535
-    
+
     @staticmethod
     def is_valid_host(value: str):
         """Compare if all iterable values are equal."""
         regex = re.compile(
-            "^((?:(?:[0-1]?\d?\d)|(?:[0-2][0-4]\d)|(?:25[0-5]))"
-            "\.(?:(?:[0-1]?\d?\d)|(?:[0-2][0-4]\d)|(?:25[0-5]))"
-            "\.(?:(?:[0-1]?\d?\d)|(?:[0-2][0-4]\d)|(?:25[0-5]))"
-            "\.(?:(?:[0-1]?\d?\d)|(?:[0-2][0-4][0-9])|(?:25[0-5])))$"
+            "^((?:(?:[0-1]?[0-9]?[0-9])|(?:[0-2][0-4][0-9])|(?:25[0-5]))"
+            "[.](?:(?:[0-1]?[0-9]?[0-9])|(?:[0-2][0-4][0-9])|(?:25[0-5]))"
+            "[.](?:(?:[0-1]?[0-9]?[0-9])|(?:[0-2][0-4][0-9])|(?:25[0-5]))"
+            "[.](?:(?:[0-1]?[0-9]?[0-9])|(?:[0-2][0-4][0-9])|(?:25[0-5])))$"
         )
         return Ut.is_str(value) and Ut.is_list(regex.findall(value), eq=1)

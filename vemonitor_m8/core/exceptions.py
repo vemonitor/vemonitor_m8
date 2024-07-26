@@ -2,6 +2,8 @@
 """
 Exceptions classes
 """
+
+
 class VeMonitorError(Exception):
     """
     Settings file has not been found
@@ -10,6 +12,8 @@ class VeMonitorError(Exception):
 # ----------------
 # Settings Loader Conf
 # ----------------
+
+
 class SettingsError(VeMonitorError):
     """
     Settings Error
@@ -48,10 +52,14 @@ class SettingNotFound(SettingsError):
 # ----------------
 # YAML Loader Conf
 # ----------------
+
+
 class LoadYamlError(VeMonitorError):
     """
     Settings Error
     """
+
+
 class YAMLFileNotFound(LoadYamlError):
     """
     YAML file has not been found
@@ -63,6 +71,7 @@ class YAMLFileEmpty(LoadYamlError):
     YAML file empty
     """
 
+
 class YAMLFileError(LoadYamlError):
     """
     YAML file empty
@@ -71,6 +80,8 @@ class YAMLFileError(LoadYamlError):
 # ----------------
 # Device data check configuration
 # ----------------
+
+
 class DeviceDataError(VeMonitorError):
     """
     Device data check error
@@ -93,9 +104,22 @@ class DeviceOutputValueError(DeviceDataError):
     """
     Device Output Value Error
     """
+
 # ----------------
 # Serial Com
 # ----------------
+
+
+class DataCacheError(VeMonitorError):
+    """
+    DataCache error
+    """
+
+# ----------------
+# Serial Com
+# ----------------
+
+
 class SerialError(VeMonitorError):
     """
     Serial error
@@ -121,6 +145,7 @@ class RedisVeError(VeMonitorError):
     """
     Redis error
     """
+
 
 class RedisConnectionException(RedisVeError):
     """

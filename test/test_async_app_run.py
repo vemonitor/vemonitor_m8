@@ -15,7 +15,7 @@ def helper_manager_fixture():
         """Json Helper test manager fixture Class"""
         def __init__(self):
             current_script_path = Opath.dirname(
-            Opath.abspath(
+                Opath.abspath(
                     inspect.getfile(inspect.currentframe())
                 )
             )
@@ -33,7 +33,7 @@ class TestAppBlockRun:
 
     def test_run_block(self, helper_manager):
         """Test subscribe_worker_data_ready method."""
-        conf=helper_manager.loader.get_settings_from_schema(
+        conf = helper_manager.loader.get_settings_from_schema(
             block_name=None,
             app_name="batSerialMonitor",
         )
@@ -43,7 +43,8 @@ class TestAppBlockRun:
 
         assert obj.is_ready()
 
-         # inputs workers blocks run on background (Threads), executed by a timer
+        # inputs workers blocks run on background (Threads),
+        # executed by a timer
         obj.add_input_items_timer()
         # inputs workers blocks run
         obj.setup_outputs_workers()

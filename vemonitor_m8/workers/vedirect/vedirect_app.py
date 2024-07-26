@@ -74,7 +74,8 @@ class VedirectApp:
             max_i = min_i + min_interval
             result = min_i <= self.get_time_cache() <= max_i
             logger.debug(
-                "[VedirectApp::is_time_to_read_serial] Evaluate cache validity: %s.\n"
+                "[VedirectApp::is_time_to_read_serial] "
+                "Evaluate cache validity: %s.\n"
                 "%s <= %s < %s",
                 result,
                 min_i,
@@ -171,7 +172,8 @@ class VedirectApp:
                     raise VedirectException
             except VedirectException as ex:
                 logger.debug(
-                    "[VedirectApp::try_serial_connection] Unable to connect to serial port %s.\n"
+                    "[VedirectApp::try_serial_connection] "
+                    "Unable to connect to serial port %s.\n"
                     "ex: %s",
                     self.ve.get_serial_port(),
                     ex
@@ -186,7 +188,8 @@ class VedirectApp:
                     self.unlock_serial()
         else:
             logger.debug(
-                "[VedirectApp::try_serial_connection]Serial port is locked by node %s. ",
+                "[VedirectApp::try_serial_connection] "
+                "Serial port is locked by node %s. ",
                 self._lock_caller
             )
         return result
