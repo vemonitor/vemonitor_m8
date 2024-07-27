@@ -315,7 +315,7 @@ class RedisCache(RedisConnector, InputsCache):
                     from_time=from_time
             ):
                 if Ut.is_list(keys, not_null=True)\
-                        and 0 < nb_items <= len(keys):
+                        and 0 <= nb_items <= len(keys):
                     node_name = node[4:]
                     max_time = Ut.get_max_in_loop(
                         value=max_time,
