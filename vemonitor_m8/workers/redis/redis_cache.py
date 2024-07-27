@@ -356,8 +356,10 @@ class RedisCache(RedisConnector, InputsCache):
             nb_items=nb_items,
             structure=structure
         )
-        if Ut.is_dict(result, min_items=nb_items):
-
+        is_valid_data = Ut.is_dict(result, min_items=1)
+        if is_valid_data\
+                and (from_time > 0 or nb_items > 0):
+            # Todo: nb_items seem need to be replaced by len(results)
             start_time, end_time = self.get_time_interval(
                 from_time=from_time,
                 nb_items=nb_items,
@@ -370,6 +372,8 @@ class RedisCache(RedisConnector, InputsCache):
                 nb_items=nb_items,
                 data=result
             )
+        elif is_valid_data:
+            last_time = max(result) + 1
 
         return result, last_time, max_time
 
