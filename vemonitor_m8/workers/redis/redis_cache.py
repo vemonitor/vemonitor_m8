@@ -257,13 +257,14 @@ class RedisCache(RedisConnector, InputsCache):
             )
             if Ut.is_dict(data, not_null=True):
                 data_in = UJson.dumps_json(data)
-
-                if self.app.api.set_hmap_data(
-                            formatted_node,
-                            Ut.get_str(time_key),
-                            values=data_in
-                        ) == 1:
-
+                nb_added = self.app.api.set_hmap_data(
+                    formatted_node,
+                    Ut.get_str(time_key),
+                    values=data_in
+                )
+                # nb_added
+                if nb_added == 1\
+                        or (is_updated is True and nb_added == 0):
                     result = True
             self.control_node_data_len(formatted_node=formatted_node)
         return result
