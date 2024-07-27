@@ -418,7 +418,6 @@ class RedisCache(RedisConnector, InputsCache):
     @staticmethod
     def get_cache_from_time_interval(start_time: int,
                                      end_time: int,
-                                     nb_items: int,
                                      data: dict
                                      ) -> tuple:
         """
