@@ -368,7 +368,6 @@ class RedisCache(RedisConnector, InputsCache):
 
             result, last_time = RedisCache.get_cache_by_start_time(
                 start_time=start_time,
-                end_time=end_time,
                 nb_items=nb_items,
                 data=result
             )
@@ -390,7 +389,6 @@ class RedisCache(RedisConnector, InputsCache):
 
     @staticmethod
     def get_cache_by_start_time(start_time: int,
-                                end_time: int,
                                 nb_items: int,
                                 data: dict
                                 ) -> tuple:
