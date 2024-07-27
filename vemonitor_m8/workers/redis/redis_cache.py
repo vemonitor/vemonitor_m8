@@ -296,12 +296,16 @@ class RedisCache(RedisConnector, InputsCache):
                             ) -> tuple:
         """
         Get data cache extract.
+        ToDo: This method must be simplified and improved
         """
         result, max_time = None, 0
+        # ToDo: Remove is_ready test and play with redis_api exceptions
         if self.is_ready():
             result = dict()
             nodes = None
-            if Ut.is_dict(structure, not_null=True):
+
+            is_structure = Ut.is_dict(structure, not_null=True)
+            if is_structure:
                 nodes = list(structure.keys())
 
             for node, keys in self.enum_cache_keys(
@@ -323,12 +327,17 @@ class RedisCache(RedisConnector, InputsCache):
                             keys=keys):
                         Ut.init_dict_key(result, key, dict())
 
-                        result[key].update({
-                            node_name: Ut.get_items_from_dict(
-                                values,
-                                structure.get(node_name)
-                            )
-                        })
+                        if is_structure:
+                            result[key].update({
+                                node_name: Ut.get_items_from_dict(
+                                    values,
+                                    structure.get(node_name)
+                                )
+                            })
+                        else:
+                            result[key].update({
+                                node_name: values
+                            })
         return result, max_time
 
     def get_data_from_cache(self,
