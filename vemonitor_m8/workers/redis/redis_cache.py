@@ -188,9 +188,9 @@ class RedisCache(RedisConnector, InputsCache):
                                      formatted_node: str,
                                      time_key: int,
                                      data: dict
-                                     ) -> Optional[dict]:
+                                     ) -> tuple:
         """Update or set data key."""
-        result = None
+        result, is_updated = None, False
         if self.is_ready()\
                 and Ut.is_int(time_key, positive=True)\
                 and Ut.is_str(formatted_node, not_null=True)\
@@ -203,11 +203,12 @@ class RedisCache(RedisConnector, InputsCache):
                 result = UJson.loads_json(data_in)
                 if Ut.is_dict(result, not_null=True):
                     result.update(data)
+                    is_updated = True
                 else:
                     result = data
             else:
                 result = data
-        return result
+        return result, is_updated
 
     def control_node_data_len(self, formatted_node: str):
         """Control inputs data cache length"""
@@ -249,7 +250,7 @@ class RedisCache(RedisConnector, InputsCache):
         time_key = Ut.get_int(time_key, 0)
         if self.is_ready():
             formatted_node = RedisCache.get_cache_map_key(key=key)
-            data = self._update_or_set_data_node_key(
+            data, is_updated = self._update_or_set_data_node_key(
                 formatted_node=formatted_node,
                 time_key=time_key,
                 data=data
