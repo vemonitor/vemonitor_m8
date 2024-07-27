@@ -396,15 +396,15 @@ class RedisCache(RedisConnector, InputsCache):
                                 ) -> tuple:
         """Get cache data by start time."""
         result, last_time = None, 0
-        if Ut.is_dict(data, not_null=True) \
+        is_valid_data = Ut.is_dict(data, not_null=True)
+        if is_valid_data \
                 and Ut.is_int(start_time, positive=True) \
                 and Ut.is_int(nb_items, positive=True):
             keys = list(data.keys())
             keys.sort()
             keys = [x for x in keys if x >= start_time]
             keys = keys[:nb_items]
-            if Ut.is_dict(data, not_null=True) \
-                    and Ut.is_list(keys, not_null=True):
+            if Ut.is_list(keys, not_null=True):
                 result = {}
                 for key, value in data.items():
                     if key in keys:
@@ -412,7 +412,10 @@ class RedisCache(RedisConnector, InputsCache):
                         result.update({key: value})
                 if Ut.is_dict(result, not_null=True):
                     last_time = max(result) + 1
-            return result, last_time
+        elif is_valid_data:
+            result = data
+            last_time = max(data) + 1
+        return result, last_time
 
     @staticmethod
     def get_cache_from_time_interval(start_time: int,
