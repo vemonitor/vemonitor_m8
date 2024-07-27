@@ -10,8 +10,9 @@ class InputsCache(ABC):
     def __init__(self,
                  max_rows: int = 10
                  ):
-        self._max_rows = Ut.get_int(max_rows, 5)
+        self._max_rows = 10
         self._interval_min = 0
+        self.set_max_rows(max_rows)
 
     def has_interval_min(self):
         """Test if instance has interval_min"""
@@ -26,6 +27,14 @@ class InputsCache(ABC):
         result = False
         if Ut.is_numeric(value, positive=True):
             self._interval_min = value
+            result = True
+        return result
+
+    def set_max_rows(self, value: int) -> bool:
+        """Set interval_min property."""
+        result = False
+        if Ut.is_int(value, positive=True):
+            self._max_rows = value
             result = True
         return result
 
