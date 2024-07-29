@@ -31,6 +31,23 @@ class DataCache(InputsCache):
         """Test if instance has data cache"""
         return Ut.is_dict(self.data, not_null=True)
 
+    def has_key_data(self, time_key: int) -> bool:
+        """Test if instance has data cache"""
+        return self.has_data()\
+            and Ut.is_dict(self.data.get(time_key), not_null=True)
+
+    def has_node_data(self, time_key: int, node: str) -> bool:
+        """Test if instance has data cache"""
+        return self.has_key_data(time_key)\
+            and Ut.is_dict(self.data[time_key].get(node), not_null=True)
+
+    def get_node_data(self, time_key: int, node: str) -> bool:
+        """Test if instance has data cache"""
+        result = None
+        if self.has_node_data(time_key, node):
+            result = self.data[time_key].get(node)
+        return result
+
     def get_cache_nodes_keys_list(self,
                                   nodes: Optional[list] = None
                                   ) -> list:
