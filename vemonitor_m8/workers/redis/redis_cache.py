@@ -395,7 +395,6 @@ class RedisCache(RedisConnector, InputsCache):
                             ) -> tuple:
         """
         Get data cache extract.
-        
         """
         last_time = 0
         result, max_time = self.get_data_from_redis(
