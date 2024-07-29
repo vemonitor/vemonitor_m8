@@ -36,13 +36,13 @@ class DataChecker:
     def validate_input_value(key: str, value, checker: dict):
         """Format data item value"""
         is_not_input_type = value is not None\
-                and (
-                    not Ut.is_str(value)\
-                    and not Ut.is_valid_format(
-                        value=value,
-                        data_type=checker.get('input_type')
-                    )
+            and (
+                not Ut.is_str(value)
+                and not Ut.is_valid_format(
+                    value=value,
+                    data_type=checker.get('input_type')
                 )
+            )
 
         if is_not_input_type is True:
 
@@ -57,10 +57,10 @@ class DataChecker:
     def validate_output_value(key: str, value, checker: dict):
         """Format data item value"""
         is_not_output_type = value is not None\
-                and not Ut.is_valid_format(
-                        value=value,
-                        data_type=checker.get('output_type')
-                )
+            and not Ut.is_valid_format(
+                    value=value,
+                    data_type=checker.get('output_type')
+            )
 
         if is_not_output_type is True:
 
@@ -80,7 +80,7 @@ class DataChecker:
         float_point = checker.get('floatpoint')
 
         if float_point is not None\
-                and not Ut.is_float(float_point,positive=True):
+                and not Ut.is_float(float_point, positive=True):
             raise DeviceDataConfError(
                 "Error: Unable to check/format data value. "
                 "Float point value or device data is not valid. "
@@ -118,16 +118,20 @@ class DataChecker:
             for key, value in columns.items():
                 if Ut.is_str(key):
                     if Ut.is_dict(local_checkers) and key in local_checkers:
-                        res[key] = callback(key, value, local_checkers.get(key))
+                        res[key] = callback(
+                            key,
+                            value,
+                            local_checkers.get(key)
+                        )
                     else:
                         res[key] = callback(key, value, checkers.get(key))
         return res
 
     @staticmethod
     def check_input_columns(columns: dict,
-                      checkers: dict,
-                      local_checkers: Optional[dict] = None
-                      ) -> dict:
+                            checkers: dict,
+                            local_checkers: Optional[dict] = None
+                            ) -> dict:
         """Check columns with checker conditions"""
         return DataChecker.check_columns(
             columns=columns,

@@ -44,9 +44,13 @@ class AppBlockHelper:
                 if Ut.is_list(data, not_null=True):
                     for content in data:
                         if Ut.is_dict(content)\
-                                and Ut.is_list(content.get('columns'), not_null=True):
+                                and Ut.is_list(
+                                    content.get('columns'),
+                                    not_null=True
+                                ):
                             blocks_columns = AppBlockHelper.add_app_block_columns(
-                                blocks_columns, content.get('columns'))
+                                blocks_columns, content.get('columns')
+                            )
         return blocks_columns
 
     @staticmethod
@@ -79,11 +83,17 @@ class AppBlockHelper:
 
     @staticmethod
     def is_app_block_inout_source_content(content: dict) -> bool:
-        """Test if is valid App Block input and/or output from source content"""
+        """
+        Test if is valid App Block input
+        and/or output from source content
+        """
         return Ut.is_dict(content) and Ut.is_str(content.get('source'))
 
     @staticmethod
-    def add_app_block_sources_key(sources: dict, key: str, source: str) -> None:
+    def add_app_block_sources_key(sources: dict,
+                                  key: str,
+                                  source: str
+                                  ) -> None:
         """Add App Block sources key"""
         sources = Ut.init_dict_key(sources, key, [])
         if Ut.is_str(source) and\
@@ -100,7 +110,9 @@ class AppBlockHelper:
             for key, data in item.items():
                 if Ut.is_list(data, not_null=True):
                     for content in data:
-                        if AppBlockHelper.is_app_block_inout_source_content(content):
+                        if AppBlockHelper.is_app_block_inout_source_content(
+                                    content=content
+                                ):
                             sources = AppBlockHelper.add_app_block_sources_key(
                                 sources, key, content.get('source')
                             )
@@ -142,4 +154,5 @@ class AppBlockHelper:
     @staticmethod
     def is_app_block_args(block: dict) -> bool:
         """Test if is valid App Block Args"""
-        return AppBlockHelper.is_app_block(block) and Ut.is_dict(block.get('args'), not_null=True)
+        return AppBlockHelper.is_app_block(block)\
+            and Ut.is_dict(block.get('args'), not_null=True)

@@ -367,7 +367,7 @@ points:
         name: "Battery discharge status (...)"
         input_type: 'int'
         output_type: 'int'
-    vm_cap_t:
+    vm_cap_current:
         name: "Current real battery capacity"
         input_type: 'int'
         output_type: 'float'

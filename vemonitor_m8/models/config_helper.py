@@ -35,7 +35,11 @@ class ConfigHelper(AppBlockHelper):
 
     def has_app_connector_key_item(self, key: str, item: str) -> bool:
         """Test if object has valid App Connectors key item"""
-        return ConfigHelper.is_app_connector_key_item(self.app_connectors, key, item)
+        return ConfigHelper.is_app_connector_key_item(
+            self.app_connectors,
+            key,
+            item
+        )
 
     def set_app_connectors(self, app_connectors: dict) -> None:
         """Set App Connectors"""
@@ -50,7 +54,10 @@ class ConfigHelper(AppBlockHelper):
             return self.app_connectors.get(key)
         return None
 
-    def get_app_connector_by_key_item(self, key: str, item: str) -> Optional[dict]:
+    def get_app_connector_by_key_item(self,
+                                      key: str,
+                                      item: str
+                                      ) -> Optional[dict]:
         """Get App Connectors by key item"""
         if self.has_app_connector_key_item(key, item):
             return self.app_connectors[key].get(item)
@@ -76,7 +83,10 @@ class ConfigHelper(AppBlockHelper):
 
     def has_data_structures_point_key(self, key) -> bool:
         """Test if obj has valid Data Structure point key"""
-        return ConfigHelper.is_data_structures_point_key(self.data_structures, key)
+        return ConfigHelper.is_data_structures_point_key(
+            self.data_structures,
+            key
+        )
 
     def get_data_structures_point_by_columns(self,
                                              columns: list
@@ -112,7 +122,10 @@ class ConfigHelper(AppBlockHelper):
             Ut.is_dict(app_connector.get(key), not_null=True)
 
     @staticmethod
-    def is_app_connector_key_item(app_connector: dict, key: str, item_key: str) -> bool:
+    def is_app_connector_key_item(app_connector: dict,
+                                  key: str,
+                                  item_key: str
+                                  ) -> bool:
         """Test if is valid App Connectors key item"""
         return ConfigHelper.is_app_connector_key(app_connector, key) and \
             Ut.is_str(item_key) and \
@@ -143,7 +156,10 @@ class ConfigHelper(AppBlockHelper):
     def is_missing_data_structure(data_structures, cols) -> bool:
         """Test if is missing Data Structure conf"""
         result = False
-        if not ConfigHelper.is_all_data_structures_covered(data_structures, cols):
+        if not ConfigHelper.is_all_data_structures_covered(
+                    data_structures=data_structures,
+                    cols=cols
+                ):
             result = True
             missing = []
             for i in cols:
@@ -153,7 +169,8 @@ class ConfigHelper(AppBlockHelper):
                 raise SettingInvalidException(
                     "Error on checkColumns configuration, "
                     "unable to retrieve all appBlock columns checks. "
-                    "Add missing columns to victronDeviceData.yaml or userColumnsChecks.yaml "
+                    "Add missing columns to victronDeviceData.yaml "
+                    "or userColumnsChecks.yaml "
                     f"Missing columns list : {missing}"
                 )
             result = False

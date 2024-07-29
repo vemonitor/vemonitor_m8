@@ -62,7 +62,9 @@ class EmoncmsStructure:
 
                     if Ut.is_dict(input_item, not_null=True) \
                             and Ut.is_dict(input_data, not_null=True) \
-                            and Ut.is_dict(input_data.get('feeds'), not_null=True) \
+                            and Ut.is_dict(
+                                input_data.get('feeds'),
+                                not_null=True) \
                             and EmoncmsStructure.set_input_data(
                                     input_item=input_item,
                                     data=input_data,
@@ -133,16 +135,21 @@ class EmoncmsStructure:
             for node, input_items in data.items():
                 if Ut.is_str(node, not_null=True):
                     node_delta = DeltaStructure()
-                    if self.init_inputs_structure(node=node,
-                                                  data=input_items,
-                                                  delta_structure=node_delta,
-                                                  global_priority=global_priority
-                                                  )\
-                            and self.init_feeds_structure(node=node,
-                                                          data=input_items,
-                                                          delta_structure=node_delta,
-                                                          global_priority=global_priority
-                                                          ):
+                    is_init_inputs_structure = self.init_inputs_structure(
+                        node=node,
+                        data=input_items,
+                        delta_structure=node_delta,
+                        global_priority=global_priority
+                    )
+
+                    is_init_feeds_structure = self.init_feeds_structure(
+                        node=node,
+                        data=input_items,
+                        delta_structure=node_delta,
+                        global_priority=global_priority
+                    )
+                    if is_init_inputs_structure\
+                            and is_init_feeds_structure:
                         if not self.init_structure(node=node,
                                                    data=input_items,
                                                    delta_structure=node_delta
@@ -239,8 +246,9 @@ class EmoncmsStructure:
                 input_id = Ut.get_int(update.get('id'), 0)
                 if Ut.is_int(input_id, positive=True):
                     if Ut.is_str(update.get('description')):
-                        if not self.api.set_input_fields(input_id=input_id,
-                                                         description=update.get('description')):
+                        if not self.api.set_input_fields(
+                                input_id=input_id,
+                                description=update.get('description')):
                             result = False
                     elif Ut.is_list(update.get('process_list'), not_null=True):
                         process_list = [
@@ -287,7 +295,8 @@ class EmoncmsStructure:
                     result = False
                 else:
                     logger.info(
-                        "New feeds added to emoncms, and corresponding process list to inputs."
+                        "New feeds added to emoncms, "
+                        "and corresponding process list to inputs."
                     )
         return result
 
@@ -310,7 +319,8 @@ class EmoncmsStructure:
                         and Ut.is_dict(data[key].get('feeds')):
                     for feed_name in feed_list:
                         if Ut.is_str(feed_name, not_null=True)\
-                                and Ut.is_dict(data[key]['feeds'].get(feed_name)):
+                                and Ut.is_dict(
+                                    data[key]['feeds'].get(feed_name)):
                             feed_data = {
                                 'tag': node,
                                 'name': feed_name
@@ -318,7 +328,13 @@ class EmoncmsStructure:
                             feed_data.update(
                                 Ut.get_items_from_dict(
                                     data[key]['feeds'].get(feed_name),
-                                    ['datatype', 'engine', 'unit', 'public', 'interval']
+                                    [
+                                        'datatype',
+                                        'engine',
+                                        'unit',
+                                        'public',
+                                        'interval'
+                                    ]
                                 )
                             )
                             feed_id = self.api.create_feed(feed_data)
@@ -341,13 +357,16 @@ class EmoncmsStructure:
                                             process=process
                                         ):
                                     logger.warning(
-                                        "Error : Failed to set process list data for new feed."
+                                        "Error : "
+                                        "Failed to set process list data "
+                                        "for new feed."
                                         "Node : %s, feedName: %s, data: %s",
                                         node, feed_name, data[key]
                                     )
                             else:
                                 logger.warning(
-                                    "Error : Failed to set new feed on emoncms server."
+                                    "Error : "
+                                    "Failed to set new feed on emoncms server."
                                     "Node : %s, feedName: %s, data: %s",
                                     node, feed_name, data[key]
                                 )
@@ -390,7 +409,10 @@ class EmoncmsStructure:
         Set input process list on emoncms Api.
 
         :Example :
-            >>> process_data = {'input_id': 26, 'process_list': ['1:23', '4:24']}
+            >>> process_data = {
+                'input_id': 26,
+                'process_list': ['1:23', '4:24']
+            }
             >>> self.set_process_list(data=process_data)
             >>> True
         :param data: dict: The process list data to set on emoncms api
@@ -401,14 +423,19 @@ class EmoncmsStructure:
             result = True
             for process_list in data.values():
                 if Ut.is_dict(process_list, not_null=True)\
-                        and Ut.is_int(process_list.get('input_id'), positive=True)\
-                        and Ut.is_list(process_list.get('process_list'), not_null=True):
+                        and Ut.is_int(
+                            process_list.get('input_id'),
+                            positive=True)\
+                        and Ut.is_list(
+                            process_list.get('process_list'),
+                            not_null=True):
                     if not self.api.set_input_process_list(
                                 input_id=process_list.get('input_id'),
                                 process_list=process_list.get('process_list')
                             ):
                         logger.error(
-                            "Error: Failed to update input process list on emoncms. "
+                            "Error: "
+                            "Failed to update input process list on emoncms. "
                             "input id: %s - data : %s.",
                             process_list.get('input_id'),
                             process_list.get('process_list')
@@ -416,7 +443,8 @@ class EmoncmsStructure:
                         result = False
                 else:
                     logger.error(
-                        "Error: Failed to update input process list on emoncms. "
+                        "Error: "
+                        "Failed to update input process list on emoncms. "
                         "Bad format data : %s.",
                         process_list
                     )
@@ -424,7 +452,9 @@ class EmoncmsStructure:
         return result
 
     @staticmethod
-    def is_master_data_conf_priority(local_priority: str, global_priority: str) -> bool:
+    def is_master_data_conf_priority(local_priority: str,
+                                     global_priority: str
+                                     ) -> bool:
         """
         Test if is master data configuration priority.
 
@@ -438,8 +468,10 @@ class EmoncmsStructure:
                 >>> True
                 >>> EmoncmsStructure.is_master_data_conf_priority("", "")
                 >>> False
-        :param local_priority: str: Define local input/feed configuration priority
-        :param global_priority: str: Define global structure configuration priority
+        :param local_priority: str:
+            Define local input/feed configuration priority
+        :param global_priority: str:
+            Define global structure configuration priority
         :return: bool: True If one of local or global priority is master.
         """
         return (local_priority == "master" or global_priority == "master") \
@@ -699,7 +731,8 @@ class EmoncmsStructure:
             >>>     }
             >>> }
             >>>}
-        :param file_path: Optional[str]: The feeds updates to execute on emoncms api.
+        :param file_path: Optional[str]:
+            The feeds updates to execute on emoncms api.
         :return: dict: The dictionary read from emoncms yaml file.
         """
         loader = Loader(file_names="emoncms.yaml", file_path=file_path)
@@ -738,10 +771,12 @@ class EmoncmsStructure:
                 and Ut.is_int(feed_id, positive=True):
             Ut.init_dict_key(process_list, 'process_list', list())
             process_list.update({'input_id': input_id})
-            process_list['process_list'].append(EmoncmsHelper.format_process_list(
-                process=process,
-                feed_id=feed_id
-            ))
+            process_list['process_list'].append(
+                EmoncmsHelper.format_process_list(
+                    process=process,
+                    feed_id=feed_id
+                )
+            )
             result = True
         return result
 
@@ -757,15 +792,19 @@ class EmoncmsStructure:
         """Format process list data."""
         result = None
         if Ut.is_str(process, not_null=True):
-            process_list = EmoncmsStructure.get_comma_separated_values_to_list(process)
+            process_list = EmoncmsStructure.get_comma_separated_values_to_list(
+                process
+            )
             if Ut.is_list(process_list, not_null=True):
                 result = list()
                 for item in process_list:
                     if Ut.is_str(item, not_null=True):
                         tmp = item.split(':')
                         if Ut.is_list(tmp, eq=2):
-                            proc, feed_id = Ut.get_int(tmp[0], 0), Ut.get_int(tmp[1], 0)
-                            if Ut.is_int(proc, positive=True) and Ut.is_int(feed_id, positive=True):
+                            proc = Ut.get_int(tmp[0], 0)
+                            feed_id = Ut.get_int(tmp[1], 0)
+                            if Ut.is_int(proc, positive=True)\
+                                    and Ut.is_int(feed_id, positive=True):
                                 result.append((proc, feed_id))
         return result
 

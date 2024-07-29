@@ -10,7 +10,10 @@ If any validation error occurs, raise exception.
 Or if no error occurs, return data tested object
 
 :Example:
-    > SchemaValidate.validate_data(data=appBlocks_data, shem_key_path="appBlocks")
+    > SchemaValidate.validate_data(
+        data=appBlocks_data,
+        shem_key_path="appBlocks"
+    )
     > ...appBlocks_data...
 
  .. seealso:: ConfigLoader
@@ -29,16 +32,18 @@ __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
 __license__ = "Apache"
-__status__ = "Dev" #Production
+__status__ = "Production"
 __version__ = "0.0.1"
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
+
 class SchemaValidate():
     """Simple Class to load jsonschema file and validate data."""
 
     MAX_FILE_SIZE = 80000
+
     @classmethod
     def validate_data(cls, data: any, shem_key_path: str) -> None:
         """
@@ -60,7 +65,10 @@ class SchemaValidate():
 
         :Example:
 
-            > SchemaValidate.validate_data(data=appBlocks_data, shem_key_path="appBlocks")
+            > SchemaValidate.validate_data(
+                data=appBlocks_data,
+                shem_key_path="appBlocks"
+            )
 
         .. seealso::  ConfigLoader
         .. raises:: ValidationError, SchemaError, ErrorTree
@@ -70,7 +78,8 @@ class SchemaValidate():
         if Ut.is_dict(schema, not_null=True):
             return SchemaValidate.validate_data_from_schema(data, schema)
         raise SchemaError(
-            f"Fatal error unable to load valid jsonschema for key {shem_key_path}"
+            "Fatal error: "
+            f"unable to load valid jsonschema for key {shem_key_path}"
         )
 
     @classmethod
@@ -93,7 +102,10 @@ class SchemaValidate():
 
         :Example:
 
-            > SchemaValidate.validate_data_from_schema(data=appBlocks_data, schema={....})
+            > SchemaValidate.validate_data_from_schema(
+                data=appBlocks_data,
+                schema={....}
+            )
 
         .. seealso::  ConfigLoader
         .. raises:: ValidationError, SchemaError, ErrorTree
@@ -113,13 +125,13 @@ class SchemaValidate():
         """
         Load json schema from file_key, and return parsed content.
 
-        First get the file name, adding "_schema.json" 
+        First get the file name, adding "_schema.json"
         at the end of file_key value.
         Then use the current script path to locate the schema directory path.
         And finaly, if path is a file on disck,
         read and parse the file content.
             > ...vemonitor/conf_manager/schemas/[file_key]_schema.json
-        
+
         If any error occurs, raise exception.
         Or if no error occurs, return parsed json schema.
 

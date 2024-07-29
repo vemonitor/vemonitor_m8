@@ -28,7 +28,6 @@ logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
 
-
 class DataStructureLoader(Loader):
     """
     Used to load Data Structure configuration from yaml file.
@@ -47,16 +46,16 @@ class DataStructureLoader(Loader):
     .. raises:: YAMLFileNotFound, NullSettingException, SettingFileNotFound
     """
     def __init__(self,
-                  file_names: Optional[Union[str, list, tuple]],
-                  file_path: Optional[str]=None
+                 file_names: Optional[Union[str, list, tuple]],
+                 file_path: Optional[str] = None
                  ):
         Loader.__init__(self, file_names, file_path)
 
     def get_yaml_data_structure(self,
-                                file_path: Optional[str]=None
+                                file_path: Optional[str] = None
                                 ) -> Optional[Union[dict, list]]:
         """
-            Class Methods which loads the provided YAML 
+            Class Methods which loads the provided YAML
             file from self.file_path and return it as a dict or list.
             In the main configuaration file, child import can be done.
 

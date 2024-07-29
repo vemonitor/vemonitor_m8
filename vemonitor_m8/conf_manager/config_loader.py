@@ -32,7 +32,6 @@ logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
 
-
 class ConfigLoader(DataStructureLoader):
     """Used to get the Config settings as an object."""
 
@@ -72,8 +71,8 @@ class ConfigLoader(DataStructureLoader):
             output.set_app_blocks(
                 cHelp.get_app_blocks_by_app_or_name(
                     imp_conf.pop('appBlocks'),
-                    block_name = block_name,
-                    app_name = app_name
+                    block_name=block_name,
+                    app_name=app_name
                 )
             )
 
@@ -105,7 +104,7 @@ class ConfigLoader(DataStructureLoader):
 
         Obtain the main configuration yaml file, whose :
             - name is defined in the global variable FILE_NAMES
-            - a path can be defined in file_path ConfigLoader constructor properties.
+            - a path can be defined in file_path ConfigLoader constructor.
               if file_path is absolute, then we try to get the full path from
               file_path + FILE_NAMES.
               Eg: /file_path/vm_conf.yaml
@@ -139,7 +138,8 @@ class ConfigLoader(DataStructureLoader):
         :return: Config object with all configuration settings compiled.
 
         .. raises:: YAMLFileNotFound, YAMLFileEmpty, YAMLFileError,
-                    SettingInvalidException, NullSettingException, YAMLFileNotFound
+                    SettingInvalidException, NullSettingException,
+                    YAMLFileNotFound
         """
         now = time.time()
         logger.debug("Start loading configuration from yaml.")
@@ -151,17 +151,21 @@ class ConfigLoader(DataStructureLoader):
             block_name=block_name
         )
 
-        data_structure = self.get_yaml_data_structure(file_path="victronDeviceData.yaml")
+        data_structure = self.get_yaml_data_structure(
+            file_path="victronDeviceData.yaml"
+        )
         app_blocks_columns = output.get_app_blocks_columns()
         filtered_checks = cHelp.get_data_structure(
             data_structure=data_structure,
-            points = app_blocks_columns
+            points=app_blocks_columns
             )
-        # ToDo: userColumnsChecks.yaml must be appended to victronDeviceData.yaml
+        # ToDo: userColumnsChecks.yaml must be appended to victronDeviceData
         # ToDo: userColumnsChecks.yaml must be loaded from defined conf path
         try:
             # get columns checks from user file
-            data_structure = self.get_yaml_data_structure(file_path="userColumnsChecks.yaml")
+            data_structure = self.get_yaml_data_structure(
+                file_path="userColumnsChecks.yaml"
+            )
             filtered_checks.update(cHelp.get_data_structure(
                 data_structure=data_structure,
                 points=app_blocks_columns

@@ -52,9 +52,9 @@ class EmoncmsApi:
                 if response is not None and response.status_code in [200, 201]:
                     result = True
             except (
-                requests.exceptions.ConnectionError,
-                requests.exceptions.Timeout
-                ):
+                    requests.exceptions.ConnectionError,
+                    requests.exceptions.Timeout
+                   ):
                 result = False
         return result
 
@@ -73,7 +73,8 @@ class EmoncmsApi:
         :param address: str: The request route without domain and port
         :param req_type: str: The request type GET or POST
         :param params: Optional[dict]: The request parameters included on url
-        :param data: Optional[dict]: The request data to send only for post request
+        :param data: Optional[dict]:
+            The request data to send only for post request
         :param response_type: str: The response type (text or json)
         :return: any: <br>
             - Return string if response_type is text.<br>
@@ -93,10 +94,16 @@ class EmoncmsApi:
                 if req_type == 'get':
                     response = requests.get(req, params=params, timeout=2)
                 elif req_type == 'post':
-                    response = requests.post(req, params=params, data=data, timeout=2)
+                    response = requests.post(
+                        req,
+                        params=params,
+                        data=data,
+                        timeout=2
+                    )
                 else:
                     logger.debug(
-                        "[EmoncmsApi] Invalid request type %s, must be get or post.",
+                        "[EmoncmsApi] "
+                        "Invalid request type %s, must be get or post.",
                         Ut.get_str(req_type))
 
                 if response is not None and response.status_code in [200, 201]:
@@ -112,7 +119,9 @@ class EmoncmsApi:
 
         else:
             logger.debug(
-                "[EmoncmsApi] Invalid parameters to execute %s request or module not ready.",
+                "[EmoncmsApi] "
+                "Invalid parameters to execute %s request "
+                "or module not ready.",
                 Ut.get_str(req_type)
             )
         return result
@@ -150,7 +159,8 @@ class EmoncmsApi:
                 result = True
             else:
                 logger.debug(
-                    "[EmoncmsApi] Post input fields for node %s from emoncms api fail "
+                    "[EmoncmsApi] "
+                    "Post input fields for node %s from emoncms api fail "
                     "Response : %s",
                     node,
                     response)
@@ -213,7 +223,10 @@ class EmoncmsApi:
             Get input(s) data from emoncms Api.
                 - all nodes and associated inputs
                     -> if node = None and inputName = None
-                    -> {'Node': {'Input': {'data 1': 'value 1', ...}, ...}, ...}
+                    -> {
+                        'Node': {'Input': {'data 1': 'value 1', ...}, ...},
+                        ...
+                        }
                 - inputs from specific node
                     -> if node value passed and inputName = None
                     -> {'Input': {'data 1': 'value 1', ...}, ...}
@@ -231,7 +244,11 @@ class EmoncmsApi:
         if Ut.is_str(name, not_null=True):
             params['name'] = name
 
-        response = self._execute_request('/input/get.json', params=params, response_type="json")
+        response = self._execute_request(
+            '/input/get.json',
+            params=params,
+            response_type="json"
+        )
 
         if Ut.is_dict(response, not_null=True):
             result = response
@@ -260,7 +277,10 @@ class EmoncmsApi:
                                     'last value input'
         """
         result = None
-        response = self._execute_request('/input/list.json', response_type="json")
+        response = self._execute_request(
+            '/input/list.json',
+            response_type="json"
+        )
         if Ut.is_list(response, not_null=True):
 
             if Ut.is_str(node, not_null=True)\
@@ -295,7 +315,10 @@ class EmoncmsApi:
                                     'input process list'
         """
         result = None
-        response = self._execute_request('/input/get_inputs.json', response_type="json")
+        response = self._execute_request(
+            '/input/get_inputs.json',
+            response_type="json"
+        )
         if Ut.is_dict(response, not_null=True):
             result = response
             if Ut.is_str(node, not_null=True):
@@ -333,7 +356,8 @@ class EmoncmsApi:
                 result = response
             else:
                 logger.debug(
-                    "[EmoncmsApi] Get input process list from emoncms api fail "
+                    "[EmoncmsApi] "
+                    "Get input process list from emoncms api fail "
                     "Response : %s",
                     response
                 )
@@ -372,7 +396,11 @@ class EmoncmsApi:
         if Ut.is_int(user_id, positive=True):
             params = {'userid': user_id}
 
-        response = self._execute_request('/feed/list.json', params=params, response_type="json")
+        response = self._execute_request(
+            '/feed/list.json',
+            params=params,
+            response_type="json"
+        )
         if Ut.is_list(response, not_null=True):
             result = response
         else:
@@ -435,7 +463,9 @@ class EmoncmsApi:
                 result = response
             else:
                 logger.debug(
-                    "[EmoncmsApi] Get feed : request: %s - field : %s from emoncms api fail "
+                    "[EmoncmsApi] "
+                    "Get feed : "
+                    "request: %s - field : %s from emoncms api fail "
                     "Response : %s",
                     req_type,
                     field,
