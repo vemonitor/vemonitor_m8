@@ -27,7 +27,7 @@ class DataCache(InputsCache):
         self.data = None
         self._nodes = []
 
-    def has_data(self):
+    def has_data(self) -> bool:
         """Test if instance has data cache"""
         return Ut.is_dict(self.data, not_null=True)
 
