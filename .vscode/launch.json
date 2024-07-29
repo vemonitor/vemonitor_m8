@@ -6,14 +6,14 @@
     "configurations": [
 
         {
-            "name": "Python : veMonitor batSerialMonitor",
+            "name": "Python : veMonitor VedirectToRedis",
             "type": "debugpy",
             "request": "launch",
-            "justMyCode": true,
+            "justMyCode": false,
             "program": "${workspaceFolder}/__main__.py",
             "args": [
                 "--debug",
-                "--app=batSerialMonitor"
+                "--block=VedirectToRedis"
             ],
             "jinja": true
         }
