@@ -55,7 +55,11 @@ class EmoncmsSetApi(EmoncmsApi):
         Execute a request on feed .
 
         :Example :
-            >>> self._execute_simple_request(item_type="feed", action="clear", item_id=14)
+            >>> self._execute_simple_request(
+                item_type="feed",
+                action="clear",
+                item_id=14
+            )
             >>> True
         :param action: str: The action id to execute
         :param item_type: str: The item_type to select (input or feed)
@@ -125,7 +129,11 @@ class EmoncmsSetApi(EmoncmsApi):
         Execute a request on emoncms with json responce .
 
         :Example :
-            >>> self._execute_simple_json_request(item_type="feed", action="clear", item_id=14)
+            >>> self._execute_simple_json_request(
+                item_type="feed",
+                action="clear",
+                item_id=14
+            )
             >>> True
         :param action: str: The action id to execute
         :param item_type: str: The item_type to select (input or feed)
@@ -158,7 +166,10 @@ class EmoncmsSetApi(EmoncmsApi):
         :Example :
             >>> self.set_input_fields(input_id=14, name="NewName")
             >>> True
-            >>> self.set_input_fields(input_id=14, description="New Input Description")
+            >>> self.set_input_fields(
+                input_id=14,
+                description="New Input Description"
+            )
             >>> True
         :param input_id: int or str: The input id to update
         :param name: Optional[str]: The new input name to update
@@ -196,7 +207,8 @@ class EmoncmsSetApi(EmoncmsApi):
                 result = True
             else:
                 logger.debug(
-                    "[EmoncmsSetApi] Set input fields for id %s from emoncms api fail "
+                    "[EmoncmsSetApi] "
+                    "Set input fields for id %s from emoncms api fail "
                     "Response : %s",
                     input_id,
                     response)
@@ -211,7 +223,10 @@ class EmoncmsSetApi(EmoncmsApi):
             )
         return result
 
-    def set_input_process_list(self, input_id: int, process_list: Union[str, list]) -> bool:
+    def set_input_process_list(self,
+                               input_id: int,
+                               process_list: Union[str, list]
+                               ) -> bool:
         """
         Set input process list on emoncms for input_id.
 
@@ -228,7 +243,9 @@ class EmoncmsSetApi(EmoncmsApi):
             params = {'inputid': input_id}
         if Ut.is_list(process_list):
             data = {
-                'processlist': EmoncmsHelper.get_list_to_comma_separated_values(process_list)
+                'processlist': EmoncmsHelper.get_list_to_comma_separated_values(
+                    process_list
+                )
             }
         elif Ut.is_str(process_list):
             data = {
@@ -249,7 +266,8 @@ class EmoncmsSetApi(EmoncmsApi):
                 result = True
             else:
                 logger.debug(
-                    "[EmoncmsSetApi] Set input process list from emoncms api fail "
+                    "[EmoncmsSetApi] "
+                    "Set input process list from emoncms api fail "
                     "Response : %s",
                     response
                 )
@@ -309,13 +327,16 @@ class EmoncmsSetApi(EmoncmsApi):
                         result = False
             if errs > 0:
                 logger.debug(
-                    "[EmoncmsSetApi] Unable to delete '%s' inputs for node '%s'...",
+                    "[EmoncmsSetApi] "
+                    "Unable to delete '%s' inputs for node '%s'...",
                     errs,
                     node
                 )
         else:
             logger.debug(
-                "[EmoncmsSetApi] Unable to delete node '%s' inputs, bad inputs list returned : %s",
+                "[EmoncmsSetApi] "
+                "Unable to delete node '%s' inputs, "
+                "bad inputs list returned : %s",
                 node,
                 inputs
             )
@@ -328,7 +349,8 @@ class EmoncmsSetApi(EmoncmsApi):
         :Example :
             >>> self.delete_inputs_by_node()
             >>> 0
-        :return: int: The number of inputs without process list deleted from server.
+        :return: int:
+            The number of inputs without process list deleted from server.
         """
         result = -1
         response = self._execute_simple_request(item_type="input",
@@ -340,7 +362,8 @@ class EmoncmsSetApi(EmoncmsApi):
                 result = Ut.get_int(nb_deleted[0], 0)
         else:
             logger.debug(
-                "[EmoncmsSetApi] Clean inputs without process list from emoncms api fail "
+                "[EmoncmsSetApi] "
+                "Clean inputs without process list from emoncms api fail "
                 "Response : %s",
                 response)
         return result
@@ -358,7 +381,9 @@ class EmoncmsSetApi(EmoncmsApi):
             - engine : int: The feed engine (required)
             - interval : int: The feed interval in sec
         :Example :
-            >>> self.create_feed(data={"tag": "Node", "name": "MyName", "engine": 1})
+            >>> self.create_feed(
+                data={"tag": "Node", "name": "MyName", "engine": 1}
+            )
             >>> True
         :param data: dict: The feed data dictionary.
         :return: Optional[int]: The feed id, created or None if error occurs.
@@ -402,7 +427,8 @@ class EmoncmsSetApi(EmoncmsApi):
         :Example :
             >>> self.clear_process_feeds(feed_id=14)
             >>> True
-        :param feed_id: int or str: The feed id to clear process list from inputs
+        :param feed_id: int or str:
+            The feed id to clear process list from inputs
         :return: bool: True if feed cleared with success.
         """
         result = False
@@ -545,12 +571,18 @@ class EmoncmsSetApi(EmoncmsApi):
         Get request parameters from global dictionary.
 
         :Example :
-            >>> EmoncmsSetApi._get_request_params(item_type="feed", action="clear", item_id=14)
+            >>> EmoncmsSetApi._get_request_params(
+                item_type="feed",
+                action="clear",
+                item_id=14
+            )
             >>> True
-        :param actions: dict: The global dictionary contening all request parameters
+        :param actions: dict:
+            The global dictionary contening all request parameters
         :param action: str: The action id to execute
         :param item_type: str: The item_type to select (input or feed)
-        :return: Optional[tuple]: Tuple (uri, params, response_type) of request parameters<br>
+        :return: Optional[tuple]:
+            Tuple (uri, params, response_type) of request parameters<br>
             or None
         """
         result = None
@@ -562,7 +594,9 @@ class EmoncmsSetApi(EmoncmsApi):
                 item_action = item_actions.get(action)
                 if Ut.is_dict(item_action, not_null=True) \
                         and Ut.is_str(item_action.get('uri'), not_null=True) \
-                        and Ut.is_str(item_action.get('response_type'), not_null=True):
+                        and Ut.is_str(
+                            item_action.get('response_type'),
+                            not_null=True):
                     result = (
                         item_action.get('uri'),
                         item_action.get('params'),

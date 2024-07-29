@@ -12,7 +12,7 @@ from vemonitor_m8.workers.workers_loader import WorkersLoader
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
-__license__ = "MIT"
+__license__ = "Apache"
 __status__ = "Production"
 __version__ = "1.0.0"
 
@@ -45,14 +45,17 @@ class WorkersManager(Workers):
                     result = worker.worker
         return result
 
-    def add_active_connector(self, key: str, value: tuple)-> bool:
+    def add_active_connector(self,
+                             key: str,
+                             value: tuple
+                             ) -> bool:
         """Add Worker status error"""
         return self.active_connectors.add_item(
             key=key,
             value=value
         )
 
-    def get_workers_status(self)-> bool:
+    def get_workers_status(self) -> bool:
         """Add Worker status error"""
         return self._workers_status is True
 
@@ -61,24 +64,25 @@ class WorkersManager(Workers):
         if self._workers_status is True and status is False:
             self._workers_status = False
 
-    def get_input_workers_status(self)-> dict:
+    def get_input_workers_status(self) -> dict:
         """Add Worker status error"""
         return self._inputs_status
 
     def add_input_worker_status(self,
-                                      worker_name: str,
-                                      worker_status: bool):
+                                worker_name: str,
+                                worker_status: bool
+                                ):
         """Add Input Worker status error"""
         self._inputs_status[worker_name] = worker_status
         self.set_workers_status(worker_status)
 
-    def get_output_workers_status(self)-> dict:
+    def get_output_workers_status(self) -> dict:
         """Add Worker status error"""
         return self._output_status
 
     def add_output_worker_status(self,
-                                       worker_name: str,
-                                       worker_status: bool):
+                                 worker_name: str,
+                                 worker_status: bool):
         """Add Output Worker status error"""
         self._output_status[worker_name] = worker_status
         self.set_workers_status(worker_status)
@@ -94,8 +98,8 @@ class WorkersManager(Workers):
         worker_name = WorkersHelper.get_worker_name(worker_key, item)
         if not self.has_input_worker_key(worker_name):
             logger.info("[WorkersManager]---> new input worker %s",
-                         worker_name
-            )
+                        worker_name
+                        )
             worker = None
             connector_key = (worker_key, item.get("source"))
             active_connector = self.get_active_connector(connector_key)
@@ -150,7 +154,7 @@ class WorkersManager(Workers):
         if not self.has_output_worker_key(worker_name):
             logger.info("[WorkersManager]---> new output worker %s",
                         worker_name
-            )
+                        )
             worker = None
             connector_key = (worker_key, item.get("source"))
             active_connector = self.get_active_connector(connector_key)

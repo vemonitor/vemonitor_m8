@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 """Redis vemonitor Helper"""
 import logging
+from operator import itemgetter
 from typing import Optional, Union
 from ve_utils.ujson import UJson
+from vemonitor_m8.core.exceptions import DataCacheError
 from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.models.inputs_cache import InputsCache
 from vemonitor_m8.workers.redis.redis_app import RedisApp
@@ -24,7 +26,7 @@ class RedisConnector:
        vemonitor Redis Cache Outputs Helper
     """
     def __init__(self,
-                 connector: Optional[Union[dict, RedisApp]] = None
+                 connector: Union[dict, RedisApp]
                  ):
         self.app = None
         self.set_redis_app(connector=connector)
@@ -35,15 +37,19 @@ class RedisConnector:
         return RedisConnector.is_app_ready(self.app)
 
     def set_redis_app(self,
-                      connector: Optional[Union[dict, RedisApp]] = None
+                      connector: Union[dict, RedisApp]
                       ) -> bool:
-        """Test if redis connection is ready"""
+        """Set up RedisApp"""
+        result = False
         if RedisConnector.is_redis_app(connector):
             self.app = connector
+            result = self.is_ready()
         elif Ut.is_dict(connector, not_null=True):
-            connector.pop('active')
+            if 'active' in connector:
+                connector.pop('active')
             self.app = RedisApp(credentials=connector)
-        return self.is_ready()
+            result = self.is_ready()
+        return result
 
     @staticmethod
     def is_redis_app(app: RedisApp) -> bool:
@@ -82,7 +88,9 @@ class RedisCache(RedisConnector, InputsCache):
         """Init inputs data cache"""
         return True
 
-    def get_cache_nodes_keys_list(self, nodes: Optional[list] = None) -> list:
+    def get_cache_nodes_keys_list(self,
+                                  nodes: Optional[list] = None
+                                  ) -> list:
         """
         Get list of inputs nodes keys from redis set cache data.
         ToDo:
@@ -90,114 +98,178 @@ class RedisCache(RedisConnector, InputsCache):
               list() may throw an exception.
               May caused by redis error (can be unreachable server).
         """
-        result = None
-        if self.is_ready():
-            result = list(
-                self.app.api.get_set_members(self.cache_name)
-            )
-            if Ut.is_list(nodes, not_null=True):
-                result = [x
-                          for x in result
-                          if x in RedisCache.get_cache_map_key(x)]
+        result = list(
+            self.app.api.get_set_members(self.cache_name)
+        )
+        if Ut.is_list(nodes, not_null=True):
+            formated_nodes = [
+                RedisCache.get_cache_map_key(x)
+                for x in nodes
+            ]
+            result = [
+                x
+                for x in result
+                if x in formated_nodes
+            ]
         return result
 
     def get_cache_keys_by_node(self,
-                               node: str,
+                               formatted_node: str,
                                from_time: int = 0
                                ) -> list:
         """Get formatted hmap keys."""
         result = None
-        if self.is_ready():
-            keys = self.app.api.get_hmap_keys(node)
-            if Ut.is_list(keys, not_null=True):
-                keys.sort()
-                if Ut.is_int(from_time, positive=True):
-                    result = [Ut.get_int(x, 0)
-                              for x in keys
-                              if InputsCache.is_from_time(
-                                item_time=Ut.get_int(x),
-                                from_time=from_time
-                              )]
-                else:
-                    result = [Ut.get_int(x, 0) for x in keys]
+        keys = self.app.api.get_hmap_keys(formatted_node)
+        if Ut.is_list(keys, not_null=True):
+            keys.sort()
+            if Ut.is_int(from_time, positive=True):
+                result = [
+                    Ut.get_int(x, 0)
+                    for x in keys
+                    if InputsCache.is_from_time(
+                            item_time=Ut.get_int(x),
+                            from_time=from_time
+                        )
+                ]
+            else:
+                result = [Ut.get_int(x, 0) for x in keys]
         return result
+
+    def get_cache_keys_structure(self,
+                                 node_keys: list,
+                                 nb_items: int,
+                                 from_time: int = 0
+                                 ) -> int:
+        """Get time interval from hmap keys."""
+        structure = None
+        if Ut.is_list(node_keys, not_null=True):
+            structure = []
+            for node in node_keys:
+                keys = self.get_cache_keys_by_node(
+                    formatted_node=node,
+                    from_time=from_time
+                )
+                if Ut.is_list(keys, not_null=True):
+                    interval = RedisCache.get_interval_keys(keys)
+                    for cache_key in keys:
+                        structure.append((node, interval, cache_key))
+            if Ut.is_list(structure, not_null=True):
+                structure = sorted(structure, key=itemgetter(2))
+                structure = RedisCache.get_cache_keys_section(
+                    structure=structure,
+                    nb_items=nb_items
+                )
+        return structure
 
     def enum_cache_keys(self,
                         nodes: Optional[list] = None,
+                        nb_items: int = 0,
                         from_time: int = 0
                         ):
         """Get list of inputs nodes keys from redis cache data."""
         if self.is_ready():
             node_keys = self.get_cache_nodes_keys_list(nodes)
             if Ut.is_list(node_keys, not_null=True):
-                for node in node_keys:
-                    yield node, self.get_cache_keys_by_node(
-                        node=node,
-                        from_time=from_time
+                if nb_items > 0:
+                    structure = self.get_cache_keys_structure(
+                        node_keys=node_keys,
+                        nb_items=nb_items,
+                        from_time=from_time,
                     )
+
+                    for node, cache_keys in structure.items():
+                        yield node, cache_keys
+                else:
+                    for node in node_keys:
+                        yield node, self.get_cache_keys_by_node(
+                            formatted_node=node,
+                            from_time=from_time
+                        )
 
     def reset_data_cache(self) -> list:
         """Reset data cache for all nodes."""
         result = None
         if self.app.api.set_pipeline():
-            for node, keys in self.enum_cache_keys():
-                if Ut.is_list(keys, not_null=True):
-                    self.app.api.del_hmap_keys(
-                        name=node,
-                        keys=keys,
+            try:
+                # Remove data cache
+                for node, keys in self.enum_cache_keys():
+                    if Ut.is_list(keys, not_null=True):
+                        self.app.api.del_hmap_keys(
+                            name=node,
+                            keys=keys,
+                            client=self.app.api.pipe
+                        )
+                # Remove Nodes list set
+                node_keys = self.get_cache_nodes_keys_list()
+                if Ut.is_list(node_keys, not_null=True):
+                    self.app.api.remove_set_members(
+                        name=self.cache_name,
+                        values=node_keys,
                         client=self.app.api.pipe
                     )
-            try:
+                # execute pipe
                 result = self.app.api.pipe.execute()
-            except Exception as ex:
+            except BaseException as ex:
                 logger.error(
                     "[InputRedisCache::reset_all_data_cache] "
                     "Unable to reset all cache data. "
                     "ex : %s",
                     ex
                 )
+                raise DataCacheError(
+                    "[RedisApi:set_pipeline] "
+                    "Fatal Error : Unable to set pipeline."
+                ) from ex
         return result
 
     def _update_or_set_data_node_key(self,
-                                     node: str,
+                                     formatted_node: str,
                                      time_key: int,
                                      data: dict
-                                     ) -> Optional[dict]:
+                                     ) -> tuple:
         """Update or set data key."""
-        result = None
+        result, is_updated = None, False
         if self.is_ready()\
                 and Ut.is_int(time_key, positive=True)\
-                and Ut.is_str(node, not_null=True)\
+                and Ut.is_str(formatted_node, not_null=True)\
                 and Ut.is_dict(data, not_null=True):
             data_in = self.app.api.get_hmap_data(
-                node,
+                formatted_node,
                 str(time_key)
             )
             if Ut.is_str(data_in, not_null=True):
                 result = UJson.loads_json(data_in)
                 if Ut.is_dict(result, not_null=True):
                     result.update(data)
+                    is_updated = True
                 else:
                     result = data
             else:
                 result = data
-        return result
+        return result, is_updated
 
-    def control_node_data_len(self, node: str):
+    def control_node_data_len(self, formatted_node: str):
         """Control inputs data cache length"""
-        keys = self.get_cache_keys_by_node(node=node)
-        if Ut.is_list(keys, not_null=True):
-            nb_items = len(keys)
+        time_keys = self.get_cache_keys_by_node(formatted_node=formatted_node)
+        if Ut.is_list(time_keys, not_null=True):
+            nb_items = len(time_keys)
             if nb_items > self._max_rows:
                 nb_del = nb_items - self._max_rows
                 # register invalid keys to delete
-                to_del = [x for x in keys if not Ut.is_int(x, positive=True)]
+                to_del = [
+                    time_key
+                    for time_key in time_keys
+                    if not Ut.is_int(time_key, positive=True)
+                ]
 
                 if nb_del > 0:
-                    to_del = to_del + keys[0: nb_del]
+                    to_del = to_del + time_keys[0: nb_del]
 
                 if Ut.is_list(to_del, not_null=True):
-                    self.app.api.del_hmap_keys(node, to_del)
+                    self.app.api.del_hmap_keys(
+                        formatted_node,
+                        to_del
+                    )
 
     def register_node(self, node: str):
         """Register node and save on redis."""
@@ -215,42 +287,43 @@ class RedisCache(RedisConnector, InputsCache):
 
     def add_data_cache(self,
                        time_key: int,
-                       key: str,
+                       node: str,
                        data: dict
                        ):
         """Set inputs data cache key on redis."""
         result = False
         time_key = Ut.get_int(time_key, 0)
         if self.is_ready():
-            node = RedisCache.get_cache_map_key(key=key)
-            data = self._update_or_set_data_node_key(
-                node=node,
+            formatted_node = RedisCache.get_cache_map_key(key=node)
+            data, is_updated = self._update_or_set_data_node_key(
+                formatted_node=formatted_node,
                 time_key=time_key,
                 data=data
             )
             if Ut.is_dict(data, not_null=True):
                 data_in = UJson.dumps_json(data)
-
-                if self.app.api.set_hmap_data(
-                            node,
-                            time_key,
-                            values=data_in
-                        ) == 1:
-
+                nb_added = self.app.api.set_hmap_data(
+                    formatted_node,
+                    Ut.get_str(time_key),
+                    values=data_in
+                )
+                # nb_added
+                if nb_added == 1\
+                        or (is_updated is True and nb_added == 0):
                     result = True
-            self.control_node_data_len(node=node)
+            self.control_node_data_len(formatted_node=formatted_node)
         return result
 
     def enum_node_data_cache_interval(self,
-                                      node: str,
+                                      formatted_node: str,
                                       keys: list
                                       ):
         """Enumerate data cache interval."""
-        if Ut.is_str(node, not_null=True)\
+        if Ut.is_str(formatted_node, not_null=True)\
                 and Ut.is_list(keys, not_null=True):
 
             data = self.app.api.get_hmap_data(
-                node,
+                formatted_node,
                 keys
             )
             if Ut.is_list(data, not_null=True) \
@@ -270,37 +343,49 @@ class RedisCache(RedisConnector, InputsCache):
                             ) -> tuple:
         """
         Get data cache extract.
+        ToDo: This method must be simplified and improved
         """
         result, max_time = None, 0
-        if self.is_ready() \
-                and Ut.is_dict(structure, not_null=True):
+        # ToDo: Remove is_ready test and play with redis_api exceptions
+        if self.is_ready():
             result = dict()
+            nodes = None
+
+            is_structure = Ut.is_dict(structure, not_null=True)
+            if is_structure:
+                nodes = list(structure.keys())
 
             for node, keys in self.enum_cache_keys(
-                    nodes=list(structure.keys()),
+                    nodes=nodes,
+                    nb_items=nb_items,
                     from_time=from_time
             ):
-                if Ut.is_list(keys, not_null=True)\
-                        and 0 < nb_items <= len(keys):
+                if Ut.is_list(keys, not_null=True):
                     node_name = node[4:]
+
                     max_time = Ut.get_max_in_loop(
                         value=max_time,
-                        max_val=max(keys) - 1
+                        max_val=max(keys)
                     )
-                    if nb_items > 0:
-                        keys = keys[0: nb_items]
 
                     for key, values in self.enum_node_data_cache_interval(
-                            node=node,
+                            formatted_node=node,
                             keys=keys):
                         Ut.init_dict_key(result, key, dict())
 
-                        result[key].update({
-                            node_name: Ut.get_items_from_dict(
-                                values,
-                                structure.get(node_name)
-                            )
-                        })
+                        if is_structure:
+                            result[key].update({
+                                node_name: Ut.get_items_from_dict(
+                                    values,
+                                    structure.get(node_name)
+                                )
+                            })
+                        else:
+                            result[key].update({
+                                node_name: values
+                            })
+            if Ut.is_dict(result, not_null=True):
+                result = dict(sorted(result.items()))
         return result, max_time
 
     def get_data_from_cache(self,
@@ -317,90 +402,52 @@ class RedisCache(RedisConnector, InputsCache):
             nb_items=nb_items,
             structure=structure
         )
-        if Ut.is_dict(result, min_items=nb_items):
+        is_valid_data = Ut.is_dict(result, min_items=1)
 
-            start_time, end_time = self.get_time_interval(
-                from_time=from_time,
-                nb_items=nb_items,
-                start_time=min(result),
-            )
-
-            result, last_time = RedisCache.get_cache_by_start_time(
-                start_time=start_time,
-                end_time=end_time,
-                nb_items=nb_items,
-                data=result
-            )
+        if is_valid_data:
+            last_time = max(result) + 1
 
         return result, last_time, max_time
 
-    def get_time_interval(self,
-                          from_time: int,
-                          nb_items: int,
-                          start_time: int
-                          ):
-        """Register node and save on redis."""
-        if from_time > 0:
-            start_time = from_time
-        end_time = start_time + (nb_items * self._interval_min)
-        return start_time, end_time
+    @staticmethod
+    def get_interval_keys(keys: list) -> int:
+        """Get time interval from hmap keys."""
+        result = 0
+        if Ut.is_list(keys, not_null=True):
+            i = 0
+            tmp = 0
+            rows = []
+            for item_time in keys:
+                if i > 0:
+                    rows.append(item_time - tmp)
+                tmp = item_time
+                i += 1
+            result = min(rows)
+        return result
 
     @staticmethod
-    def get_cache_by_start_time(start_time: int,
-                                end_time: int,
-                                nb_items: int,
-                                data: dict
-                                ) -> tuple:
-        """Get cache data by start time."""
-        result, last_time = None, 0
-        if Ut.is_dict(data, not_null=True) \
-                and Ut.is_int(start_time, positive=True) \
+    def get_cache_keys_section(structure: list,
+                               nb_items: int
+                               ) -> int:
+        """Get time interval from hmap keys."""
+        result = None
+        if Ut.is_list(structure, not_null=True)\
                 and Ut.is_int(nb_items, positive=True):
-            keys = list(data.keys())
-            keys.sort()
-            keys = [x for x in keys if x >= start_time]
-            keys = keys[:nb_items]
-            if Ut.is_dict(data, not_null=True) \
-                    and Ut.is_list(keys, not_null=True):
-                result = {}
-                for key, value in data.items():
-                    if key in keys:
-                        keys.pop(keys.index(key))
-                        result.update({key: value})
-                if Ut.is_dict(result, not_null=True):
-                    last_time = max(result) + 1
-            return result, last_time
-
-    @staticmethod
-    def get_cache_from_time_interval(start_time: int,
-                                     end_time: int,
-                                     nb_items: int,
-                                     data: dict
-                                     ) -> tuple:
-        """
-        Get cache data from time interval and nb of results.
-        """
-        result, last_time = None, 0
-        if Ut.is_dict(data, not_null=True)\
-                and Ut.is_int(end_time, positive=True)\
-                and 0 < start_time < end_time:
-            result = {key: value
-                      for key, value in data.items()
-                      if start_time <= key < end_time}
-            if Ut.is_dict(result, not_null=True):
-                last_time = max(result) + 1
-            else:
-                result = {}
-                nb_get = 0
-                for key, value in data.items():
-                    if start_time <= key and nb_get < 10:
-                        result.update({key:value})
-                        nb_get += 1
-
-                if Ut.is_dict(result, not_null=True):
-                    last_time = max(result) + 1
-
-        return result, last_time
+            result = {}
+            nb_in = 0
+            last_cache_key = 0
+            for node, interval, cache_key in structure:
+                if nb_in < nb_items\
+                        or last_cache_key == cache_key:
+                    if node not in result:
+                        result[node] = []
+                    result[node].append(cache_key)
+                    if cache_key > 0 and last_cache_key != cache_key:
+                        nb_in += 1
+                    last_cache_key = cache_key
+                else:
+                    break
+        return result
 
     @staticmethod
     def get_cache_map_key(key: str) -> str:

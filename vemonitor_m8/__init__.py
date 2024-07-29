@@ -11,10 +11,11 @@ __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
 __license__ = "Apache"
 __status__ = "Production"
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
+
 
 def parse_args(args):
     """
@@ -23,18 +24,36 @@ def parse_args(args):
     :return: return parser
     """
     # create arguments
-    parser = argparse.ArgumentParser(description='Monitor From VE.Direct protocol')
-    parser.add_argument('--block', help='Main block name to run in your configuration file.')
-    parser.add_argument('--app', help='Main app to run')
-    parser.add_argument('--conf_path', help='Main Configuration file path')
-    parser.add_argument('--log_path', help='Console log file path')
-    parser.add_argument("--debug", action='store_true',
-                        help="Show debug output")
-    parser.add_argument('-v', '--version', action='version',
-                        version='VeMonitor ' + __version__)
+    parser = argparse.ArgumentParser(
+        description='Monitor From VE.Direct protocol'
+    )
+    parser.add_argument(
+        '--block',
+        help='Main block name to run in your configuration file.'
+    )
+    parser.add_argument(
+        '--app',
+        help='Main app to run'
+    )
+    parser.add_argument(
+        '--conf_path', help='Main Configuration file path'
+    )
+    parser.add_argument(
+        '--log_path', help='Console log file path'
+    )
+    parser.add_argument(
+        "--debug", action='store_true',
+        help="Show debug output"
+    )
+    parser.add_argument(
+        '-v', '--version',
+        action='version',
+        version='VeMonitor ' + __version__
+    )
 
     # parse arguments from script parameters
     return parser.parse_args(args)
+
 
 def main():
     """Entry point of VeMonitor program."""
@@ -75,7 +94,10 @@ class CustomFormatter(logging.Formatter):
     bold_red = '\x1b[31;1m'
     reset = '\x1b[0m'
 
-    def __init__(self, fmt:str, date_format:str="%Y-%m-%d %H:%M:%S"):
+    def __init__(self,
+                 fmt: str,
+                 date_format: str = "%Y-%m-%d %H:%M:%S"
+                 ):
         super().__init__()
         self.fmt = fmt
         self.date_format = date_format
@@ -92,6 +114,7 @@ class CustomFormatter(logging.Formatter):
         log_fmt = self.colors_format.get(record.levelno)
         formatter = logging.Formatter(log_fmt, self.date_format)
         return formatter.format(record)
+
 
 def configure_logging(debug=None):
     """

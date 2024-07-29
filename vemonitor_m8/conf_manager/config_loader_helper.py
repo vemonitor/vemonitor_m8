@@ -23,7 +23,8 @@ import logging
 from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.conf_manager.shema_validate_selector import SchemaValidateSelector as jValid
-from vemonitor_m8.core.exceptions import SettingInvalidException, NullSettingException
+from vemonitor_m8.core.exceptions import SettingInvalidException
+from vemonitor_m8.core.exceptions import NullSettingException
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
@@ -34,10 +35,10 @@ class ConfigLoaderHelper:
 
     @classmethod
     def get_app_blocks_by_app_or_name(cls,
-                               app_blocks:list,
-                               block_name: Optional[str]=None,
-                               app_name: Optional[str]=None
-                               ) -> Optional[dict]:
+                                      app_blocks: list,
+                                      block_name: Optional[str] = None,
+                                      app_name: Optional[str] = None
+                                      ) -> Optional[dict]:
         """Get AppBlocks from config by app or by name."""
         res = None
         if Ut.is_list(app_blocks, not_null=True)\
@@ -64,7 +65,7 @@ class ConfigLoaderHelper:
 
     @classmethod
     def get_args_objects_from_conf(cls,
-                                   args:dict,
+                                   args: dict,
                                    conf: dict
                                    ) -> Optional[dict]:
         """Get Args data from config."""
@@ -105,12 +106,12 @@ class ConfigLoaderHelper:
                                      ) -> Optional[dict]:
         """Get App Connector Item data from config."""
         res = None
-        if Ut.is_dict(conector, not_null=True) and Ut.is_list(sources, not_null=True):
+        if Ut.is_dict(conector, not_null=True)\
+                and Ut.is_list(sources, not_null=True):
             res = {}
             for item_key, item in conector.items():
                 if Ut.is_dict(item) and\
-                        item_key in sources: # and\
-                        # key == item_key:
+                        item_key in sources:  # and key == item_key:
                     res[item_key] = item
             if not Ut.is_dict(res, not_null=True):
                 raise SettingInvalidException(
@@ -126,7 +127,7 @@ class ConfigLoaderHelper:
     @classmethod
     def get_app_connectors_from_sources(cls,
                                         app_conectors: dict,
-                                        sources: Optional[dict]=None
+                                        sources: Optional[dict] = None
                                         ) -> Optional[dict]:
         """Get App Connectors data from config."""
         res = None
@@ -137,7 +138,8 @@ class ConfigLoaderHelper:
                 for key, conector in app_conectors.items():
                     if not Ut.is_dict(conector, not_null=True):
                         raise SettingInvalidException(
-                            "Fatal Error: unable to get appConnectors from sources, "
+                            "Fatal Error: "
+                            "unable to get appConnectors from sources, "
                             "conector key {key} is not valid. "
                         )
 
@@ -164,7 +166,9 @@ class ConfigLoaderHelper:
     def is_battery_banks_items(cls, battery_bank: dict) -> bool:
         """Test if is valid battery banks items data."""
         return cls.is_battery_banks(battery_bank)\
-            and Ut.is_dict(battery_bank['batteryDatas'].get('bankItems'), not_null=True)
+            and Ut.is_dict(
+                battery_bank['batteryDatas'].get('bankItems'),
+                not_null=True)
 
     @classmethod
     def is_battery_banks_items_key(cls,
@@ -174,7 +178,9 @@ class ConfigLoaderHelper:
         """Test if is valid battery banks items key."""
         return cls.is_battery_banks_items(battery_bank) and \
             Ut.is_str(key) and\
-            Ut.is_dict(battery_bank['batteryDatas']['bankItems'].get(key), not_null=True)
+            Ut.is_dict(
+                battery_bank['batteryDatas']['bankItems'].get(key),
+                not_null=True)
 
     @classmethod
     def get_battery_banks_items_key(cls,
@@ -191,7 +197,9 @@ class ConfigLoaderHelper:
     def is_battery_items(cls, battery_bank: dict) -> bool:
         """Test if is valid battery items."""
         return cls.is_battery_banks(battery_bank)\
-            and Ut.is_dict(battery_bank['batteryDatas'].get('batteries'), not_null=True)
+            and Ut.is_dict(
+                battery_bank['batteryDatas'].get('batteries'),
+                not_null=True)
 
     @classmethod
     def is_battery_items_key(cls,
@@ -201,7 +209,9 @@ class ConfigLoaderHelper:
         """Test if is valid battery items key."""
         return cls.is_battery_items(battery_bank) and \
             Ut.is_str(key) and\
-            Ut.is_dict(battery_bank['batteryDatas']['batteries'].get(key), not_null=True)
+            Ut.is_dict(
+                battery_bank['batteryDatas']['batteries'].get(key),
+                not_null=True)
 
     @classmethod
     def get_battery_items_key(cls,
@@ -219,7 +229,7 @@ class ConfigLoaderHelper:
                          battery_bank: dict
                          ) -> dict:
         """Set battery item."""
-        return{
+        return {
             **battery_bank,
             'name': key,
             'battery': battery
@@ -236,13 +246,17 @@ class ConfigLoaderHelper:
             if Ut.is_dict(bank, not_null=True)\
                     and Ut.is_str(bank.get('battery_key')):
 
-                battery = cls.get_battery_items_key(bank.get('battery_key'), battery_bank)
+                battery = cls.get_battery_items_key(
+                    bank.get('battery_key'),
+                    battery_bank
+                )
                 if Ut.is_dict(battery, not_null=True):
                     return cls.set_battery_item(arg, battery, bank)
                 else:
                     raise SettingInvalidException(
                         "Fatal Error: unable to get battery data, "
-                        f"from arg {bank.get('battery_key')} in batteryBank key {arg}."
+                        f"from arg {bank.get('battery_key')} "
+                        f"in batteryBank key {arg}."
                     )
             else:
                 raise SettingInvalidException(
@@ -253,21 +267,20 @@ class ConfigLoaderHelper:
             raise SettingInvalidException(
                 "Fatal Error: unable to get batteryBank data, "
                 "validation fails or bad root key. "
-                f"arg: {arg}." 
+                f"arg: {arg}."
             )
 
     @classmethod
     def _is_filtered_key(cls,
-                      key: str,
-                      check_keys: Optional[list] = None
-                      ) -> bool:
+                         key: str,
+                         check_keys: Optional[list] = None
+                         ) -> bool:
         """Test if is filtered key."""
-        return (not Ut.is_list(check_keys, not_null=True)\
-                or (
-                    Ut.is_list(check_keys, not_null=True)\
-                    and Ut.is_str(key, not_null=True)\
-                    and key in check_keys)
-                )
+        return not Ut.is_list(check_keys, not_null=True)\
+            or (
+                Ut.is_list(check_keys, not_null=True)
+                and Ut.is_str(key, not_null=True)
+                and key in check_keys)
 
     @classmethod
     def _check_column_keys(cls,
@@ -290,18 +303,20 @@ class ConfigLoaderHelper:
                             res[key].append(item_key)
                         else:
                             raise SettingInvalidException(
-                                "Error on Device Data Structure configuration, "
-                                f"checks Key {key} is not valid: {item}"
+                                "Error on Device Data Structure configuration,"
+                                f" checks Key {key} is not valid: {item}"
                             )
                 else:
                     raise SettingInvalidException(
                             "Error on Device Data Structure configuration, "
                             f"column key {key} is not valid"
-                            f"and/or check keys not a list. type(checksKeys): {type(item)}"
+                            "and/or check keys not a list. "
+                            f"type(checksKeys): {type(item)}"
                         )
         else:
             raise SettingInvalidException(
-                "Error on Device Data Structure configuration, empty columns keys data: "
+                "Error on Device Data Structure configuration, "
+                "empty columns keys data: "
             )
 
         return res
@@ -312,49 +327,56 @@ class ConfigLoaderHelper:
                              points: Optional[list] = None
                              ) -> Optional[dict]:
         """
-            Helper function that checks the input configuration for appBlocks. 
-            It is called by the _is_app_blocks method and takes two arguments: key, data. 
-            The key argument is a string containing the name of an input connector
-            (i.e., serial or redis). 
-            The data argument is a dictionary containing all of the settings 
+            Helper function that checks the input configuration for appBlocks.
+            It is called by the _is_app_blocks method
+            and takes two arguments: key, data.
+            The key argument is a string
+            containing the name of an input connector
+            (i.e., serial or redis).
+            The data argument is a dictionary containing all of the settings
             for that specific input connector.
-            
+
             :param self: Reference the class instance
             :param key: Check if the input is valid
             :param data: Check the data in the input key
-            :return: True if the key is a valid app connector and the data is a dict
+            :return:
+                True if the key is a valid app connector and the data is a dict
             :doc-author: Trelent
         """
         res = None
         if Ut.is_dict(data, not_null=True):
             res = {}
             for key, item in data.items():
-                if Ut.is_dict(item, not_null=True) and cls._is_filtered_key(key, points):
+                if Ut.is_dict(item, not_null=True)\
+                        and cls._is_filtered_key(key, points):
                     res[key] = item
         else:
             raise SettingInvalidException(
-                "Error on checkColumns configuration, empty columns keys data: "
+                "Error on checkColumns configuration, "
+                "empty columns keys data: "
             )
 
         return res
 
     @classmethod
     def get_data_structure(cls,
-                          data_structure: dict,
-                          check_keys: Optional[list] = None,
-                          points: Optional[list] = None
-                          ) -> Optional[dict]:
+                           data_structure: dict,
+                           check_keys: Optional[list] = None,
+                           points: Optional[list] = None
+                           ) -> Optional[dict]:
         """Get Data Structure Config."""
         res = None
         if jValid.is_valid_data_structure_conf(data_structure):
             res = {}
             res['devices'] = cls._check_column_keys(
-                data = data_structure.get('devices'),
-                check_keys = check_keys)
+                data=data_structure.get('devices'),
+                check_keys=check_keys
+            )
 
             res['points'] = cls._check_column_points(
-                data = data_structure.get('points'),
-                points = points)
+                data=data_structure.get('points'),
+                points=points
+            )
         else:
             raise NullSettingException(
                 "Error on appBlocks configuration settings, "

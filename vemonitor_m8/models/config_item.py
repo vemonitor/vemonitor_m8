@@ -9,6 +9,7 @@ from vemonitor_m8.conf_manager.shema_validate_selector import SchemaValidateSele
 from vemonitor_m8.models.config_helper import ConfigHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException
 
+
 class ConfigItem(ConfigHelper):
     """
     Config Item Model Class
@@ -37,7 +38,9 @@ class ConfigItem(ConfigHelper):
 
     def is_valid(self):
         """Test if is valid Config Item Data"""
-        return self.has_app_block() and self.has_app_connectors() and self.has_data_structures()
+        return self.has_app_block()\
+            and self.has_app_connectors()\
+            and self.has_data_structures()
 
     def has_app_block(self) -> bool:
         """Test if obj has valid App Block item"""
@@ -52,11 +55,13 @@ class ConfigItem(ConfigHelper):
 
     def has_app_block_inputs(self) -> bool:
         """Test if obj has valid App Block inputs"""
-        return self.has_app_block() and Ut.is_dict(self.app_block.get('inputs'), not_null=True)
+        return self.has_app_block()\
+            and Ut.is_dict(self.app_block.get('inputs'), not_null=True)
 
     def has_app_block_outputs(self) -> bool:
         """Test if obj has valid App Block outputs"""
-        return self.has_app_block() and Ut.is_dict(self.app_block.get('outputs'), not_null=True)
+        return self.has_app_block()\
+            and Ut.is_dict(self.app_block.get('outputs'), not_null=True)
 
     def get_app_block_inputs(self) -> Optional[list]:
         """Get App Block inputs"""
@@ -72,12 +77,12 @@ class ConfigItem(ConfigHelper):
             result = self.app_block.get('outputs')
         return result
 
-    def is_app_block_input_key(self, key:str) -> bool:
+    def is_app_block_input_key(self, key: str) -> bool:
         """Test if is valid App Block input key"""
         return self.has_app_block_inputs()\
             and Ut.is_list(self.app_block['inputs'].get(key), not_null=True)
 
-    def get_app_block_input_by_key(self, key:str) -> Optional[list]:
+    def get_app_block_input_by_key(self, key: str) -> Optional[list]:
         """Get App Block input key"""
         result = None
         if self.is_app_block_input_key(key):

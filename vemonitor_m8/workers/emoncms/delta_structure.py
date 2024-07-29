@@ -47,7 +47,9 @@ class DeltaStructure:
             if not Ut.is_list(self.inputs_get, not_null=True):
                 self.inputs_set = self.inputs_conf
             elif len(self.inputs_conf) != len(self.inputs_get):
-                self.inputs_set = list(set(self.inputs_conf) - set(self.inputs_get))
+                self.inputs_set = list(
+                    set(self.inputs_conf) - set(self.inputs_get)
+                )
             result = True
         return result
 
@@ -120,9 +122,15 @@ class DeltaStructure:
 
     def has_feed_key_to_set(self, key: str):
         """Add inputs got list"""
-        return self.has_feeds_to_set() and Ut.is_str(key, not_null=True) and self.feeds_set.get(key)
+        return self.has_feeds_to_set()\
+            and Ut.is_str(key, not_null=True)\
+            and self.feeds_set.get(key)
 
-    def add_feeds_to_set(self, input_name: str, feeds_conf: list, feeds_get: list) -> bool:
+    def add_feeds_to_set(self,
+                         input_name: str,
+                         feeds_conf: list,
+                         feeds_get: list
+                         ) -> bool:
         """Add inputs got list"""
         result = False
         if Ut.is_list(feeds_conf, not_null=True)\
@@ -132,7 +140,9 @@ class DeltaStructure:
                 self.feeds_set[input_name] = feeds_conf
             elif len(feeds_conf) != len(feeds_get):
                 self.init_feeds_set_key(input_name)
-                self.feeds_set[input_name] = list(set(feeds_conf) - set(feeds_get))
+                self.feeds_set[input_name] = list(
+                    set(feeds_conf) - set(feeds_get)
+                )
             result = True
         return result
 
@@ -150,9 +160,17 @@ class DeltaStructure:
 
     def has_feeds_to_update(self) -> bool:
         """Test if he has feeds to update."""
-        return Ut.is_dict(self.feeds_update, not_null=True)
+        return Ut.is_dict(
+            self.feeds_update,
+            not_null=True
+        )
 
-    def add_feeds_update_item(self, input_name: str, feed_id: int, key: str, value: str):
+    def add_feeds_update_item(self,
+                              input_name: str,
+                              feed_id: int,
+                              key: str,
+                              value: str
+                              ):
         """Add feeds got list"""
         self.init_feeds_update_key(input_name)
         if Ut.is_str(input_name, not_null=True)\

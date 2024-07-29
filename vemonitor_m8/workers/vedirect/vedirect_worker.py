@@ -15,7 +15,7 @@ from vemonitor_m8.core.exceptions import SettingInvalidException
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
-__license__ = "MIT"
+__license__ = "Apache"
 __status__ = "Production"
 __version__ = "1.0.0"
 
@@ -109,7 +109,10 @@ class VedirectWorker(InputWorker):
                 if Ut.is_str(connector.get('serialPort'), not_null=True):
                     serial_port = connector.get('serialPort')
                     if '/${HOME}' in serial_port:
-                        serial_port = serial_port.replace('/${HOME}', os.getenv("HOME"))
+                        serial_port = serial_port.replace(
+                            '/${HOME}',
+                            os.getenv("HOME")
+                        )
                     serial_conf["serial_port"] = serial_port
 
                 if Ut.is_int(connector.get('baud'), positive=True):

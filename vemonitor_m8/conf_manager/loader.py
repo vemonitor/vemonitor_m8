@@ -34,22 +34,22 @@ logger = logging.getLogger("vemonitor")
 
 class Loader():
     """
-    This Class is used to be 
+    This Class is used to be
     """
     def __init__(self,
                  file_names: Union[str, list, tuple],
-                 file_path: Optional[str]=None
+                 file_path: Optional[str] = None
                  ):
         self.settings = None
         self.file_path = None
         self.set_file_path(
-            file_name= file_names,
+            file_name=file_names,
             base_path=file_path
         )
 
     def set_file_path(self,
                       file_name: Union[str, list, tuple],
-                      base_path: Optional[str]=None
+                      base_path: Optional[str] = None
                       ):
         """
             Used to set the file path of a given file.
@@ -60,25 +60,26 @@ class Loader():
             on disk. If the argument is a tuple/list,
             each item in that list must be either another tuple/list
             containing multiple strings
-            (e.g., ['file_name', 'sub_dir', 'etc']), 
+            (e.g., ['file_name', 'sub_dir', 'etc']),
             or just one string (e.g., ['file_name']).
-            The first item in this nested structure must be 
+            The first item in this nested structure must be
             the name of an existing file somewhere on disk;
             if there are more than one items in this nested
-            structure then any number of them can be passed 
+            structure then any number of them can be passed
             and they will all attempt to be joined together
             into one full path by os-specific rules for joining paths together;
             if there are no items then only os-specific rules
             for joining paths together will apply and nothing else.
-            
+
             :param self: Used to Access variables that belongs to the class.
             :param file_name: Used to Set the file path.
             :return: The file path of the file name that is passed in.
-        
+
             :doc-author: Trelent
         """
         self.file_path = None
-        if not Ut.is_str(base_path, not_null=True) or not os.path.isdir(base_path):
+        if not Ut.is_str(base_path, not_null=True)\
+                or not os.path.isdir(base_path):
             base_path = None
 
         if Ut.is_str(file_name):
@@ -118,16 +119,20 @@ class Loader():
                         child_list: Optional[list] = None
                         ) -> Optional[Union[dict, list]]:
         """
-        Loads the provided YAML file from self.file_path and return it as a dict or list.
+        Loads the provided YAML file from self.file_path
+        and return it as a dict or list.
 
         In the main configuration file, child import can be done.
         Result is list or dict of configuration files content
         and batteryBank.yaml content if exist on same path.
 
         :Example :
-            >>> config_yaml = self.get_yaml_config(child_list=['batteryBank.yaml'])
+            >>> config_yaml = self.get_yaml_config(
+                child_list=['batteryBank.yaml']
+            )
             >>> {...} # Content of yaml files (result can be a list)
-        :param child_list: list or None: List of yaml file names to import, others are not.
+        :param child_list: list or None: List of yaml file names to import,
+            others are not.
         :return: list dict or None: The loaded YAML data
         """
         return YmlConfLoader.get_config(self.file_path, child_list)
@@ -139,14 +144,17 @@ class Loader():
             If the path is an absolute on, we return it directly.
 
             If the path is relative, we try to get the full path in this order:
-            - from the current directory where vemonitor has been called + the file_path.
+            - from the current directory where vemonitor has been called
+                + the file_path.
             Eg: /home/me/Documents/vemonitor_config
             - from /etc/vemonitor + file_path
-            - from the default file passed as <file_name> at the root of the project
+            - from the default file passed as <file_name>
+                at the root of the project
 
             :param file_path file path to test
             :type file_path: str
-            :return: absolute path to the file file_path or None if is doen't exist
+            :return: absolute path to the file file_path
+                or None if is doen't exist
         """
         result = None
         # ToDo: data must be sanitized
@@ -186,6 +194,11 @@ class Loader():
             Usys.get_current_file_parent_parent_path(
                 Loader.get_current_script_path()
             ),
-            os.path.join(os.path.abspath(os.path.expanduser("~")), ".vemonitor"),
+            os.path.join(
+                os.path.abspath(
+                    os.path.expanduser("~")
+                ),
+                ".vemonitor"
+            ),
             os.path.abspath(os.getcwd()),
         ]

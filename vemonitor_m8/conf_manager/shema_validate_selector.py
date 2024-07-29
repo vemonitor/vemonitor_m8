@@ -8,7 +8,10 @@ If any validation error occurs, raise exception.
 Or if no error occurs, return data tested object
 
 :Example:
-    > SchemaValidate.validate_data(data=appBlocks_data, shem_key_path="appBlocks")
+    > SchemaValidate.validate_data(
+        data=appBlocks_data,
+        shem_key_path="appBlocks"
+    )
     > ...appBlocks_data...
 
  .. seealso:: ConfigLoader
@@ -35,7 +38,9 @@ class SchemaValidateSelector(SchemaValidate):
         ) is not None
 
     @classmethod
-    def is_valid_app_connectors_conf(cls, conf_item: Union[dict, list]) -> bool:
+    def is_valid_app_connectors_conf(cls,
+                                     conf_item: Union[dict, list]
+                                     ) -> bool:
         """Test if is valid App Connectors configuration"""
         return SchemaValidateSelector.validate_data(
             conf_item,
@@ -51,7 +56,9 @@ class SchemaValidateSelector(SchemaValidate):
         ) is not None
 
     @classmethod
-    def is_valid_data_structure_conf(cls, conf_item: Union[dict, list]) -> bool:
+    def is_valid_data_structure_conf(cls,
+                                     conf_item: Union[dict, list]
+                                     ) -> bool:
         """Test if is valid Data Structure configuration"""
         return SchemaValidateSelector.validate_data(
             conf_item,

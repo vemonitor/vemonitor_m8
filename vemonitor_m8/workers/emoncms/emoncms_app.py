@@ -85,7 +85,9 @@ class EmoncmsApp:
                 result['offset'] = time_ref - result['max']
                 result['len'] = len(tmp_times)
                 result['interval_total'] = result['max'] - result['min']
-                result['avg_interval'] = sum(result['intervals']) / len(result['intervals'])
+                result['avg_interval'] = sum(
+                    result['intervals']
+                ) / len(result['intervals'])
         return result
 
     @staticmethod
@@ -136,7 +138,10 @@ class EmoncmsApp:
                     item_values = EmoncmsApp.get_ordered_data_points(item_list)
                     time_stats = EmoncmsApp.control_data_time(item_values)
                     if Ut.is_dict(time_stats, not_null=True)\
-                            and Ut.is_list(input_structure.get(node), not_null=True):
+                            and Ut.is_list(
+                                input_structure.get(node),
+                                not_null=True
+                            ):
                         offset = time_stats.get("offset")
                         cols = input_structure.get(node)
                         data_points = EmoncmsApp.prepare_input_bulk_data_point(
@@ -192,13 +197,19 @@ class EmoncmsApp:
                 result['offset'] = time_ref - result['max']
                 result['len'] = len(tmp_times)
                 result['interval_total'] = result['max'] - result['min']
-                result['avg_interval'] = sum(result['intervals']) / len(result['intervals'])
+                result['avg_interval'] = sum(
+                    result['intervals']
+                ) / len(result['intervals'])
         return result
 
     @staticmethod
     def get_formatted_columns(point_items: dict, cols: list):
         """Get formatted columns from data cache."""
-        return [{key: value} for key, value in point_items.items() if key in cols]
+        return [
+            {key: value}
+            for key, value in point_items.items()
+            if key in cols
+        ]
 
     @staticmethod
     def prepare_bulk_from_cache(data: dict,
@@ -223,7 +234,9 @@ class EmoncmsApp:
                                 point_items=point_items,
                                 cols=cols
                             )
-                            offset_item = (point_time - time_stats.get('time_ref')) + offset
+                            offset_item = (
+                                point_time - time_stats.get('time_ref')
+                            ) + offset
                             tmp.insert(0, offset_item)
                             tmp.insert(1, node)
                             result.append(tmp)

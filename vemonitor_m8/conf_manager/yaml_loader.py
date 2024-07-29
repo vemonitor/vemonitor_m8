@@ -79,7 +79,8 @@ class YmlConfLoader:
         if os.path.isfile(file_path_to_load):
             # import the main configuration file content
             inc_import = IncludeImport(file_path_to_load)
-            # import all or selected childs from configuration files on same path
+            # import all or selected childs from configuration files
+            # on same path
             inc_import.import_from_included_files(
                 file_path_to_load,
                 child_list)
@@ -88,6 +89,7 @@ class YmlConfLoader:
         else:
             raise YAMLFileNotFound(f"File {file_path_to_load} not found")
         return result
+
 
 class IncludeImport:
     """
@@ -137,7 +139,9 @@ class IncludeImport:
 
     MAX_FILE_SIZE, MAX_TOTAL_SIZE = 500000, 500000
 
-    def get_master_conf(self, file_path: Optional[str]) -> Optional[Union[dict, list]]:
+    def get_master_conf(self,
+                        file_path: Optional[str]
+                        ) -> Optional[Union[dict, list]]:
         """
         Take in a file path and returns the loaded data.
 
@@ -169,7 +173,8 @@ class IncludeImport:
         if os.path.isfile(file_path):
             file_size = os.path.getsize(file_path)
 
-            if file_size <= self.MAX_FILE_SIZE and IncludeImport.is_yaml_ext(file_path):
+            if file_size <= self.MAX_FILE_SIZE\
+                    and IncludeImport.is_yaml_ext(file_path):
                 self.cumuled_size = file_size
                 # load the yaml file
                 with open(file_path, "r", encoding="utf-8") as f:
@@ -180,7 +185,8 @@ class IncludeImport:
                     "and/or have bad file extension ( != .yaml or .yml )."
                 )
 
-        if not Ut.is_dict(self.data, not_null=True) and not Ut.is_list(self.data, not_null=True):
+        if not Ut.is_dict(self.data, not_null=True)\
+                and not Ut.is_list(self.data, not_null=True):
             raise YAMLFileEmpty("[YAMLLoader] File {file_path} is empty")
 
     def _get_included_file_conf(self,
@@ -285,7 +291,7 @@ class IncludeImport:
         """
         imports = None
         if Ut.is_dict(self.data)\
-            and "Imports" in self.data:
+                and "Imports" in self.data:
 
             if not Ut.is_list(self.data.get('Imports'), not_null=True):
                 raise YAMLFileError(
@@ -355,8 +361,10 @@ class IncludeImport:
             logger.info(
                 "List of files ready to import : %s", imports)
             for file_name in imports:
-                if not Ut.is_list(child_list, not_null=True) or \
-                        (Ut.is_list(child_list, not_null=True) and file_name in child_list):
+                if not Ut.is_list(child_list, not_null=True) \
+                        or (
+                            Ut.is_list(child_list, not_null=True)
+                            and file_name in child_list):
 
                     conf = self._get_included_file_conf(file_name, main_path)
                     if isinstance(conf, type(self.data)):
@@ -368,13 +376,15 @@ class IncludeImport:
                     else:
                         if conf is None:
                             raise YAMLFileNotFound(
-                                f"[YAMLLoader] Unable to load child file {file_name}. "
+                                "[YAMLLoader] "
+                                f"Unable to load child file {file_name}. "
                                 "File don't exist or contain bad content."
                             )
                         raise YAMLFileError(
                             f"[YAMLLoader] the child file {file_name},"
                             "don't return same data type of father conf."
-                            f"child type : {type(conf)}, base : {type(self.data)}"
+                            f"child type : {type(conf)}, "
+                            f"base : {type(self.data)}"
                         )
         return tst
 

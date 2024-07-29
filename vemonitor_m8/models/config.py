@@ -11,15 +11,14 @@ from vemonitor_m8.models.config_item import ConfigItem
 from vemonitor_m8.core.exceptions import SettingInvalidException
 
 
-
 class Config(ConfigHelper):
     """
     Config Model Class
     """
 
     def __init__(self,
-                 app_blocks:Optional[list]=None,
-                 app_connectors:Optional[dict]=None):
+                 app_blocks: Optional[list] = None,
+                 app_connectors: Optional[dict] = None):
         """
         Initialise Config model instance.
 
@@ -43,7 +42,9 @@ class Config(ConfigHelper):
 
     def is_valid(self):
         """Test if is valid Config Data"""
-        return self.has_app_blocks() and self.has_app_connectors() and self.has_data_structures()
+        return self.has_app_blocks()\
+            and self.has_app_connectors()\
+            and self.has_data_structures()
 
     def has_app_blocks(self) -> bool:
         """Test instance has app_blocks configuration"""
@@ -61,7 +62,8 @@ class Config(ConfigHelper):
         result = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                if ConfigHelper.is_app_block(block) and block.get('name') == block_name:
+                if ConfigHelper.is_app_block(block)\
+                        and block.get('name') == block_name:
                     result = block
                     break
         return result
@@ -71,7 +73,8 @@ class Config(ConfigHelper):
         result = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                if ConfigHelper.is_app_block(block) and block.get('app') == app_name:
+                if ConfigHelper.is_app_block(block)\
+                        and block.get('app') == app_name:
                     result = block
                     break
         return result
@@ -90,7 +93,10 @@ class Config(ConfigHelper):
         sources = None
         if self.has_app_blocks():
             for block in self.app_blocks:
-                sources = ConfigHelper.get_app_block_sources(block, sources=sources)
+                sources = ConfigHelper.get_app_block_sources(
+                    block=block,
+                    sources=sources
+                )
         return sources
 
     def set_and_reduce_app_connectors(self, app_connector: dict) -> None:
@@ -191,9 +197,13 @@ class Config(ConfigHelper):
         sources = ConfigHelper.get_app_block_sources(conf.app_block)
         conf.app_connectors = self.get_app_connector_by_sources(sources)
         columns = ConfigHelper.get_app_block_columns_by_block(conf.app_block)
-        conf.data_structures = self.get_data_structures_point_by_columns(columns)
+        conf.data_structures = self.get_data_structures_point_by_columns(
+            columns=columns
+        )
 
-        battery_bank = self.get_battery_banks_from_args(conf.app_block.get('args'))
+        battery_bank = self.get_battery_banks_from_args(
+            args=conf.app_block.get('args')
+        )
 
         return {
             'conf': conf,

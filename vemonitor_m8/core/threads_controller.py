@@ -46,7 +46,8 @@ class ThreadsController:
 
     def has_timer_key(self, key: str):
         """Test if instance has timer key registered."""
-        return self.has_timers() and isinstance(self._timers.get(key), RepeatTimer)
+        return self.has_timers()\
+            and isinstance(self._timers.get(key), RepeatTimer)
 
     def cancel_all_timers(self):
         """Cancel all timers running"""

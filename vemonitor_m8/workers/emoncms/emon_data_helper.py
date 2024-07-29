@@ -33,7 +33,9 @@ class EmoncmsHelper:
         return Ut.is_dict(result) and Ut.str_to_bool(result.get('success'))
 
     @staticmethod
-    def get_data_key_from_input_item(input_data: Union[list, dict], key: str) -> any:
+    def get_data_key_from_input_item(input_data: Union[list, dict],
+                                     key: str
+                                     ) -> any:
         """
         Get data key inputs list from emoncms Api.
 
@@ -116,12 +118,17 @@ class EmoncmsHelper:
         return result
 
     @staticmethod
-    def remove_feed_from_process(process: Union[str, list], feed_id: int) -> str:
+    def remove_feed_from_process(process: Union[str, list],
+                                 feed_id: int
+                                 ) -> str:
         """
         Remove process feed from input process list.
 
         :Example :
-            >>> EmoncmsHelper.remove_feed_from_process(process="1:12,1:13", feed_id=13)
+            >>> EmoncmsHelper.remove_feed_from_process(
+                process="1:12,1:13",
+                feed_id=13
+            )
             >>> "1:12"
         :param process: str or list: The input process list.
         :param feed_id: int: The feed id.
@@ -148,16 +155,22 @@ class EmoncmsHelper:
         return result
 
     @staticmethod
-    def remove_feed_from_processes(inputs: list, feed_id: int) -> Optional[list]:
+    def remove_feed_from_processes(inputs: list,
+                                   feed_id: int
+                                   ) -> Optional[list]:
         """
         Remove feed from inputs processes.
 
         :Example :
-            >>> EmoncmsHelper.remove_feed_from_processes(inputs={...}, feed_id=13)
+            >>> EmoncmsHelper.remove_feed_from_processes(
+                inputs={...},
+                feed_id=13
+            )
             >>> [{'input_id': 18, "process_list": ""}]
         :param inputs: list: The inputs list.
         :param feed_id: int: The feed id.
-        :return: Optional[list]: The inputs list to update processes with new ones
+        :return: Optional[list]:
+            The inputs list to update processes with new ones
         """
         result = None
         if Ut.is_list(inputs, not_null=True)\
@@ -215,7 +228,10 @@ class EmoncmsHelper:
         Format string input process list to list.
 
         :Example :
-            >>> EmoncmsHelper.get_comma_separated_values_to_list(process="1:18, 1:19, 1:20")
+            >>> EmoncmsHelper.get_comma_separated_values_to_list(
+                process="1:18,
+                1:19, 1:20"
+            )
             >>> ["1:18", "1:19", "1:20"]
         :param process: str: The input process list.
         :return: list: Formated process list as list of strings.
@@ -236,7 +252,8 @@ class EmoncmsHelper:
             tmp = process.split(':')
             if Ut.is_list(tmp, eq=2):
                 proc, feed_id = Ut.get_int(tmp[0], 0), Ut.get_int(tmp[1], 0)
-                if Ut.is_int(proc, positive=True) and Ut.is_int(feed_id, positive=True):
+                if Ut.is_int(proc, positive=True)\
+                        and Ut.is_int(feed_id, positive=True):
                     result = (proc, feed_id)
         return result
 
@@ -253,7 +270,9 @@ class EmoncmsHelper:
         """
         result = None
         if Ut.is_str(process, not_null=True):
-            process_list = EmoncmsHelper.get_comma_separated_values_to_list(process)
+            process_list = EmoncmsHelper.get_comma_separated_values_to_list(
+                process
+            )
             if Ut.is_list(process_list, not_null=True):
                 result = list()
                 for item in process_list:
@@ -268,9 +287,13 @@ class EmoncmsHelper:
         Format process list from list to string.
 
         :Example :
-            >>> EmoncmsHelper.get_list_to_comma_separated_values(process=["1:18", "1:19", "1:20"])
+            >>> EmoncmsHelper.get_list_to_comma_separated_values(
+                process=["1:18", "1:19", "1:20"]
+            )
             >>> "1:18,1:19,1:20"
-            >>> EmoncmsHelper.get_list_to_comma_separated_values(process=[(1, 18), (1,19), (1, 20)])
+            >>> EmoncmsHelper.get_list_to_comma_separated_values(
+                process=[(1, 18), (1,19), (1, 20)]
+            )
             >>> "1:18,1:19,1:20"
         :param process: list: The input process list.
         :return: Optional[str]: Formated process list as string.
@@ -296,7 +319,9 @@ class EmoncmsHelper:
         return result
 
     @staticmethod
-    def prepare_feed_data(data: dict, is_create: bool = True) -> Optional[dict]:
+    def prepare_feed_data(data: dict,
+                          is_create: bool = True
+                          ) -> Optional[dict]:
         """
         Prepare feed data to create or update feed.
 
