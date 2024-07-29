@@ -25,10 +25,26 @@ class DataCache(InputsCache):
         InputsCache.__init__(self,
                              max_rows=max_rows)
         self.data = None
+        self._nodes = []
 
     def has_data(self):
         """Test if instance has data cache"""
         return Ut.is_dict(self.data, not_null=True)
+
+    def get_cache_nodes_keys_list(self,
+                                  nodes: Optional[list] = None
+                                  ) -> list:
+        """
+        Get list of inputs nodes keys from redis set cache data.
+        """
+        result = self._nodes
+        if Ut.is_list(nodes, not_null=True):
+            result = [
+                x
+                for x in result
+                if x in nodes
+            ]
+        return result
 
     def init_data(self):
         """Init inputs data cache"""
@@ -50,8 +66,18 @@ class DataCache(InputsCache):
 
     def register_node(self, node: str):
         """Register node in cache."""
+        result = False
+        if Ut.is_str(node, not_null=True)\
+                and node not in self._nodes:
+            self._nodes.append(node)
+            result = True
+        return result
 
-    def add_data_cache(self, time_key, key, data):
+    def reset_data_cache(self) -> bool:
+        """Reset data cache for all nodes."""
+        self._nodes = []
+        self.data = None
+        return True
         """Set inputs data cache key"""
         time_key = Ut.get_int(time_key, 0)
         if Ut.is_int(time_key, positive=True):
