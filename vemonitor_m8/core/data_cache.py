@@ -74,12 +74,34 @@ class DataCache(InputsCache):
         if not Ut.is_dict(self.data.get(key)):
             self.data[key] = {}
 
-    def control_data_len(self):
+    def get_cache_keys_by_node(self,
+                               node: str
+                               ) -> list:
+        """Get formatted hmap keys."""
+        result = None
+        if self.has_data():
+            result = [
+                time_key
+                for time_key in self.data
+                if self.has_node_data(time_key, node)
+            ]
+        return result
+
+    def control_node_data_len(self, node: str):
         """Control inputs data cache length"""
-        nb_items = len(self.data)
-        if nb_items > self._max_rows:
-            min_key = min(list(self.data.keys()))
-            del self.data[min_key]
+        time_keys = self.get_cache_keys_by_node(node)
+        if Ut.is_list(time_keys, not_null=True):
+            nb_items = len(time_keys)
+            if nb_items > self._max_rows:
+                nb_del = nb_items - self._max_rows
+                # register invalid keys to delete
+                to_del = time_keys[0: nb_del]
+                for time_key in to_del:
+                    nb_nodes = len(self.data.get(time_key))
+                    if nb_nodes > 1:
+                        self.data[time_key].pop(node, None)
+                    else:
+                        self.data.pop(time_key, None)
 
     def register_node(self, node: str):
         """Register node in cache."""
@@ -95,6 +117,24 @@ class DataCache(InputsCache):
         self._nodes = []
         self.data = None
         return True
+
+    def _update_or_set_data_node_key(self,
+                                     formatted_node: str,
+                                     time_key: int,
+                                     data: dict
+                                     ) -> tuple:
+        """Update or set data key."""
+        result = None
+        if self.has_data()\
+                and Ut.is_int(time_key, positive=True)\
+                and Ut.is_str(formatted_node, not_null=True)\
+                and Ut.is_dict(data, not_null=True):
+            result = self.get_node_data(time_key, formatted_node)
+            if Ut.is_dict(result, not_null=True):
+                result.update(data)
+            else:
+                result = data
+        return result
         """Set inputs data cache key"""
         time_key = Ut.get_int(time_key, 0)
         if Ut.is_int(time_key, positive=True):
