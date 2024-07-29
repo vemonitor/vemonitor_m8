@@ -155,6 +155,29 @@ class DataCache(InputsCache):
             self.control_node_data_len(node=node)
         return result
 
+    def get_cache_data_by_structure(self,
+                                    time_key: int,
+                                    structure: Optional[dict] = None
+                                    ):
+        """Get data cache key by structure"""
+        result = None
+        if Ut.is_int(time_key, positive=True)\
+                and Ut.is_dict(structure, not_null=True):
+            nodes = list(structure.keys())
+            result = {}
+            for node in nodes:
+                if Ut.is_list(structure.get(node)):
+                    data_node = self.get_node_data(
+                        time_key=time_key,
+                        node=node
+                    )
+                    if Ut.is_dict(data_node, not_null=True):
+                        result[node] = Ut.get_items_from_dict(
+                            data=data_node,
+                            list_keys=structure.get(node)
+                        )
+
+        return result
 
     def get_data_from_cache(self,
                             from_time: int = 0,
