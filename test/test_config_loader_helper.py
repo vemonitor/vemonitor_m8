@@ -16,7 +16,7 @@ def helper_manager_fixture():
         """Json Helper test manager fixture Class"""
         def __init__(self):
             current_script_path = Opath.dirname(
-            Opath.abspath(
+                Opath.abspath(
                     inspect.getfile(inspect.currentframe())
                 )
             )
@@ -34,7 +34,9 @@ class TestConfigLoaderHelper:
     def test_get_app_blocks_by_app_or_name(self, helper_manager):
         """Test get_app_blocks_by_app_or_name method """
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor"
+        )
         res = clh.get_app_blocks_by_app_or_name(app_blocks=settings.app_blocks)
         assert res == settings.app_blocks
 
@@ -75,13 +77,15 @@ class TestConfigLoaderHelper:
         Test get_args_objects_from_conf method
         """
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor"
+        )
         imp_conf = c_loader._get_settings_from_file()
         res = clh.get_args_objects_from_conf(
             args=settings.app_blocks[0].get('args'),
             conf=imp_conf
         )
-        assert Ut.is_dict(res, not_null=True) #
+        assert Ut.is_dict(res, not_null=True)
 
         res = clh.get_args_objects_from_conf(
             args=dict(),
@@ -98,7 +102,9 @@ class TestConfigLoaderHelper:
     def test_get_app_blocks_args_objects(self, helper_manager):
         """Test get_app_blocks_args_objects method."""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor"
+        )
         imp_conf = c_loader._get_settings_from_file()
         res = clh.get_app_blocks_args_objects(
             app_blocks=settings.app_blocks,
@@ -121,7 +127,9 @@ class TestConfigLoaderHelper:
     def test_get_app_conector_from_source(self, helper_manager):
         """Test get_app_conector_from_source method"""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor"
+        )
         imp_conf = c_loader._get_settings_from_file()
         sources = settings.get_app_blocks_sources()
         res = clh.get_app_conector_from_source(
@@ -151,7 +159,9 @@ class TestConfigLoaderHelper:
     def test_get_app_connectors_from_sources(self, helper_manager):
         """Test get_app_connectors_from_sources method"""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor"
+        )
         imp_conf = c_loader._get_settings_from_file()
         res = clh.get_app_connectors_from_sources(
             app_conectors=imp_conf.get('appConnectors'),
@@ -309,7 +319,9 @@ class TestConfigLoaderHelper:
     def test_get_data_structure(self, helper_manager):
         """Test get_data_structure method"""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor"
+        )
         res = clh.get_data_structure(
             data_structure=settings.data_structures
         )

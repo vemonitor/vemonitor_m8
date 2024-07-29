@@ -10,11 +10,13 @@ from vemonitor_m8.conf_manager.schema_validate import SchemaValidate
 from vemonitor_m8.conf_manager.data_structure_loader import DataStructureLoader
 from .schema_test_helper import SchemaTestHelper
 
+
 @pytest.fixture(name="schema_manager", scope="class")
 def schema_manager_fixture():
     """Json Schema test manager fixture"""
     class SchemaManager(SchemaTestHelper):
         """Json Schema test manager fixture Class"""
+
         def __init__(self):
             SchemaTestHelper.__init__(self)
             self.schema = SchemaValidate.load_schema("data_structure")
@@ -26,6 +28,7 @@ def schema_manager_fixture():
             )
 
     return SchemaManager()
+
 
 class TestSchemaDataStructure:
     """
@@ -41,27 +44,28 @@ class TestSchemaDataStructure:
 
     def test_data_validation(self, schema_manager):
         """Test data validation"""
-        data = SchemaValidate.validate_data(schema_manager.obj, "data_structure")
+        data = SchemaValidate.validate_data(
+            schema_manager.obj, "data_structure")
         assert Ut.is_dict(data, not_null=True)
 
     def test_datas_string_key_pattern(self, schema_manager):
         """Test bad key patterns on data"""
         datas = [
-                ('input_type', schema_manager.obj['points']['V']),
-                ('output_type', schema_manager.obj['points']['V'])
-            ]
-        schema_manager.run_test_values(datas = datas, key = "string_key")
+            ('input_type', schema_manager.obj['points']['V']),
+            ('output_type', schema_manager.obj['points']['V'])
+        ]
+        schema_manager.run_test_values(datas=datas, key="string_key")
 
     def test_string_column_pattern(self, schema_manager):
         """Test string_column values to validate patterns"""
         datas = [
-                (0, schema_manager.obj['devices']['BMV']),
-            ]
-        schema_manager.run_test_values(datas = datas, key = "string_column")
+            (0, schema_manager.obj['devices']['BMV']),
+        ]
+        schema_manager.run_test_values(datas=datas, key="string_column")
 
     def test_datas_positive_number(self, schema_manager):
         """Test bad key patterns on data"""
-        datas =  [
-                ('floatpoint', schema_manager.obj['points']['V'])
-            ]
-        schema_manager.run_test_values(datas = datas, key = "positive_number")
+        datas = [
+            ('floatpoint', schema_manager.obj['points']['V'])
+        ]
+        schema_manager.run_test_values(datas=datas, key="positive_number")

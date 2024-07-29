@@ -16,8 +16,8 @@ def helper_manager_fixture():
         """Json Helper test manager fixture Class"""
         def __init__(self):
             current_script_path = Opath.dirname(
-            Opath.abspath(
-                    inspect.getfile(inspect.currentframe())
+                Opath.abspath(
+                        inspect.getfile(inspect.currentframe())
                 )
             )
             self.test_path = Opath.join(

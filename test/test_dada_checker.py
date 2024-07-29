@@ -17,6 +17,7 @@ def helper_manager_fixture():
     """Json Schema test manager fixture"""
     class HelperManager:
         """Json Helper test manager fixture Class"""
+
         def __init__(self):
             current_script_path = Opath.dirname(
                 Opath.abspath(
@@ -41,15 +42,15 @@ class TestDataChecker:
     def test_validate_checker(self):
         """Test validate_checker method """
         checker = checker = {
-                'name': 'Number of automatic synchronizations',
-                'input_type': 'int',
-                'output_type': 'float',
-                'floatpoint': 0.1
+            'name': 'Number of automatic synchronizations',
+            'input_type': 'int',
+            'output_type': 'float',
+            'floatpoint': 0.1
         }
         assert DataChecker.validate_checker(
-                key='V',
-                checker=checker
-            ) is True
+            key='V',
+            checker=checker
+        ) is True
 
         with pytest.raises(DeviceDataConfError):
             DataChecker.validate_checker(
@@ -60,16 +61,16 @@ class TestDataChecker:
     def test_validate_input_value(self):
         """Test validate_input_value method """
         checker = {
-                'name': 'Number of automatic synchronizations',
-                'input_type': 'int',
-                'output_type': 'float',
-                'floatpoint': 0.1
+            'name': 'Number of automatic synchronizations',
+            'input_type': 'int',
+            'output_type': 'float',
+            'floatpoint': 0.1
         }
         assert DataChecker.validate_input_value(
-                key='V',
-                value="25525",
-                checker=checker
-            ) is True
+            key='V',
+            value="25525",
+            checker=checker
+        ) is True
 
         with pytest.raises(DeviceInputValueError):
             DataChecker.validate_input_value(
@@ -81,16 +82,16 @@ class TestDataChecker:
     def test_validate_output_value(self):
         """Test validate_output_value method """
         checker = {
-                'name': 'Number of automatic synchronizations',
-                'input_type': 'int',
-                'output_type': 'float',
-                'floatpoint': 0.1
+            'name': 'Number of automatic synchronizations',
+            'input_type': 'int',
+            'output_type': 'float',
+            'floatpoint': 0.1
         }
         assert DataChecker.validate_output_value(
-                key='V',
-                value=25.2,
-                checker=checker
-            ) is True
+            key='V',
+            value=25.2,
+            checker=checker
+        ) is True
 
         with pytest.raises(DeviceOutputValueError):
             DataChecker.validate_output_value(
@@ -101,7 +102,13 @@ class TestDataChecker:
 
     def test_bad_checker(self, helper_manager):
         """Test check_input_columns method with bad chckers data """
-        data = {'H10': '26', 'H6': '-5526739', 'H7': '11733', 'H8': '16161', 'H9': '368301'}
+        data = {
+            'H10': '26',
+            'H6': '-5526739',
+            'H7': '11733',
+            'H8': '16161',
+            'H9': '368301'
+        }
         local_checkers = {
             'H10': {
                 'name': 'Number of automatic synchronizations',
@@ -118,7 +125,8 @@ class TestDataChecker:
 
     def test_bad_floatpoint(self, helper_manager):
         """Test check_input_columns method with bad floatpoint value """
-        data = {'H10': '26', 'H6': '-5526739', 'H7': '11733', 'H8': '16161', 'H9': '368301'}
+        data = {'H10': '26', 'H6': '-5526739',
+                'H7': '11733', 'H8': '16161', 'H9': '368301'}
 
         # Test bad floatpoint type error
         local_checkers = {
@@ -138,7 +146,8 @@ class TestDataChecker:
 
     def test_check_input_columns(self, helper_manager):
         """Test check_input_columns method """
-        data = {'H10': '26', 'H6': '-5526739', 'H7': '11733', 'H8': '16161', 'H9': '368301'}
+        data = {'H10': '26', 'H6': '-5526739',
+                'H7': '11733', 'H8': '16161', 'H9': '368301'}
 
         result = DataChecker.check_input_columns(
             columns=data,
@@ -158,7 +167,8 @@ class TestDataChecker:
 
     def test_check_input_columns_with_local_checkers(self, helper_manager):
         """Test check_input_columns method """
-        data = {'H10': '26', 'H6': '-5526739', 'H7': '11733', 'H8': '16161', 'H9': '368301'}
+        data = {'H10': '26', 'H6': '-5526739',
+                'H7': '11733', 'H8': '16161', 'H9': '368301'}
 
         local_checkers = {
             'H10': {
@@ -180,7 +190,8 @@ class TestDataChecker:
 
     def test_check_output_columns(self, helper_manager):
         """Test check_output_columns method """
-        data = {'H10': 26, 'H6': -5526.739, 'H7': 11.733, 'H8': 16.161, 'H9': 368301}
+        data = {'H10': 26, 'H6': -5526.739,
+                'H7': 11.733, 'H8': 16.161, 'H9': 368301}
 
         result = DataChecker.check_output_columns(
             columns=data,
@@ -200,7 +211,8 @@ class TestDataChecker:
 
     def test_check_output_columns_with_local_checkers(self, helper_manager):
         """Test check_output_columns method """
-        data = {'H10': 2.6, 'H6': -5526.739, 'H7': 11.733, 'H8': 16.161, 'H9': 368301}
+        data = {'H10': 2.6, 'H6': -5526.739,
+                'H7': 11.733, 'H8': 16.161, 'H9': 368301}
 
         local_checkers = {
             'H10': {

@@ -12,6 +12,7 @@ def schema_manager_fixture():
     """Json Schema test manager fixture"""
     class SchemaManager(SchemaTestHelper):
         """Json Schema test manager fixture Class"""
+
         def __init__(self):
             SchemaTestHelper.__init__(self)
             self.init_data()
@@ -28,7 +29,8 @@ def schema_manager_fixture():
             """
             Return a list of string_auth values to test jsonschema validation.
 
-            The function returns different lists depending on the choice parameter,
+            The function returns different lists
+            depending on the choice parameter,
             which is either good or bad.
             If choice is set to good,
             then strings that are expected to be valid will be returned.
@@ -38,19 +40,27 @@ def schema_manager_fixture():
             :return: A list of values that are bad or good string_auth.
             """
             if choice == "good":
-                return ["h_ello", "H,eLlO", "H1.eL2lO", "0H1eL2lO.dev", "0H1e_L2lO@.-"]
+                return [
+                    "h_ello",
+                    "H,eLlO",
+                    "H1.eL2lO",
+                    "0H1eL2lO.dev",
+                    "0H1e_L2lO@.-"
+                ]
 
-            return [0, -1, -0.1, 0.1, 2.2, "_hel?lo", "_hel$lo", "_hel#lo", "_hel&lo",
-                    False, None, dict(), tuple()
-                    ]
-
+            return [
+                0, -1, -0.1, 0.1, 2.2,
+                "_hel?lo", "_hel$lo", "_hel#lo", "_hel&lo",
+                False, None, dict(), tuple()
+            ]
 
         def get_values_helper(self, key: str, choice: str) -> list:
             """
             Return a list of values to test json schema validation.
 
             Accepts two parameters, key and choice.
-            - 'key' is a string that specifies the type of value to be returned.
+            - 'key' is a string that specifies
+                the type of value to be returned.
             - 'choice' is also a string that specifies whether
                 to return good or bad values for the specified key.
 
@@ -69,7 +79,9 @@ def schema_manager_fixture():
                 elif key == "string_text":
                     result = self.get_string_text_values_helper(choice)
                 elif key == "string_description":
-                    result = SchemaManager.get_string_description_values_helper(choice)
+                    result = SchemaManager.get_string_description_values_helper(
+                        choice
+                    )
                 elif key == "positive_number":
                     result = self.get_positive_number_values_helper(choice)
                 elif key == "positive_integer":
@@ -112,15 +124,16 @@ class TestEmoncmsSchemas:
     def test_string_description_pattern(self, schema_manager):
         """Test string_description values to validate patterns."""
         datas = [
-                ('description', schema_manager.obj['unittest_api']['V']),
-            ]
+            ('description', schema_manager.obj['unittest_api']['V']),
+        ]
         schema_manager.run_test_values(datas=datas, key="string_description")
 
     def test_positive_integer_pattern(self, schema_manager):
         """Test positive_integer values to validate patterns."""
         datas = [
-                ('process', schema_manager.obj['unittest_api']['V']['feeds']['V']),
-                ('engine', schema_manager.obj['unittest_api']['V']['feeds']['V']),
-                ('time_interval', schema_manager.obj['unittest_api']['V']['feeds']['V'])
-            ]
+            ('process', schema_manager.obj['unittest_api']['V']['feeds']['V']),
+            ('engine', schema_manager.obj['unittest_api']['V']['feeds']['V']),
+            ('time_interval',
+             schema_manager.obj['unittest_api']['V']['feeds']['V'])
+        ]
         schema_manager.run_test_values(datas=datas, key="positive_integer")

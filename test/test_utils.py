@@ -3,6 +3,7 @@
 """Test Utils class."""
 from vemonitor_m8.core.utils import Utils as Ut
 
+
 class TestUtils:
     """Test Utils class."""
 
@@ -72,7 +73,7 @@ class TestUtils:
             iterable={'a': 1, 'b': 1, 'c': 1, 'd': 1}
         )
         assert result is False
-    
+
     def test_is_valid_port(self):
         """Test is_valid_port method."""
         assert Ut.is_valid_port(0) is False
@@ -95,7 +96,6 @@ class TestUtils:
         assert Ut.is_valid_host('255.-1.255.255') is False
         assert Ut.is_valid_host('255.255.-1.255') is False
         assert Ut.is_valid_host('255.255.255.-1') is False
-
 
         assert Ut.is_valid_host('0.0.0.0') is True
         assert Ut.is_valid_host('255.255.255.255') is True
