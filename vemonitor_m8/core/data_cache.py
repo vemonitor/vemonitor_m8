@@ -179,6 +179,29 @@ class DataCache(InputsCache):
 
         return result
 
+    def get_cache_keys(self,
+                       from_time: int = 0,
+                       structure: Optional[dict] = None
+                       ):
+        """Get data cache key"""
+        result = None
+        if self.has_data():
+            time_keys = list(self.data.keys())
+            time_keys.sort()
+
+            if from_time > 0:
+                result = [
+                    time_key
+                    for time_key in time_keys
+                    if InputsCache.is_from_time(
+                        item_time=time_key,
+                        from_time=from_time
+                    )
+                ]
+            else:
+                result = time_keys
+        return result
+
     def get_data_from_cache(self,
                             from_time: int = 0,
                             nb_items: int = 0,
