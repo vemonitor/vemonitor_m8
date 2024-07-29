@@ -52,7 +52,7 @@ class InputsCache(ABC):
     @abstractmethod
     def add_data_cache(self,
                        time_key: int,
-                       key: str,
+                       node: str,
                        data: dict
                        ):
         """Add inputs data cache."""

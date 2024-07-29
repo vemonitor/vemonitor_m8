@@ -202,7 +202,7 @@ class AppBlockRun:
 
                             self.inputs_data.add_data_cache(
                                 time_key=time_key,
-                                key=worker.get_name(),
+                                node=worker.get_name(),
                                 data=data
                             )
                             test = True

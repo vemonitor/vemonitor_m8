@@ -242,14 +242,14 @@ class RedisCache(RedisConnector, InputsCache):
 
     def add_data_cache(self,
                        time_key: int,
-                       key: str,
+                       node: str,
                        data: dict
                        ):
         """Set inputs data cache key on redis."""
         result = False
         time_key = Ut.get_int(time_key, 0)
         if self.is_ready():
-            formatted_node = RedisCache.get_cache_map_key(key=key)
+            formatted_node = RedisCache.get_cache_map_key(key=node)
             data, is_updated = self._update_or_set_data_node_key(
                 formatted_node=formatted_node,
                 time_key=time_key,
