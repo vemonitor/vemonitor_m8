@@ -135,14 +135,26 @@ class DataCache(InputsCache):
             else:
                 result = data
         return result
+
+    def add_data_cache(self, time_key, node, data):
         """Set inputs data cache key"""
+        result = False
         time_key = Ut.get_int(time_key, 0)
-        if Ut.is_int(time_key, positive=True):
-            # \
-            # and Ut.is_dict(data, not_null=True)
+        if Ut.is_int(time_key, positive=True)\
+                and Ut.is_str(node, not_null=True)\
+                and Ut.is_dict(data, not_null=True):
             self.init_data_key(time_key)
-            self.data[time_key].update({key: data})
-            self.control_data_len()
+            data = self._update_or_set_data_node_key(
+                formatted_node=node,
+                time_key=time_key,
+                data=data
+            )
+            if Ut.is_dict(data, not_null=True):
+                self.data[time_key].update({node: data})
+                result = True
+            self.control_node_data_len(node=node)
+        return result
+
 
     def get_data_from_cache(self,
                             from_time: int = 0,
