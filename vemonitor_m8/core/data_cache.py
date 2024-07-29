@@ -211,18 +211,25 @@ class DataCache(InputsCache):
         result, last_time, max_time = None, 0, 0
         if self.has_data():
             result = {}
-            keys = list(self.data.keys())
-            keys.sort()
-            max_time = max(keys)
-            for key in keys:
-                if Ut.is_dict(self.data.get(key), not_null=True) \
-                        and InputsCache.is_from_time(
-                            item_time=key,
-                            from_time=from_time
-                        ):
-                    if len(result) < nb_items:
-                        result.update({key: self.data.get(key)})
-                        last_time = key
-                    else:
+            time_keys = self.get_cache_keys(from_time=from_time)
+            if Ut.is_list(time_keys, not_null=True):
+                for time_key in time_keys:
+                    if nb_items > 0\
+                            and len(result) >= nb_items:
                         break
+                    if Ut.is_dict(structure, not_null=True):
+                        data = self.get_cache_data_by_structure(
+                            time_key=time_key,
+                            structure=structure
+                        )
+                        if Ut.is_dict(data, not_null=True):
+                            result.update({
+                                time_key: data
+                            })
+                    else:
+                        result.update({time_key: self.data.get(time_key)})
+
+            if Ut.is_dict(result, not_null=True):
+                max_time = max(result)
+                last_time = max_time + 1
         return result, last_time, max_time
