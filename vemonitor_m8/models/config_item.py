@@ -31,10 +31,10 @@ class ConfigItem(ConfigHelper):
         """Init Config item data"""
         if kwargs.get('app_block') is not None:
             self.set_app_block(kwargs.get('app_block'))
-        if kwargs.get('app_conectors') is not None:
-            self.set_app_connectors(kwargs.get('app_conectors'))
-        if kwargs.get('check_points') is not None:
-            self.set_data_structures(kwargs.get('check_points'))
+        if kwargs.get('app_connectors') is not None:
+            self.set_app_connectors(kwargs.get('app_connectors'))
+        if kwargs.get('data_structure') is not None:
+            self.set_data_structures(kwargs.get('data_structure'))
 
     def is_valid(self):
         """Test if is valid Config Item Data"""
