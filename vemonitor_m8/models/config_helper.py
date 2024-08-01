@@ -78,7 +78,10 @@ class ConfigHelper(AppBlockHelper):
                         if self.has_app_connector_key_item(key, item):
                             if not Ut.is_dict(result.get(key)):
                                 result[key] = {}
-                            result[key][item] = self.app_connectors[key].get(item)
+                            result[key][item] = self.get_app_connector_by_key_item(
+                                key=key,
+                                item=item
+                            )
         return result
 
     def has_data_structures(self) -> bool:
@@ -102,7 +105,7 @@ class ConfigHelper(AppBlockHelper):
             data_points = self.data_structures.get('points')
             for col in columns:
                 if Ut.is_str(col) and self.has_data_structures_point_key(col):
-                    result[col] = data_points['points'].get(col)
+                    result[col] = data_points.get(col)
         return result
 
     @staticmethod
