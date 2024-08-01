@@ -16,6 +16,8 @@ def helper_manager_fixture():
 
         def __init__(self):
             self.obj = Config()
+            self.test_path = None
+            self.loader = None
 
         def init_loader(self):
             """Init config loader module"""
@@ -92,17 +94,6 @@ class TestConfig:
         )
         assert result is None
 
-    def test_get_app_connector_by_sources(self, helper_manager):
-        """Test get_app_connector_by_sources method """
-        helper_manager.init_config_with_loader()
-        result = helper_manager.obj.get_app_connector_by_sources(
-            key="redis",
-            item="local"
-        )
-        assert Ut.is_dict(result, not_null=True)
-        assert result.get('host') == '127.0.0.1'
-        assert result.get('port') == 6379
-
     def test_get_app_block_by_name(self, helper_manager):
         """Test get_app_block_by_name method """
         helper_manager.init_config_with_loader()
@@ -136,6 +127,20 @@ class TestConfig:
         assert Ut.is_dict(data, eq=2)
         assert data.get('serial') == ['bmv700']
         assert data.get('redis') == ['local']
+
+    def test_get_app_connector_by_sources(self, helper_manager):
+        """Test get_app_connector_by_sources method """
+        helper_manager.init_config_with_loader()
+        sources = helper_manager.obj.get_app_blocks_sources()
+        result = helper_manager.obj.get_app_connector_by_sources(
+            sources=sources
+        )
+        sources_keys = list(sources.keys())
+        connectors_keys = list(result.keys())
+        assert Ut.is_dict(result, not_null=True)
+        assert sources_keys == connectors_keys
+        assert Ut.is_dict(result['serial'].get('bmv700'), not_null=True)
+        assert Ut.is_dict(result['redis'].get('local'), not_null=True)
 
     def test_reduce_app_connector_from_sources(self, helper_manager):
         """Test reduce_app_connector_from_sources method """
@@ -171,6 +176,46 @@ class TestConfig:
                 data_structures={'a': 2}
             )
 
+    def test_has_data_structures(self, helper_manager):
+        """Test has_data_structures method """
+        helper_manager.init_config_with_loader()
+        assert helper_manager.obj.has_data_structures() is True
+
+    def test_has_data_structures_point_key(self, helper_manager):
+        """Test has_data_structures_point_key method """
+        helper_manager.init_config_with_loader()
+        assert helper_manager.obj.has_data_structures_point_key(
+            key='V'
+        ) is True
+
+    def test_get_data_structures_point_by_columns(self, helper_manager):
+        """Test get_data_structures_point_by_columns method """
+        helper_manager.init_config_with_loader()
+        columns = ['V', 'I', 'P']
+        result = helper_manager.obj.get_data_structures_point_by_columns(
+            columns=columns
+        )
+        assert Ut.is_dict(result, eq=3)
+        assert Ut.is_dict(result.get('V'), not_null=True)
+        assert Ut.is_dict(result.get('I'), not_null=True)
+        assert Ut.is_dict(result.get('P'), not_null=True)
+
+    def test_is_missing_data_structure(self, helper_manager):
+        """Test is_missing_data_structure method """
+        helper_manager.init_config_with_loader()
+        columns = ['V', 'I', 'P']
+        result = helper_manager.obj.is_missing_data_structure(
+            data_structures=helper_manager.obj.data_structures,
+            cols=columns
+        )
+        assert result is False
+
+        with pytest.raises(SettingInvalidException):
+            helper_manager.obj.is_missing_data_structure(
+                data_structures=helper_manager.obj.data_structures,
+                cols=['V', 'bad_point']
+            )
+
     def test_has_battery_banks(self, helper_manager):
         """Test has_battery_banks method """
         helper_manager.init_config_with_loader()
@@ -202,7 +247,7 @@ class TestConfig:
     def test___str__(self, helper_manager):
         """Test __str__ method """
         helper_manager.init_config_with_loader()
-        data = helper_manager.obj.__str__()
+        data = str(helper_manager.obj)
         assert Ut.is_str(data, not_null=True)
 
     def test_serialize(self, helper_manager):
