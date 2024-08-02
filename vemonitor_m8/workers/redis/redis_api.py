@@ -352,6 +352,12 @@ class RedisApi(RedisBase):
     """Redis Cli Helper"""
 
     def __init__(self, credentials: dict):
+        if not RedisApi.is_redis_credentials(credentials):
+            raise RedisVeError(
+                "Fatal Error: "
+                "Redis connector properties are invalid. "
+                "You must provide a valid host and port values."
+            )
         RedisBase.__init__(self, credentials)
 
     def get_hmap_len(self,
