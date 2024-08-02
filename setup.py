@@ -10,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='vemonitor_m8',
-    version='0.0.3',
+    version='0.0.4',
     description='Solar Plant Monitoring',
     url='https://github.com/vemonitor/vemonitor_m8',
     author='Eli Serra',
@@ -27,7 +27,19 @@ setup(
         "Programming Language :: Python :: 3.11",
     ],
     license='Apache',
-    packages=['test', 'vemonitor_m8'],
+    py_modules=[
+        'vemonitor_m8.conf_manager.loader',
+        'vemonitor_m8.conf_manager.schema_validate',
+        'vemonitor_m8.conf_manager.schema_validate_selector',
+        'vemonitor_m8.core.exceptions',
+        'vemonitor_m8.core.utils',
+        'vemonitor_m8.models.workers',
+        'vemonitor_m8.models.item_dict'
+    ],
+    packages=[
+        'test',
+        'vemonitor_m8'
+    ],
     package_dir={
         'vemonitor_m8': 'vemonitor_m8',
         'test': 'test'
