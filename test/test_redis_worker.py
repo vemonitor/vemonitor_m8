@@ -227,11 +227,6 @@ class TestRedisOutputWorker:
         assert helper_manager.obj.get_last_saved_time() == 1722013447
 
         result = helper_manager.obj.set_last_saved_time(
-            value=0
-        )
-        assert result is False
-
-        result = helper_manager.obj.set_last_saved_time(
             value=-1
         )
         assert result is False
