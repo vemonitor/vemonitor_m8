@@ -82,7 +82,7 @@ class Worker(ABC):
 
     def has_enum_key(self) -> bool:
         """Test if instance has enum_key property."""
-        return Ut.is_int(self._info.get('enum_key'), mini=0)
+        return Ut.is_int(self._info.get('enum_key'), positive=True)
 
     def get_enum_key(self) -> int:
         """Get enum_key property."""
@@ -91,19 +91,19 @@ class Worker(ABC):
     def set_enum_key(self, value: int) -> bool:
         """Set enum_key property."""
         result = False
-        if Ut.is_int(value, mini=0):
+        if Ut.is_int(value, positive=True):
             self._info['enum_key'] = value
             result = True
         return result
 
     def has_time_interval(self) -> bool:
         """Test if instance has time_interval property."""
-        return Ut.is_numeric(self.time_interval, mini=0)
+        return Ut.is_numeric(self.time_interval, positive=True)
 
     def set_time_interval(self, value: Union[int, float]) -> bool:
         """Set time_interval property."""
         result = False
-        if Ut.is_numeric(value, mini=0):
+        if Ut.is_numeric(value, positive=True):
             self.time_interval = value
             result = True
         return result
@@ -255,7 +255,7 @@ class OutputWorker(Worker):
         """Set last_saved_time property."""
         value = Ut.get_int(value, -1)
         result = False
-        if Ut.is_int(value, mini=0):
+        if Ut.is_int(value, positive=True):
             self.last_saved_time = value
             result = True
         return result
@@ -271,7 +271,7 @@ class OutputWorker(Worker):
     def set_cache_interval(self, value: int) -> bool:
         """Test if instance has cache_interval property."""
         result = False
-        if Ut.is_int(value, mini=0):
+        if Ut.is_int(value, positive=True):
             self.cache_interval = value
             result = True
         return result
@@ -287,7 +287,7 @@ class OutputWorker(Worker):
     def set_min_req_interval(self, value: Union[int, float]) -> bool:
         """Test if instance has min_req_interval property."""
         result = False
-        if Ut.is_numeric(value, mini=0):
+        if Ut.is_numeric(value, positive=True):
             self.min_req_interval = value
             result = True
         return result
