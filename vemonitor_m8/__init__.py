@@ -11,7 +11,7 @@ __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
 __license__ = "Apache"
 __status__ = "Production"
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
