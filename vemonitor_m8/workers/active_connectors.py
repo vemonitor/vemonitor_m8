@@ -1,6 +1,5 @@
 """ActiveConnectors model helper"""
 import logging
-from typing import Optional
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.models.item_dict import DictOfObject
 
@@ -20,31 +19,15 @@ class ActiveConnectors(DictOfObject):
     def __init__(self):
         DictOfObject.__init__(self)
 
-    def has_item_key(self, key: tuple) -> bool:
-        """Test if instance has item key defined."""
-        return self.has_items()\
-            and ActiveConnectors.is_valid_item_type(key)\
-            and ActiveConnectors.is_valid_item_type(self.items.get(key))
+    @staticmethod
+    def is_valid_item_key(key: tuple):
+        """Test if is valid item type"""
+        return ActiveConnectors.is_valid_item_type(key)
 
-    def add_item(self,
-                 key: tuple,
-                 value: tuple
-                 ) -> bool:
-        """Add item item."""
-        result = False
-        if ActiveConnectors.is_valid_item_type(key)\
-                and ActiveConnectors.is_valid_item_type(value):
-            self.init_item()
-            self.items[key] = value
-            result = True
-        return result
-
-    def get_item(self, key: tuple) -> Optional[object]:
-        """Get item key."""
-        result = None
-        if self.has_item_key(key):
-            result = self.items.get(key)
-        return result
+    @staticmethod
+    def is_valid_item_value(value: tuple):
+        """Test if is valid item type"""
+        return ActiveConnectors.is_valid_item_type(value)
 
     @staticmethod
     def is_valid_item_type(item: tuple):

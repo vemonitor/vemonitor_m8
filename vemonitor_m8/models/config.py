@@ -4,10 +4,10 @@
 Config Model Class
 """
 from typing import Optional
+from jsonschema import SchemaError, ValidationError
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.conf_manager.shema_validate_selector import SchemaValidateSelector as jValid
 from vemonitor_m8.models.config_helper import ConfigHelper
-from vemonitor_m8.models.config_item import ConfigItem
 from vemonitor_m8.core.exceptions import SettingInvalidException
 
 
@@ -52,7 +52,8 @@ class Config(ConfigHelper):
 
     def set_app_blocks(self, app_blocks: list) -> bool:
         """Set App Blocks configuration"""
-        if jValid.is_valid_app_blocks_conf(app_blocks):
+        if Ut.is_list(app_blocks, not_null=True)\
+                and jValid.is_valid_app_blocks_conf(app_blocks):
             self.app_blocks = app_blocks
             return True
         return False
@@ -119,11 +120,11 @@ class Config(ConfigHelper):
                 and ConfigHelper.is_app_block_sources(sources):
 
             sources_keys = list(sources.keys())
-            res = dict()
+            res = {}
             for key, conector in app_connector.items():
                 if key in sources_keys:
                     if not Ut.is_dict(res.get(key)):
-                        res[key] = dict()
+                        res[key] = {}
 
                     if Ut.is_dict(conector):
                         for item_key, item in conector.items():
@@ -135,9 +136,11 @@ class Config(ConfigHelper):
     def set_data_structures(self, data_structures: dict) -> None:
         """Set Data Structures Conf"""
         cols = self.get_app_blocks_columns()
-        if not ConfigHelper.is_missing_data_structure(data_structures, cols)\
+        if ConfigHelper.is_data_structures(data_structures)\
+                and not ConfigHelper.is_missing_data_structure(
+                    data_structures, cols)\
                 and jValid.is_valid_data_structure_conf(
-                                            conf_item=data_structures):
+                    conf_item=data_structures):
             self.data_structures = data_structures
             return True
         raise SettingInvalidException(
@@ -151,28 +154,34 @@ class Config(ConfigHelper):
 
     def validate_battery_banks(self, battery_banks: dict) -> None:
         """Validate Battery Banks"""
+        result = False
         if Ut.is_dict(battery_banks, not_null=True):
+            result = True
             for item in battery_banks.values():
-                if not jValid.is_valid_battery_banks_conf(
+                try:
+                    jValid.is_valid_battery_banks_conf(
                         conf_item={"batteryBankArgs": item}
-                        ):
+                    )
+                except (SchemaError, ValidationError) as ex:
+                    result = False
                     raise SettingInvalidException(
                         "Fatal Error : invalid batteryBank data,"
                         "for key {key}."
-                    )
-            return True
+                    ) from ex
         else:
             raise SettingInvalidException(
                 "Fatal Error : invalid batteryBank data,"
                 "is empty or not a dict."
             )
+        return result
 
     def set_battery_banks(self, battery_banks: dict) -> None:
         """Set Battery Banks"""
+        result = False
         if self.validate_battery_banks(battery_banks):
             self.battery_banks = battery_banks
-            return True
-        return False
+            result = True
+        return result
 
     def get_battery_banks_from_args(self, args: dict) -> Optional[dict]:
         """Get Battery Banks from Args"""
@@ -184,31 +193,6 @@ class Config(ConfigHelper):
                         if Ut.is_dict(self.battery_banks.get(arg)):
                             return self.battery_banks.get(arg)
         return res
-
-    def serialize_app_block_data(self, app_name: str):
-        """
-        This method allows to serialize in a proper way this object
-
-        :return: A dict of order
-        :rtype: Dict
-        """
-        conf = ConfigItem()
-        conf.app_block = self.get_app_block_by_app(app_name)
-        sources = ConfigHelper.get_app_block_sources(conf.app_block)
-        conf.app_connectors = self.get_app_connector_by_sources(sources)
-        columns = ConfigHelper.get_app_block_columns_by_block(conf.app_block)
-        conf.data_structures = self.get_data_structures_point_by_columns(
-            columns=columns
-        )
-
-        battery_bank = self.get_battery_banks_from_args(
-            args=conf.app_block.get('args')
-        )
-
-        return {
-            'conf': conf,
-            'battery_bank': battery_bank
-        }
 
     def __str__(self):
         """__str__"""

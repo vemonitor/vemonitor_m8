@@ -61,12 +61,12 @@ class SchemaTestHelper:
         """
         #
         if choice == "good":
-            return[
+            return [
                 "hello", "HeLlO", "H1eL2lO", "0H1eL2lO", "0H1e_L2lO",
                 "H1_eL 2-l/O", "0H1e-L2lO", "0H1e_L2lO", "0H1e L2lO"
             ]
         else:
-            return[
+            return [
                 1, 0, None, "_hello", "hello_", "a&",
                 "c^", "m%", "Ad8M.s+dsd", "Ad8M$ sdsd",
                 "[a-z]", "%shello", "hello%sworld"
@@ -88,11 +88,11 @@ class SchemaTestHelper:
         :return: A list of values that are bad or good string_key
         """
         if choice == "good":
-            return[
+            return [
                 "hello", "HeLlO", "H1eL2lO", "0H1eL2lO", "0H1e_L2lO"
             ]
         else:
-            return[
+            return [
                 1, 0, None, "_hello", "hello_", "hello#", "a&",
                 "c$", "m%", "Ad8M.sdsd", "Ad8M sdsd", "[a-z]",
                 "%shello"
@@ -114,12 +114,12 @@ class SchemaTestHelper:
         :return: A list of values that are bad or good string_columns
         """
         if choice == "good":
-            return[
+            return [
                 "hello", "HeLlO", "H1eL2lO", "0H1eL2lO", "0H1e_L2lO",
                 "#H1eL2lO", "0H1e#L2lO", "0H1e_L2lO#",
             ]
         else:
-            return[
+            return [
                 1, 0, None, "_hello", "hello_", "a&",
                 "c^", "m%", "Ad8M.sdsd", "Ad8M sdsd",
                 "[a-z]", "%shello", "hello%sworld"
@@ -141,9 +141,9 @@ class SchemaTestHelper:
         :return: A list of values that are bad or good positive_number
         """
         if choice == "good":
-            return[1, 3, 10, 1.2]
+            return [1, 3, 10, 1.2]
         else:
-            return[
+            return [
                 0, -1, -0.1, "_hel lo",
                 False, None, dict(), tuple()
             ]
@@ -197,14 +197,15 @@ class SchemaTestHelper:
         return data[key] == val
 
     def _run_assert_values_data(self,
-                               key: Union[str, int],
-                               item: Union[dict, list],
-                               list_values: list,
-                               choice: str,
-                               restrict: str
-                               ):
+                                key: Union[str, int],
+                                item: Union[dict, list],
+                                list_values: list,
+                                choice: str,
+                                restrict: str
+                                ):
         if Ut.is_str(key) or Ut.is_int(key) \
-                and (Ut.is_dict(item, not_null=True) or Ut.is_list(item, not_null=True))\
+                and (Ut.is_dict(item, not_null=True)
+                     or Ut.is_list(item, not_null=True))\
                 and Ut.is_list(list_values, not_null=True):
 
             for val_tst in list_values:
@@ -213,7 +214,7 @@ class SchemaTestHelper:
                 elif choice == "bad" and restrict != "good":
                     assert self._run_test_bad_value_data(key, item, val_tst)
                 else:
-                    if not ((choice == "good" and restrict == "bad") \
+                    if not ((choice == "good" and restrict == "bad")
                             or (choice == "bad" and restrict == "good")):
                         raise ValueError(
                             f"Fatal error: Unable to evaluate {choice} value "
@@ -231,7 +232,8 @@ class SchemaTestHelper:
                              choice: str
                              ):
         """Apply and test values."""
-        if Ut.is_list(datas, not_null=True) and Ut.is_list(list_values, not_null=True):
+        if Ut.is_list(datas, not_null=True)\
+                and Ut.is_list(list_values, not_null=True):
             for data_item in datas:
                 key, item, restrict = None, None, None
                 if Ut.is_tuple(data_item):
@@ -241,11 +243,18 @@ class SchemaTestHelper:
                         key, item, restrict = data_item
                     else:
                         raise ValueError(
-                        "Fatal error: Unable to evaluate good values "
-                        f"on key {key}, items tuple must have a length of 2 or 3. "
-                        "( key: str or int, data: list or dict )"
+                            "Fatal error: Unable to evaluate good values "
+                            f"on key {key}, "
+                            "items tuple must have a length of 2 or 3. "
+                            "( key: str or int, data: list or dict )"
+                        )
+                    self._run_assert_values_data(
+                        key,
+                        item,
+                        list_values,
+                        choice,
+                        restrict
                     )
-                    self._run_assert_values_data(key, item, list_values, choice, restrict)
                 else:
                     raise ValueError(
                         "Fatal error: Unable to evaluate good values "
@@ -261,13 +270,13 @@ class SchemaTestHelper:
     def run_test_values(self, datas: list, key: str):
         """Apply and test all values."""
         self.run_test_values_data(
-            datas = datas,
-            list_values = self.get_values_helper(key, 'good'),
+            datas=datas,
+            list_values=self.get_values_helper(key, 'good'),
             choice='good'
         )
 
         self.run_test_values_data(
-            datas = datas,
-            list_values = self.get_values_helper(key, 'bad'),
+            datas=datas,
+            list_values=self.get_values_helper(key, 'bad'),
             choice='bad'
         )

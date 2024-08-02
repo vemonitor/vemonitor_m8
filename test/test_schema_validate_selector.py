@@ -12,9 +12,10 @@ def helper_manager_fixture():
     """Json Schema test manager fixture"""
     class HelperManager:
         """Json Helper test manager fixture Class"""
+
         def __init__(self):
             current_script_path = Opath.dirname(
-            Opath.abspath(
+                Opath.abspath(
                     inspect.getfile(inspect.currentframe())
                 )
             )
@@ -28,10 +29,12 @@ def helper_manager_fixture():
 
 class TestSchemaValidateSelector:
     """Test SchemaValidateSelector class."""
+
     def test_is_valid_app_blocks_conf(self, helper_manager):
         """Test is_valid_app_blocks_conf method"""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor")
         res = jValid.is_valid_app_blocks_conf(conf_item=settings.app_blocks)
         assert res is True
 
@@ -44,8 +47,10 @@ class TestSchemaValidateSelector:
     def test_is_valid_app_connectors_conf(self, helper_manager):
         """Test is_valid_app_connectors_conf method"""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
-        res = jValid.is_valid_app_connectors_conf(conf_item=settings.app_connectors)
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor")
+        res = jValid.is_valid_app_connectors_conf(
+            conf_item=settings.app_connectors)
         assert res is True
 
         with pytest.raises(ValidationError):
@@ -58,7 +63,8 @@ class TestSchemaValidateSelector:
         """Test is_valid_battery_banks_conf method"""
         c_loader = ConfigLoader(helper_manager.test_path)
         imp_conf = c_loader._get_settings_from_file()
-        res = jValid.is_valid_battery_banks_conf(conf_item=imp_conf.get('batteryBanks'))
+        res = jValid.is_valid_battery_banks_conf(
+            conf_item=imp_conf.get('batteryBanks'))
         assert res is True
 
         res = jValid.is_valid_battery_banks_conf(conf_item={})
@@ -73,8 +79,10 @@ class TestSchemaValidateSelector:
     def test_is_valid_data_structure_conf(self, helper_manager):
         """Test is_valid_app_connectors_conf method"""
         c_loader = ConfigLoader(helper_manager.test_path)
-        settings = c_loader.get_settings_from_schema(app_name="batSerialMonitor")
-        res = jValid.is_valid_data_structure_conf(conf_item=settings.data_structures)
+        settings = c_loader.get_settings_from_schema(
+            app_name="batSerialMonitor")
+        res = jValid.is_valid_data_structure_conf(
+            conf_item=settings.data_structures)
         assert res is True
 
         res = jValid.is_valid_data_structure_conf(conf_item={})

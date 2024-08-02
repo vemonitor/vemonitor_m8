@@ -5,6 +5,7 @@ import time
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.core.threads_controller import ThreadsController
 
+
 def timers_callback(**kwargs):
     """Timer callback function"""
     time_call = time.time()

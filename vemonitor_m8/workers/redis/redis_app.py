@@ -20,3 +20,8 @@ class RedisApp:
     def ping(self) -> bool:
         """Test if redis ping return True"""
         return self.api.is_ready() and self.api.is_connected()
+
+    @staticmethod
+    def is_redis_connector(connector) -> bool:
+        """Test if client is redis client instance"""
+        return RedisApi.is_redis_credentials(connector)

@@ -43,39 +43,46 @@ class ConfigHelper(AppBlockHelper):
 
     def set_app_connectors(self, app_connectors: dict) -> None:
         """Set App Connectors"""
-        if jValid.is_valid_app_connectors_conf(app_connectors):
+        result = False
+        if Ut.is_dict(app_connectors, not_null=True)\
+                and jValid.is_valid_app_connectors_conf(app_connectors):
             self.app_connectors = app_connectors
-            return True
-        return False
+            result = True
+        return result
 
     def get_app_connector_by_key(self, key: str) -> Optional[dict]:
         """Get App Connectors by key"""
+        result = None
         if self.has_app_connector_key(key):
-            return self.app_connectors.get(key)
-        return None
+            result = self.app_connectors.get(key)
+        return result
 
     def get_app_connector_by_key_item(self,
                                       key: str,
                                       item: str
                                       ) -> Optional[dict]:
         """Get App Connectors by key item"""
+        result = None
         if self.has_app_connector_key_item(key, item):
-            return self.app_connectors[key].get(item)
-        return None
+            result = self.app_connectors[key].get(item)
+        return result
 
     def get_app_connector_by_sources(self, sources: dict) -> Optional[dict]:
         """Get App Connectors by sources"""
-        res = None
+        result = None
         if ConfigHelper.is_app_block_sources(sources):
-            res = {}
+            result = {}
             for key, items in sources.items():
                 if Ut.is_list(items, not_null=True):
                     for item in items:
                         if self.has_app_connector_key_item(key, item):
-                            if not Ut.is_dict(res.get(key)):
-                                res[key] = {}
-                            res[key][item] = self.app_connectors[key].get(item)
-        return res
+                            if not Ut.is_dict(result.get(key)):
+                                result[key] = {}
+                            result[key][item] = self.get_app_connector_by_key_item(
+                                key=key,
+                                item=item
+                            )
+        return result
 
     def has_data_structures(self) -> bool:
         """Test if obj has valid Data Structures"""
@@ -92,22 +99,14 @@ class ConfigHelper(AppBlockHelper):
                                              columns: list
                                              ) -> Optional[dict]:
         """Get Data Structure point by columns names"""
-        res = None
+        result = None
         if self.has_data_structures() and Ut.is_list(columns, not_null=True):
-            res = {}
+            result = {}
             data_points = self.data_structures.get('points')
             for col in columns:
                 if Ut.is_str(col) and self.has_data_structures_point_key(col):
-                    res[col] = data_points['points'].get(col)
-        return res
-
-    def __eq__(self, other):
-        """
-        This is used to compare 2 objects
-        :param other:
-        :return:
-        """
-        return self.__dict__ == other.__dict__
+                    result[col] = data_points.get(col)
+        return result
 
     @staticmethod
     def is_app_connectors(app_connectors: dict) -> bool:
@@ -156,7 +155,9 @@ class ConfigHelper(AppBlockHelper):
     def is_missing_data_structure(data_structures, cols) -> bool:
         """Test if is missing Data Structure conf"""
         result = False
-        if not ConfigHelper.is_all_data_structures_covered(
+        if Ut.is_dict(data_structures, not_null=True)\
+                and Ut.is_dict(data_structures.get('points'), not_null=True)\
+                and not ConfigHelper.is_all_data_structures_covered(
                     data_structures=data_structures,
                     cols=cols
                 ):

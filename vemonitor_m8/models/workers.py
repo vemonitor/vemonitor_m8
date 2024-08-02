@@ -15,6 +15,8 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 
+from vemonitor_m8.models.item_dict import DictOfObject
+
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
@@ -103,7 +105,7 @@ class Worker(ABC):
     def set_time_interval(self, value: Union[int, float]) -> bool:
         """Set time_interval property."""
         result = False
-        if Ut.is_numeric(value, mini=0):
+        if Ut.is_numeric(value, positive=True):
             self.time_interval = value
             result = True
         return result
@@ -287,7 +289,7 @@ class OutputWorker(Worker):
     def set_min_req_interval(self, value: Union[int, float]) -> bool:
         """Test if instance has min_req_interval property."""
         result = False
-        if Ut.is_numeric(value, mini=0):
+        if Ut.is_numeric(value, positive=True):
             self.min_req_interval = value
             result = True
         return result
@@ -340,45 +342,36 @@ class OutputWorker(Worker):
         """Send data to worker."""
 
 
-class WorkersDict:
+class WorkersDict(DictOfObject):
     """Workers model helper"""
     def __init__(self):
-        self.items = None
+        DictOfObject.__init__(self)
 
     def has_workers(self) -> bool:
         """Test if workers items defined."""
-        return Ut.is_dict(self.items, not_null=True)
+        return self.has_items()
 
     def has_worker_key(self, key: str) -> bool:
         """Test if instance has worker key defined."""
-        return self.has_workers()\
-            and Ut.is_str(key)\
-            and WorkersHelper.is_worker(self.items.get(key))
+        return self.has_item_key(key=key)
 
     def init_worker(self, reset: bool = False):
         """Initialise worker items."""
-        if not self.has_workers()\
-                or reset is True:
-            self.items = dict()
+        self.init_item(reset=reset)
 
     def add_worker(self,
                    key: str,
                    worker: Worker
                    ) -> bool:
         """Add worker item."""
-        result = False
-        if Ut.is_str(key) and WorkersHelper.is_worker(worker):
-            self.init_worker()
-            self.items[key] = worker
-            result = True
-        return result
+        return self.add_item(
+            key=key,
+            value=worker
+        )
 
     def get_worker(self, key: str) -> Optional[Worker]:
         """Get worker key."""
-        result = None
-        if self.has_worker_key(key):
-            result = self.items.get(key)
-        return result
+        return self.get_item(key=key)
 
     def loop_on_workers(self):
         """Get worker key."""
@@ -389,10 +382,17 @@ class WorkersDict:
 
     def get_workers(self) -> Optional[dict]:
         """Get worker key."""
-        result = None
-        if self.has_workers():
-            result = self.items
-        return result
+        return self.get_items()
+
+    @staticmethod
+    def is_valid_item_key(key: tuple):
+        """Test if is valid item type"""
+        return Ut.is_str(key)
+
+    @staticmethod
+    def is_valid_item_value(value: tuple):
+        """Test if is valid item type"""
+        return WorkersHelper.is_worker(value)
 
 
 class Workers:
