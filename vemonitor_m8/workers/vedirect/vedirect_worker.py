@@ -6,7 +6,7 @@ import os
 from typing import Optional, Union
 from ve_utils.utype import UType as Ut
 
-from vemonitor_m8.workers.vedirect.vedirect_app import VedirectApp
+from vemonitor_m8.workers.vedirect.vedirect_app import VedirectApp, WorkerConf
 from vemonitor_m8.models.workers import InputWorker
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.core.exceptions import SettingInvalidException
@@ -36,7 +36,7 @@ class VedirectWorker(InputWorker):
         return isinstance(self.worker, VedirectApp)\
             and self.worker.is_ready()
 
-    def notify_worker_error(self) -> bool:
+    def notify_worker_error(self):
         """Add message to logger if worker is not ready."""
         if self._status is False:
             logger.warning(
@@ -52,11 +52,13 @@ class VedirectWorker(InputWorker):
         self.notify_worker_error()
         return self._status
 
-    def set_worker(self, worker: Union[dict, VedirectApp]) -> bool:
+    def set_worker(self,
+                   worker: Optional[Union[WorkerConf, VedirectApp]]
+                   ) -> bool:
         """Set vedirect worker"""
         result = False
         if Ut.is_dict(worker, not_null=True):
-            self.worker = VedirectApp(**worker)
+            self.worker = VedirectApp(**worker)  # type: ignore
             result = True
         elif isinstance(worker, VedirectApp):
             self.worker = worker
@@ -66,11 +68,10 @@ class VedirectWorker(InputWorker):
     def set_conf(self, conf: dict) -> bool:
         """Set Configuration data."""
         connector = VedirectWorker.get_connector_conf(conf)
+        worker_conf = WorkersHelper.get_worker_conf_from_dict(conf)
         if VedirectWorker.is_connector(connector)\
-                and self.set_worker_conf(
-                    WorkersHelper.get_worker_conf_from_dict(conf)
-                ):
-            self.set_worker(connector)
+                and self.set_worker_conf(conf=worker_conf):
+            self.set_worker(connector)  # type: ignore
             result = True
         else:
             raise SettingInvalidException(
@@ -81,12 +82,12 @@ class VedirectWorker(InputWorker):
 
     def read_data(self,
                   timeout: int = 2
-                  ) -> dict:
+                  ) -> Optional[dict]:
         """
         Read data on worker
         """
         return self.worker.read_data(
-            caller_key=self.get_name(),
+            caller_name=self.get_name(),
             timeout=timeout
         )
 
@@ -96,7 +97,7 @@ class VedirectWorker(InputWorker):
         result = None
         if Ut.is_dict(conf, not_null=True):
             if Ut.is_dict(conf.get('connector'), not_null=True):
-                connector = conf.get('connector')
+                connector = conf.get('connector', {})
                 result = {
                     "serial_conf": {},
                     "serial_test": connector.get('serialTest'),
