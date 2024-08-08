@@ -123,14 +123,24 @@ class VedirectApp:
         """Read data"""
         result = None
         now = time.time()
-        logger.debug(
-            "[VedirectApp::read_data] Read vedirect data."
-            "worker: %s - time: %s",
-            caller_name,
-            now
+        self.init_lock_serial(
+            caller_name=caller_name
         )
-        result = self.ve.read_data(
+        result, is_cache = self.ve.read_data(
             caller_name=caller_name,
             timeout=timeout
+        )
+        self.unlock_serial()
+        nb_data = 0
+        if Ut.is_dict(result, not_null=True):
+            nb_data = len(result)
+        logger.debug(
+            "[VedirectApp::read_data] Read vedirect data."
+            "worker: %s - time: %s  - is cache: %s "
+            "- data len: %s",
+            caller_name,
+            now,
+            is_cache,
+            nb_data
         )
         return result
