@@ -17,7 +17,7 @@ from vemonitor_m8.core.data_checker import DataChecker
 from vemonitor_m8.models.config import Config
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.workers.workers_manager import WorkersManager
-from vemonitor_m8.core.exceptions import DeviceInputValueError
+from vemonitor_m8.core.exceptions import DeviceInputValueError, VeMonitorError
 from vemonitor_m8.core.exceptions import RedisConnectionException
 from vemonitor_m8.core.exceptions import SettingInvalidException
 from vemonitor_m8.core.exceptions import WorkerException
@@ -222,6 +222,10 @@ class AppBlockRun:
                     "Worker exception, ex : %s .",
                     str(ex)
                 )
+                raise VeMonitorError(
+                    "Fatal Error: "
+                    "Ann error occured while running VeMonitor"
+                ) from ex
         else:
             logger.debug(
                 "[AppBlockRun::read_worker_data] "
