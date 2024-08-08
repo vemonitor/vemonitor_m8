@@ -140,7 +140,8 @@ class RedisOutputWorker(OutputWorker):
         OutputWorker.__init__(self)
         self.cache_interval = 5
         self.set_min_req_interval(1)
-        self.set_conf(conf)
+        if self.set_conf(conf):
+            self.set_worker_status()
 
     def is_ready(self) -> bool:
         """Test if worker is ready."""
