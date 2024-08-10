@@ -20,6 +20,7 @@ logger = logging.getLogger("vemonitor")
 
 
 class WorkerConf(NamedTuple):
+    """WorkerConf Type"""
     serial_conf: dict
     serial_test: dict
     source_name: str = 'VePackets'
