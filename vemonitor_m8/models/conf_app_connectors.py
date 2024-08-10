@@ -29,8 +29,7 @@ class ConfigAppConnectors(ConfigAppBlocks):
         ConfigAppBlocks.__init__(self, app_blocks=app_blocks)
         self.app_connectors = None
 
-        if app_connectors is not None:
-            self.set_app_connectors(app_connectors)
+        self.set_app_connectors(app_connectors)
 
     def has_app_connectors(self) -> bool:
         """Test if object has valid App Connectors"""
