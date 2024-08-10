@@ -5,13 +5,14 @@ import logging
 import sys
 import argparse
 from vemonitor_m8.app_run import AppRun
+from vemonitor_m8.version import VERSION
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 __deprecated__ = False
 __license__ = "Apache"
 __status__ = "Production"
-__version__ = "0.0.4"
+__version__ = VERSION
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
