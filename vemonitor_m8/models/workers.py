@@ -127,7 +127,7 @@ class Worker(ABC):
         return self.has_info() and self.has_time_interval()
 
     def set_worker_conf(self,
-                        conf: dict
+                        conf: Optional[dict]
                         ) -> bool:
         """
         Set Worker configuration data.

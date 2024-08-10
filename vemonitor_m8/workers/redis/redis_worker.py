@@ -96,6 +96,9 @@ class RedisInputWorker(InputDictWorker):
         """Set redis worker"""
         result = False
         if RedisWorkerHelper.is_connector(worker):
+            if Ut.is_dict(worker, not_null=True)\
+                    and worker.get('active'):
+                worker.pop('active')
             self.worker = RedisApp(credentials=worker)
             result = True
         elif isinstance(worker, RedisApp):
@@ -140,7 +143,8 @@ class RedisOutputWorker(OutputWorker):
         OutputWorker.__init__(self)
         self.cache_interval = 5
         self.set_min_req_interval(1)
-        self.set_conf(conf)
+        if self.set_conf(conf):
+            self.set_worker_status()
 
     def is_ready(self) -> bool:
         """Test if worker is ready."""
@@ -167,6 +171,9 @@ class RedisOutputWorker(OutputWorker):
         """Set redis worker"""
         result = False
         if RedisWorkerHelper.is_connector(worker):
+            if Ut.is_dict(worker, not_null=True)\
+                    and worker.get('active'):
+                worker.pop('active')
             self.worker = RedisApp(worker)
             result = True
         elif isinstance(worker, RedisApp):
