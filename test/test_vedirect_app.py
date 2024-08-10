@@ -143,6 +143,7 @@ class TestVedirectApp:
         assert helper_manager.obj.ve.packets_stats.set_max_read_error(
             value=2
         ) is True
+        helper_manager.obj.ve.packets_stats.reset_global_counters()
         assert helper_manager.obj.ve.packets_stats.add_serial_read_errors(
         ) == 1
         assert helper_manager.obj.ve.packets_stats.add_serial_read_errors(
