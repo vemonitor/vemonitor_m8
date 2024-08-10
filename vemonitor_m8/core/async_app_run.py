@@ -39,9 +39,9 @@ class AppBlockRun:
 
     def __init__(self, conf: Config):
         self._run = False
-        self.conf = None
+        self.conf: Optional[Config] = None
         self.events = AppBlockEvents()
-        self.inputs_data = None
+        self.inputs_data: Optional[InputsCache] = None
         self._threads = ThreadsController()
         self.workers = WorkersManager()
         signal.signal(signal.SIGTERM, self.sig_handler)
@@ -68,7 +68,7 @@ class AppBlockRun:
 
     def is_conf_ready(self) -> bool:
         """Test if class instance have valid battery_bank property."""
-        return isinstance(self.conf, Config)
+        return AppBlockRun.is_conf(self.conf)
 
     def is_cache_ready(self) -> bool:
         """Test if class instance have valid battery_bank property."""
@@ -77,8 +77,10 @@ class AppBlockRun:
     def init_redis_cache(self) -> bool:
         """Init redis cache object."""
         result = False
-        if AppBlockRun.is_conf(self.conf):
-            redis_cache = self.conf.app_blocks[0].get('redis_cache')
+        if self.is_conf_ready():
+            redis_cache = self.conf.get_redis_cache_by_key(  # type: ignore
+                index=0
+            )
             if Ut.is_dict(redis_cache, not_null=True):
                 try:
                     self.inputs_data = RedisCache(
@@ -104,9 +106,12 @@ class AppBlockRun:
         return result
 
     def init_data_cache(self) -> bool:
-        """Init dataCache object."""
+        """
+        Init dataCache object.
+        ToDo: Redis cache is only needed for worker outputs who send bulk data
+        """
         result = False
-        if AppBlockRun.is_conf(self.conf):
+        if self.is_conf_ready():
             if self.init_redis_cache() is True:
                 result = True
             else:
@@ -130,8 +135,8 @@ class AppBlockRun:
             )
         return result
 
-    def cancel_all_timers(self) -> bool:
-        """Set Cancell all Thread timers."""
+    def cancel_all_timers(self):
+        """Cancell all Thread timers."""
         self._threads.cancel_all_timers()
         time.sleep(3)
 
@@ -171,7 +176,8 @@ class AppBlockRun:
 
     def is_worker_data_ready(self):
         """On worker data ready event"""
-        if len(self.inputs_data.data) >= 5:
+        if Ut.is_dict(self.inputs_data.data, not_null=True)\
+                and len(self.inputs_data.data) >= 5:
             self.events.on_worker_data_ready()
 
     def read_worker_data(self,
@@ -342,12 +348,12 @@ class AppBlockRun:
                 and self.workers.has_output_workers():
             result = True
             for key, worker in self.workers.loop_on_output_workers():
-
-                data, last_time, max_time = self.inputs_data.get_data_from_cache(
+                data_cache = self.inputs_data.get_data_from_cache(
                     from_time=worker.get_last_saved_time(),
                     nb_items=worker.get_cache_interval(),
                     structure=worker.columns
                 )
+                data, last_time, max_time = data_cache
                 interval = max_time - worker.last_saved_time
                 is_time_interval = (
                     worker.last_saved_time == 0
@@ -398,8 +404,8 @@ class AppBlockRun:
                 time.sleep(0.1)
 
     @staticmethod
-    def is_conf(conf: Config) -> bool:
+    def is_conf(conf: Optional[Config]) -> bool:
         """Test if valid conf"""
         return isinstance(conf, Config)\
             and conf.is_valid()\
-            and len(conf.app_blocks) == 1
+            and len(conf.app_blocks) == 1  # type: ignore
