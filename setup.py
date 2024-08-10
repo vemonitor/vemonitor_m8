@@ -57,17 +57,22 @@ setup(
     },
     include_package_data=True,
     install_requires=[
-        'jsonschema',
-        'pyyaml',
-        'simplejson',
-        'redis',
-        'vedirect_m8',
-        've_utils',
+        'jsonschema>=4.23.0',
+        'pyyaml>=6.0.2',
+        'simplejson>=3.19.2',
+        'redis>=5.0.8',
+        'vedirect_m8>=1.3.2.4',
+        've-utils>=2.5.3',
     ],
     extras_require={
         "TEST": [
-            "pytest>=7.1.2",
-            "coverage"
+            "pytest>=8.3.2",
+            "pytest-cov>=5.0.0",
+            "coverage>=7.6.1",
+            "setuptools>=72.1.0",
+            "twine>=5.1.1",
+            "wheel>=0.44.0",
+            "flake8>=7.1.1"
         ]
     },
     python_requires='>3.5.2',
