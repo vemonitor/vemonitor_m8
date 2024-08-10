@@ -96,6 +96,9 @@ class RedisInputWorker(InputDictWorker):
         """Set redis worker"""
         result = False
         if RedisWorkerHelper.is_connector(worker):
+            if Ut.is_dict(worker, not_null=True)\
+                    and worker.get('active'):
+                worker.pop('active')
             self.worker = RedisApp(credentials=worker)
             result = True
         elif isinstance(worker, RedisApp):
@@ -168,6 +171,9 @@ class RedisOutputWorker(OutputWorker):
         """Set redis worker"""
         result = False
         if RedisWorkerHelper.is_connector(worker):
+            if Ut.is_dict(worker, not_null=True)\
+                    and worker.get('active'):
+                worker.pop('active')
             self.worker = RedisApp(worker)
             result = True
         elif isinstance(worker, RedisApp):
