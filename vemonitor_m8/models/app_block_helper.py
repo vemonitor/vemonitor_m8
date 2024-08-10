@@ -21,23 +21,28 @@ class AppBlockHelper:
             Ut.is_dict(block.get('outputs'), not_null=True)
 
     @staticmethod
-    def add_app_block_columns(blocks_columns: list,
-                              columns: list
-                              ) -> list:
-        """Add App Block columns to config"""
+    def add_block_columns(blocks_columns: Optional[list],
+                          columns: Optional[list]
+                          ) -> Optional[list]:
+        """
+        Add App Block columns to config
+        Todo: columns can be a dict
+        """
+        result = None
         if Ut.is_list(columns, not_null=True):
             if not Ut.is_list(blocks_columns, not_null=True):
-                blocks_columns = columns
+                result = columns
             else:
+                result = blocks_columns
                 for col in columns:
                     if Ut.is_str(col) and col not in blocks_columns:
-                        blocks_columns.append(col)
-        return blocks_columns
+                        result.append(col)
+        return result
 
     @staticmethod
-    def get_app_block_columns_from_inout(item: dict,
-                                         blocks_columns: Optional[list] = None
-                                         ) -> Optional[list]:
+    def get_block_columns_from_inout(item: dict,
+                                     blocks_columns: Optional[list] = None
+                                     ) -> Optional[list]:
         """Get App Block columns from inputs and/or outputs"""
         if Ut.is_dict(item, not_null=True):
             for data in item.values():
@@ -48,8 +53,9 @@ class AppBlockHelper:
                                     content.get('columns'),
                                     not_null=True
                                 ):
-                            blocks_columns = AppBlockHelper.add_app_block_columns(
-                                blocks_columns, content.get('columns')
+                            blocks_columns = AppBlockHelper.add_block_columns(
+                                blocks_columns=blocks_columns,
+                                columns=content.get('columns')
                             )
         return blocks_columns
 
@@ -64,12 +70,12 @@ class AppBlockHelper:
 
         if AppBlockHelper.is_app_block(block):
             if selector in ['all', 'inputs']:
-                blocks_columns = AppBlockHelper.get_app_block_columns_from_inout(
+                blocks_columns = AppBlockHelper.get_block_columns_from_inout(
                     item=block.get('inputs'),
                     blocks_columns=blocks_columns
                 )
             if selector in ['all', 'outputs']:
-                blocks_columns = AppBlockHelper.get_app_block_columns_from_inout(
+                blocks_columns = AppBlockHelper.get_block_columns_from_inout(
                     item=block.get('outputs'),
                     blocks_columns=blocks_columns
                     )
@@ -114,7 +120,9 @@ class AppBlockHelper:
                                     content=content
                                 ):
                             sources = AppBlockHelper.add_app_block_sources_key(
-                                sources, key, content.get('source')
+                                sources=sources,
+                                key=key,
+                                source=content.get('source')
                             )
         return sources
 
@@ -130,17 +138,21 @@ class AppBlockHelper:
         if AppBlockHelper.is_app_block(block):
             if selector in ['all', 'inputs']:
                 sources = AppBlockHelper.get_app_block_sources_from_inout(
-                    block.get('inputs'), sources)
+                    item=block.get('inputs'),
+                    sources=sources
+                )
 
             if selector in ['all', 'outputs']:
                 sources = AppBlockHelper.get_app_block_sources_from_inout(
-                    block.get('outputs'), sources)
+                    item=block.get('outputs'),
+                    sources=sources
+                )
 
             if Ut.is_dict(block.get("redis_cache"), not_null=True)\
                     and Ut.is_str(
                         block['redis_cache'].get("source"), not_null=True
                     ):
-                redis_source = block['redis_cache'].get("source")
+                redis_source: str = block['redis_cache'].get("source")
                 if Ut.is_dict(sources):
                     if not Ut.is_list(sources.get('redis')):
                         sources.update({'redis': [redis_source]})
