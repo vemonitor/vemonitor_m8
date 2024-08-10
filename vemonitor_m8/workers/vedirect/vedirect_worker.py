@@ -67,7 +67,10 @@ class VedirectWorker(InputWorker):
 
     def set_conf(self, conf: dict) -> bool:
         """Set Configuration data."""
-        connector = VedirectWorker.get_connector_conf(conf)
+        connector = VedirectWorker.get_connector_conf(
+            conf=conf,
+            min_interval=self.min_source_interval
+        )
         worker_conf = WorkersHelper.get_worker_conf_from_dict(conf)
         if VedirectWorker.is_connector(connector)\
                 and self.set_worker_conf(conf=worker_conf):
@@ -92,7 +95,9 @@ class VedirectWorker(InputWorker):
         )
 
     @staticmethod
-    def get_connector_conf(conf: dict) -> Optional[dict]:
+    def get_connector_conf(conf: dict,
+                           min_interval: int = 1
+                           ) -> Optional[dict]:
         """Get formatted connector configuration data."""
         result = None
         if Ut.is_dict(conf, not_null=True):
@@ -104,7 +109,9 @@ class VedirectWorker(InputWorker):
                     "source_name": "VedirectWorker",
                     "auto_start": True,
                     "wait_connection": True,
-                    "wait_timeout": 5
+                    "wait_timeout": 5,
+                    "min_interval": Ut.get_int(min_interval, 1),
+                    "max_read_error": 0
                 }
                 serial_conf = {}
                 if Ut.is_str(connector.get('serialPort'), not_null=True):
