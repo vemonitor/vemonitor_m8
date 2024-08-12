@@ -50,3 +50,15 @@ class Utils(Ut):
             "[.](?:(?:[0-1]?[0-9]?[0-9])|(?:[0-2][0-4][0-9])|(?:25[0-5])))$"
         )
         return Ut.is_str(value) and Ut.is_list(regex.findall(value), eq=1)
+
+    @staticmethod
+    def is_from_time(item_time: int, from_time: int = 0):
+        """Test if 0 < from_time <= item_time or from_time == 0."""
+        is_valid_props = Ut.is_numeric(item_time, mini=0)\
+            and Ut.is_numeric(from_time, mini=0)
+        is_from_time_null = is_valid_props\
+            and from_time == 0
+        is_valid = is_valid_props\
+            and 0 < from_time <= item_time
+        return is_from_time_null \
+            or is_valid
