@@ -2,7 +2,7 @@
 import pytest
 from ve_utils.utype import UType as Ut
 from vemonitor_m8.core.exceptions import RedisConnectionException, RedisVeError
-from vemonitor_m8.workers.redis.redis_app import RedisApp
+from vemonitor_m8.workers.redis.redis_h_time_series import HmapTimeSeriesApp
 from vemonitor_m8.workers.redis.redis_cache import RedisConnector
 from vemonitor_m8.workers.redis.redis_cache import RedisCache
 
@@ -22,12 +22,14 @@ def helper_manager_fixture():
         def init_redis_connector(self):
             """Init RedisCli"""
             self.obj = RedisConnector(
+                max_rows=10,
                 connector={
                     "host": self.host,
                     "port": self.port,
                     "db": self.db
                 }
             )
+            self.obj.node_base = "ric"
 
         def init_redis_cache(self):
             """Init RedisCache"""
@@ -40,6 +42,7 @@ def helper_manager_fixture():
                 },
                 reset_at_start=True
             )
+            self.obj.app.node_base = "ric"
 
         def init_nodes_test(self):
             """Init RedisCache"""
@@ -131,6 +134,7 @@ class TestRedisConnector:
         helper_manager.init_redis_connector()
         # set redis app with dict data
         assert helper_manager.obj.set_redis_app(
+            max_rows=10,
             connector={
                 "host": helper_manager.host,
                 "port": helper_manager.port,
@@ -140,7 +144,8 @@ class TestRedisConnector:
         ) is True
 
         # set redis app with RedisApp object
-        connector = RedisApp(
+        connector = HmapTimeSeriesApp(
+            max_rows=10,
             credentials={
                 "host": helper_manager.host,
                 "port": helper_manager.port,
@@ -216,28 +221,6 @@ class TestRedisCache:
         helper_manager.obj.app.api.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_cache_nodes_keys_list()
-
-    def test_get_interval_keys(self, helper_manager):
-        """Test get_interval_keys method"""
-        keys = [1722013465, 1722013470]
-        assert RedisCache.get_interval_keys(
-            keys
-        ) == 5
-
-        keys = [1722013464, 1722013466, 1722013468, 1722013470]
-        assert RedisCache.get_interval_keys(
-            keys
-        ) == 2
-
-        keys = [1722013466, 1722013467, 1722013468, 1722013469, 1722013470]
-        assert RedisCache.get_interval_keys(
-            keys
-        ) == 1
-
-        keys = [1722013466, 1722013468, 1722013469, 1722013470, 1722013475]
-        assert RedisCache.get_interval_keys(
-            keys
-        ) == 1
 
     def test_get_cache_keys_structure(self, helper_manager):
         """Test get_cache_keys_structure method"""
