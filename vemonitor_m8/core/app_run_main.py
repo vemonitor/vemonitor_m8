@@ -2,16 +2,18 @@
 # -*- coding: utf-8 -*-
 """App block run Helper"""
 import logging
+import time
 from typing import Optional
 from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.events.app_block_events import AppBlockEvents
 from vemonitor_m8.core.data_cache import DataCache
+from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.workers.redis.redis_cache import RedisCache
 from vemonitor_m8.models.inputs_cache import InputsCache
 from vemonitor_m8.core.data_checker import DataChecker
 from vemonitor_m8.models.config import Config
 from vemonitor_m8.workers.workers_manager import WorkersManager
-from vemonitor_m8.core.exceptions import DeviceInputValueError
+from vemonitor_m8.core.exceptions import DeviceInputValueError, VeMonitorError
 from vemonitor_m8.core.exceptions import RedisConnectionException
 from vemonitor_m8.core.exceptions import SettingInvalidException
 from vemonitor_m8.core.exceptions import DeviceDataConfError
@@ -149,6 +151,64 @@ class AppBlockRun:
         if Ut.is_dict(self.inputs_data.data, not_null=True)\
                 and len(self.inputs_data.data) >= 5:
             self.events.on_worker_data_ready()
+
+    def read_worker_data(self,
+                         worker_key: str
+                         ):
+        """Read input data from worker"""
+        test = False
+        worker = self.workers.get_input_worker(worker_key)
+        if WorkersHelper.is_worker(worker):
+            try:
+                time_key = time.time()
+                data = worker.read_data()
+                if Ut.is_dict(data, not_null=True):
+                    data = self.format_input_data(data, worker.columns)
+                    if Ut.is_dict(data, not_null=True):
+                        data.update({'time': time_key})
+                        data.update({
+                            'time_ref': Ut.get_rounded_float(
+                                    time_key - int(time_key/1000) * 1000, 3
+                                    )
+                        })
+
+                        self.inputs_data.add_data_cache(
+                            time_key=time_key,
+                            node=worker.get_name(),
+                            data=data
+                        )
+                        test = True
+                    else:
+                        logger.debug(
+                            "[AppBlockRun::read_worker_data] "
+                            "Unable to format data from serial port."
+                        )
+                else:
+                    logger.debug(
+                        "[AppBlockRun::read_worker_data] "
+                        "Unable to read data from serial port."
+                    )
+            except Exception as ex:
+                logger.error(
+                    "[AppBlockRun::read_worker_data] "
+                    "Worker exception, ex : %s .",
+                    str(ex)
+                )
+                raise VeMonitorError(
+                    "Fatal Error: "
+                    "Ann error occured while running VeMonitor"
+                ) from ex
+        else:
+            logger.debug(
+                "[AppBlockRun::read_worker_data] "
+                "Worker is down."
+            )
+        if not test:
+            logger.debug(
+                "[AppBlockRun::read_worker_data] "
+                "Worker data readed with errors."
+            )
+        return test
 
     @staticmethod
     def is_conf(conf: Optional[Config]) -> bool:

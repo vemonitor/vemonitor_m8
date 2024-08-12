@@ -32,7 +32,7 @@ class AsyncAppBlockRun(AppBlockRun):
     def sig_handler(self, signum, frame):
         """Signal handler"""
         logger.critical(
-            "[AppBlockRun:sig_handler] handling signal: %s\n",
+            "[AsyncAppBlockRun:sig_handler] handling signal: %s\n",
             signum
         )
         self._run = False
@@ -71,69 +71,35 @@ class AsyncAppBlockRun(AppBlockRun):
                          ):
         """Read input data from worker"""
         test = False
-
-        start = time.perf_counter()
-        current_thread = threading.current_thread()
-        worker = self.workers.get_input_worker(worker_key)
-        interval = current_thread.interval
-        if WorkersHelper.is_worker(worker):
-            try:
+        try:
+            start = time.perf_counter()
+            current_thread = threading.current_thread()
+            worker = self.workers.get_input_worker(worker_key)
+            if WorkersHelper.is_worker(worker):
                 interval = worker.time_interval
                 with self._threads.lock:
-                    time_key = time.time()
-                    data = worker.read_data()
-                    if Ut.is_dict(data, not_null=True):
-                        data = self.format_input_data(data, worker.columns)
-                        if Ut.is_dict(data, not_null=True):
-                            data.update({'time': time_key})
-                            data.update({
-                                'time_ref': Ut.get_rounded_float(
-                                        time_key - int(time_key/1000) * 1000, 3
-                                        )
-                            })
-
-                            self.inputs_data.add_data_cache(
-                                time_key=time_key,
-                                node=worker.get_name(),
-                                data=data
-                            )
-                            test = True
-                        else:
-                            logger.debug(
-                                "[AppBlockRun::read_worker_data] "
-                                "Unable to format data from serial port."
-                            )
-                    else:
-                        logger.debug(
-                            "[AppBlockRun::read_worker_data] "
-                            "Unable to read data from serial port."
-                        )
-            except Exception as ex:
-                logger.error(
-                    "[AppBlockRun::read_worker_data] "
-                    "Worker exception, ex : %s .",
-                    str(ex)
+                    test = AppBlockRun.read_worker_data(
+                        self,
+                        worker_key=worker_key
+                    )
+                AsyncAppBlockRun.set_thread_interval(
+                    current_thread=current_thread,
+                    interval=interval,
+                    start=start
                 )
-                raise VeMonitorError(
-                    "Fatal Error: "
-                    "Ann error occured while running VeMonitor"
-                ) from ex
-        else:
-            logger.debug(
-                "[AppBlockRun::read_worker_data] "
-                "Worker is down."
+        except VeMonitorError as ex:
+            logger.error(
+                "[AsyncAppBlockRun::read_worker_data] "
+                "Worker exception, ex : %s .",
+                str(ex)
             )
+            self.cancel_all_timers()
+            raise VeMonitorError(
+                "Fatal Error: "
+                "Ann error occured while running VeMonitor"
+            ) from ex
 
-        AsyncAppBlockRun.set_thread_interval(
-            current_thread=current_thread,
-            interval=interval,
-            start=start
-        )
-        if not test:
-            logger.debug(
-                "[AppBlockRun::read_worker_data] "
-                "Worker data readed with errors."
-            )
+        return test
 
     def loop_inputs(self):
         """Run block inputs."""
@@ -306,7 +272,7 @@ class AsyncAppBlockRun(AppBlockRun):
                 current_thread.interval = new_interval
                 result = new_interval
                 logger.debug(
-                    "[AppBlockRun::set_thread_interval] "
+                    "[AsyncAppBlockRun::set_thread_interval] "
                     "New thread interval : %s - "
                     "Worker Interval : %s - "
                     "Read time: %s",
