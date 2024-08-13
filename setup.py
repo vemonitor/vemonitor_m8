@@ -1,7 +1,7 @@
 """Vemonitor_m8 Setup"""
 import pathlib
 from setuptools import setup
-from vedirect_m8.version import VERSION
+from vemonitor_m8.version import VERSION
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
