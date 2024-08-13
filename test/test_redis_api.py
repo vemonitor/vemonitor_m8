@@ -247,8 +247,8 @@ class TestRedisBase:
         last_saved_time = info.get('rdb_last_save_time')
         now = Ut.get_int(time.time())
         assert now > last_saved_time
-
-        helper_manager.obj.save_redis_data_on_disk()
+        assert helper_manager.obj.flush() is True
+        assert helper_manager.obj.save_redis_data_on_disk() is True
 
         time.sleep(5)
         info = helper_manager.obj.get_redis_info_usage()

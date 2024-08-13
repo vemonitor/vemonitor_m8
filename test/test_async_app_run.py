@@ -1,11 +1,11 @@
-"""Test AppBlockRun method."""
+"""Test AsyncAppBlockRun method."""
 
 import inspect
 import time
 from os import path as Opath
 import pytest
 from vemonitor_m8.conf_manager.config_loader import ConfigLoader
-from vemonitor_m8.core.async_app_run import AppBlockRun
+from vemonitor_m8.core.async_app_run import AsyncAppBlockRun
 
 
 @pytest.fixture(name="helper_manager", scope="class")
@@ -28,8 +28,8 @@ def helper_manager_fixture():
     return HelperManager()
 
 
-class TestAppBlockRun:
-    """Test AppBlockRun method."""
+class TestAsyncAppBlockRun:
+    """Test AsyncAppBlockRun method."""
 
     def test_run_block(self, helper_manager):
         """Test subscribe_worker_data_ready method."""
@@ -37,7 +37,7 @@ class TestAppBlockRun:
             block_name=None,
             app_name="batSerialMonitor",
         )
-        obj = AppBlockRun(
+        obj = AsyncAppBlockRun(
             conf=conf
         )
 

@@ -153,6 +153,12 @@ class RedisConnectionException(RedisVeError):
     """
 
 
+class RedisAppException(RedisVeError):
+    """
+    Redis App error
+    """
+
+
 # ----------------
 # Workers
 # ----------------

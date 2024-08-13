@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Test Utils class."""
+import time
 from vemonitor_m8.core.utils import Utils as Ut
 
 
@@ -101,3 +102,51 @@ class TestUtils:
         assert Ut.is_valid_host('255.255.255.255') is True
         assert Ut.is_valid_host('127.0.0.1') is True
         assert Ut.is_valid_host('192.168.1.1') is True
+
+    def test_is_from_time(self):
+        """Test is_from_time method."""
+        assert Ut.is_from_time(
+            item_time=2,
+            from_time=1
+        ) is True
+
+        assert Ut.is_from_time(
+            item_time=2,
+            from_time=0
+        ) is True
+
+        assert Ut.is_from_time(
+            item_time=0,
+            from_time=1
+        ) is False
+
+        assert Ut.is_from_time(
+            item_time=-1,
+            from_time=1
+        ) is False
+
+        assert Ut.is_from_time(
+            item_time=1,
+            from_time=-1
+        ) is False
+
+        assert Ut.is_from_time(
+            item_time="a",
+            from_time=1
+        ) is False
+
+        assert Ut.is_from_time(
+            item_time=1,
+            from_time="a"
+        ) is False
+
+        assert Ut.is_from_time(
+            item_time=None,
+            from_time=1
+        ) is False
+
+        assert Ut.is_from_time(
+            item_time=1,
+            from_time=None
+        ) is False
+

@@ -2,7 +2,7 @@
 import logging
 from ve_utils.utype import UType as Ut
 
-from vemonitor_m8.core.async_app_run import AppBlockRun
+from vemonitor_m8.core.async_app_run import AsyncAppBlockRun
 from vemonitor_m8.conf_manager.config_loader import ConfigLoader
 
 logging.basicConfig()
@@ -43,5 +43,5 @@ class AppRun:
             logger.info(
                 "Starting app blocks workers"
             )
-            self.app = AppBlockRun(self.conf)
+            self.app = AsyncAppBlockRun(self.conf)
             self.app.run_block()

@@ -1,10 +1,9 @@
 """Test redis_cache module"""
 import pytest
 from ve_utils.utype import UType as Ut
-from vemonitor_m8.core.exceptions import RedisConnectionException, RedisVeError
+from vemonitor_m8.core.exceptions import RedisConnectionException
+from vemonitor_m8.core.exceptions import RedisVeError
 from vemonitor_m8.workers.redis.redis_h_time_series import HmapTimeSeriesApp
-from vemonitor_m8.workers.redis.redis_cache import RedisConnector
-from vemonitor_m8.workers.redis.redis_cache import RedisCache
 
 
 @pytest.fixture(name="helper_manager", scope="class")
@@ -18,50 +17,50 @@ def helper_manager_fixture():
             self.host = '127.0.0.1'
             self.port = 6379
             self.db = 2
+            self.node_name = "Pytest"
 
-        def init_redis_connector(self):
-            """Init RedisCli"""
-            self.obj = RedisConnector(
+        def init_redis_h_time_series(self):
+            """Init HmapTimeSeriesApp"""
+            self.obj = HmapTimeSeriesApp(
                 max_rows=10,
-                connector={
+                credentials={
                     "host": self.host,
                     "port": self.port,
                     "db": self.db
                 }
             )
-            self.obj.node_base = "ric"
-
-        def init_redis_cache(self):
-            """Init RedisCache"""
-            self.obj = RedisCache(
-                max_rows=10,
-                connector={
-                    "host": self.host,
-                    "port": self.port,
-                    "db": self.db
-                },
-                reset_at_start=True
-            )
-            self.obj.app.node_base = "ric"
 
         def init_nodes_test(self):
-            """Init RedisCache"""
+            """Init HmapTimeSeriesApp"""
             # reset data cache
-            self.obj.reset_data_cache()
+            self.obj.reset_node_data(
+                node_name=self.node_name
+            )
             # get all nodes list
-            data = self.obj.get_cache_nodes_keys_list()
+            data = self.obj.get_nodes_keys_list(
+                node_name=self.node_name
+            )
             assert data == []
             # register nodes
-            assert self.obj.register_node('pytest_1') is True
-            assert self.obj.register_node('pytest_2') is True
-            assert self.obj.register_node('pytest_3') is True
+            assert self.obj.register_node(
+                node_name=self.node_name,
+                node='pytest_1'
+            ) is True
+            assert self.obj.register_node(
+                node_name=self.node_name,
+                node='pytest_2'
+            ) is True
+            assert self.obj.register_node(
+                node_name=self.node_name,
+                node='pytest_3'
+            ) is True
 
         def init_data_test(self):
             """Init data to test"""
             # init nodes
             self.init_nodes_test()
 
-            assert self.obj.add_data_cache(
+            assert self.obj.add_time_serie_to_node(
                 time_key=1722013447,
                 node='pytest_1',
                 data={
@@ -70,7 +69,7 @@ def helper_manager_fixture():
                 }
             ) is True
 
-            assert self.obj.add_data_cache(
+            assert self.obj.add_time_serie_to_node(
                 time_key=1722013448,
                 node='pytest_1',
                 data={
@@ -79,7 +78,7 @@ def helper_manager_fixture():
                 }
             ) is True
 
-            assert self.obj.add_data_cache(
+            assert self.obj.add_time_serie_to_node(
                 time_key=1722013449,
                 node='pytest_1',
                 data={
@@ -94,7 +93,7 @@ def helper_manager_fixture():
 
             for i in range(50):
                 now += 1
-                assert self.obj.add_data_cache(
+                assert self.obj.add_time_serie_to_node(
                     time_key=now,
                     node="pytest_1",
                     data={
@@ -104,7 +103,7 @@ def helper_manager_fixture():
                 ) is True
 
                 if now % 2 == 0:
-                    assert self.obj.add_data_cache(
+                    assert self.obj.add_time_serie_to_node(
                         time_key=now,
                         node="pytest_2",
                         data={
@@ -114,7 +113,7 @@ def helper_manager_fixture():
                     ) is True
 
                 if now % 5 == 0:
-                    assert self.obj.add_data_cache(
+                    assert self.obj.add_time_serie_to_node(
                         time_key=now,
                         node="pytest_3",
                         data={
@@ -126,105 +125,102 @@ def helper_manager_fixture():
     return HelperManager()
 
 
-class TestRedisConnector:
-    """Test RedisConnector class"""
+class TestHmapTimeSeriesApp:
+    """Test HmapTimeSeriesApp class"""
 
-    def test_set_redis_app(self, helper_manager):
-        """Test set_redis_app method"""
-        helper_manager.init_redis_connector()
-        # set redis app with dict data
-        assert helper_manager.obj.set_redis_app(
-            max_rows=10,
-            connector={
-                "host": helper_manager.host,
-                "port": helper_manager.port,
-                "db": helper_manager.db,
-                "active": True
-            }
-        ) is True
-
-        # set redis app with RedisApp object
-        connector = HmapTimeSeriesApp(
-            max_rows=10,
-            credentials={
-                "host": helper_manager.host,
-                "port": helper_manager.port,
-                "db": helper_manager.db
-            }
-        )
-
-        assert helper_manager.obj.set_redis_app(
-            connector=connector
-        ) is True
-
-
-class TestRedisCache:
-    """Test RedisCache class"""
-
-    def test_get_cache_nodes_keys_list(self, helper_manager):
-        """Test get_cache_nodes_keys_list method"""
-        helper_manager.init_redis_cache()
+    def test_get_nodes_keys_list(self, helper_manager):
+        """Test get_nodes_keys_list method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_nodes_test()
 
         # get all nodes list
-        data = helper_manager.obj.get_cache_nodes_keys_list()
+        data = helper_manager.obj.get_nodes_keys_list(
+            node_name=helper_manager.node_name
+        )
         assert Ut.is_list(data, eq=3)
 
         # get two first nodes list
-        data = helper_manager.obj.get_cache_nodes_keys_list(
+        data = helper_manager.obj.get_nodes_keys_list(
+            node_name=helper_manager.node_name,
             nodes=['pytest_1', 'pytest_2']
         )
         assert Ut.is_list(data, eq=2)
-        assert 'ric_pytest_1' in data
-        assert 'ric_pytest_2' in data
+        assert 'n_pytest_1' in data
+        assert 'n_pytest_2' in data
 
         # test bad name type
-        helper_manager.obj.cache_name = ["inputs_cache"]
         with pytest.raises(RedisVeError):
-            helper_manager.obj.get_cache_nodes_keys_list()
-        helper_manager.obj.cache_name = "inputs_cache"
+            helper_manager.obj.get_nodes_keys_list(
+                node_name=["inputs_cache"]
+            )
 
         # test loose redis conection
-        helper_manager.obj.app.api.cli = None
+        helper_manager.obj.api.cli = None
         with pytest.raises(RedisConnectionException):
-            helper_manager.obj.get_cache_nodes_keys_list()
+            helper_manager.obj.get_nodes_keys_list(
+                node_name=helper_manager.node_name
+            )
 
-    def test_get_cache_keys_by_node(self, helper_manager):
-        """Test get_cache_keys_by_node method"""
-        helper_manager.init_redis_cache()
+    def test_get_keys_by_node(self, helper_manager):
+        """Test get_keys_by_node method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_data_test()
 
         # get cache keys by node
-        data = helper_manager.obj.get_cache_keys_by_node(
-            formatted_node='ric_pytest_1'
+        data = helper_manager.obj.get_keys_by_node(
+            formatted_node='n_pytest_1'
         )
         assert Ut.is_list(data, eq=3)
         assert data == [1722013447, 1722013448, 1722013449]
 
         # get cache keys by node
-        data = helper_manager.obj.get_cache_keys_by_node(
-            formatted_node='ric_pytest_1',
+        data = helper_manager.obj.get_keys_by_node(
+            formatted_node='n_pytest_1',
             from_time=1722013448
         )
         assert Ut.is_list(data, eq=2)
         assert data == [1722013448, 1722013449]
 
         # test bad name type
-        helper_manager.obj.cache_name = ["inputs_cache"]
         with pytest.raises(RedisVeError):
-            helper_manager.obj.get_cache_nodes_keys_list()
-        helper_manager.obj.cache_name = "inputs_cache"
+            helper_manager.obj.get_nodes_keys_list(
+                node_name=["inputs_cache"]
+            )
 
         # test loose redis conection
-        helper_manager.obj.app.api.cli = None
+        helper_manager.obj.api.cli = None
         with pytest.raises(RedisConnectionException):
-            helper_manager.obj.get_cache_nodes_keys_list()
+            helper_manager.obj.get_nodes_keys_list(
+                node_name="inputs_cache"
+            )
 
-    def test_get_cache_keys_structure(self, helper_manager):
-        """Test get_cache_keys_structure method"""
-        helper_manager.init_redis_cache()
+    def test_get_interval_keys(self):
+        """Test get_interval_keys method"""
+        keys = [1722013465, 1722013470]
+        assert HmapTimeSeriesApp.get_interval_keys(
+            keys
+        ) == 5
+
+        keys = [1722013464, 1722013466, 1722013468, 1722013470]
+        assert HmapTimeSeriesApp.get_interval_keys(
+            keys
+        ) == 2
+
+        keys = [1722013466, 1722013467, 1722013468, 1722013469, 1722013470]
+        assert HmapTimeSeriesApp.get_interval_keys(
+            keys
+        ) == 1
+
+        keys = [1722013466, 1722013468, 1722013469, 1722013470, 1722013475]
+        assert HmapTimeSeriesApp.get_interval_keys(
+            keys
+        ) == 1
+
+    def test_get_keys_structure(self, helper_manager):
+        """Test get_keys_structure method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_nodes_test()
 
@@ -233,71 +229,74 @@ class TestRedisCache:
         # add more cache data
         helper_manager.add_more_data_test()
 
-        result = helper_manager.obj.get_cache_keys_structure(
-            node_keys=['ric_pytest_3', 'ric_pytest_1', 'ric_pytest_2'],
+        result = helper_manager.obj.get_keys_structure(
+            node_keys=['n_pytest_3', 'n_pytest_1', 'n_pytest_2'],
             from_time=1722013464,
             nb_items=2
         )
-        assert result == {'ric_pytest_3': [1722013465, 1722013470]}
+        assert result == {'n_pytest_3': [1722013465, 1722013470]}
 
-        result = helper_manager.obj.get_cache_keys_structure(
-            node_keys=['ric_pytest_3', 'ric_pytest_1', 'ric_pytest_2'],
+        result = helper_manager.obj.get_keys_structure(
+            node_keys=['n_pytest_3', 'n_pytest_1', 'n_pytest_2'],
             from_time=1722013460,
             nb_items=5
         )
         assert result == {
-            'ric_pytest_3': [1722013460, 1722013465, 1722013470],
-            'ric_pytest_2': [1722013472, 1722013474]
+            'n_pytest_3': [1722013460, 1722013465, 1722013470],
+            'n_pytest_2': [1722013472, 1722013474]
         }
 
-    def test_enum_cache_keys(self, helper_manager):
-        """Test enum_cache_keys method"""
-        helper_manager.init_redis_cache()
+    def test_enum_node_keys(self, helper_manager):
+        """Test enum_node_keys method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_data_test()
 
-        for node, keys in helper_manager.obj.enum_cache_keys():
+        for node, keys in helper_manager.obj.enum_node_keys(
+                node_name=helper_manager.node_name):
 
-            if node == 'ric_pytest_1':
+            if node == 'n_pytest_1':
                 assert keys == [1722013447, 1722013448, 1722013449]
             else:
                 assert keys is None
 
-        for node, keys in helper_manager.obj.enum_cache_keys(
-            nodes=['ric_pytest_1', 'ric_pytest_2']
-        ):
+        for node, keys in helper_manager.obj.enum_node_keys(
+                node_name=helper_manager.node_name,
+                nodes=['n_pytest_1', 'n_pytest_2']):
 
-            if node == 'ric_pytest_1':
+            if node == 'n_pytest_1':
                 assert keys == [1722013447, 1722013448, 1722013449]
-            elif node == 'ric_pytest_2':
+            elif node == 'n_pytest_2':
                 assert keys is None
             else:
                 assert False
 
-        for node, keys in helper_manager.obj.enum_cache_keys(
-            nodes=['ric_pytest_1', 'ric_pytest_2'],
-            from_time=1722013448
-        ):
+        for node, keys in helper_manager.obj.enum_node_keys(
+                node_name=helper_manager.node_name,
+                nodes=['n_pytest_1', 'n_pytest_2'],
+                from_time=1722013448):
 
-            if node == 'ric_pytest_1':
+            if node == 'n_pytest_1':
                 assert keys == [1722013448, 1722013449]
-            elif node == 'ric_pytest_2':
+            elif node == 'n_pytest_2':
                 assert keys is None
             else:
                 assert False
 
-    def test_reset_data_cache(self, helper_manager):
-        """Test reset_data_cache method"""
-        helper_manager.init_redis_cache()
+    def test_reset_node_data(self, helper_manager):
+        """Test reset_node_data method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_data_test()
 
-        deleted = helper_manager.obj.reset_data_cache()
+        deleted = helper_manager.obj.reset_node_data(
+            node_name=helper_manager.node_name
+        )
         assert deleted == [3, 3]
 
-    def test_add_data_cache(self, helper_manager):
-        """Test add_data_cache method"""
-        helper_manager.init_redis_cache()
+    def test_add_time_serie_to_node(self, helper_manager):
+        """Test add_time_serie_to_node method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_nodes_test()
 
@@ -306,28 +305,28 @@ class TestRedisCache:
         # add more cache data
         helper_manager.add_more_data_test()
 
-        data_ric_pytest_1 = helper_manager.obj.app.api.get_hmap_data(
-            "ric_pytest_1"
+        data_n_pytest_1 = helper_manager.obj.api.get_hmap_data(
+            "n_pytest_1"
         )
-        data_ric_pytest_2 = helper_manager.obj.app.api.get_hmap_data(
-            "ric_pytest_2"
+        data_n_pytest_2 = helper_manager.obj.api.get_hmap_data(
+            "n_pytest_2"
         )
-        data_ric_pytest_3 = helper_manager.obj.app.api.get_hmap_data(
-            "ric_pytest_3"
+        data_n_pytest_3 = helper_manager.obj.api.get_hmap_data(
+            "n_pytest_3"
         )
 
-        assert len(data_ric_pytest_1) == 10
-        assert len(data_ric_pytest_2) == 10
-        assert len(data_ric_pytest_3) == 10
+        assert len(data_n_pytest_1) == 10
+        assert len(data_n_pytest_2) == 10
+        assert len(data_n_pytest_3) == 10
 
-    def test_enum_node_data_cache_interval(self, helper_manager):
-        """Test enum_node_data_cache_interval method"""
-        helper_manager.init_redis_cache()
+    def test_enum_node_data_interval(self, helper_manager):
+        """Test enum_node_data_interval method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_data_test()
 
-        for key, values in helper_manager.obj.enum_node_data_cache_interval(
-            formatted_node='ric_pytest_1',
+        for key, values in helper_manager.obj.enum_node_data_interval(
+            formatted_node='n_pytest_1',
             keys=[1722013447, 1722013448]
         ):
             if key == 1722013447:
@@ -337,9 +336,9 @@ class TestRedisCache:
             else:
                 assert False
 
-    def test_get_data_from_redis(self, helper_manager):
-        """Test get_data_from_redis method"""
-        helper_manager.init_redis_cache()
+    def test_get_redis_time_series(self, helper_manager):
+        """Test get_redis_time_series method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_nodes_test()
 
@@ -349,7 +348,9 @@ class TestRedisCache:
         helper_manager.add_more_data_test()
 
         # get all items for all nodes
-        result, max_time = helper_manager.obj.get_data_from_redis()
+        result, max_time = helper_manager.obj.get_redis_time_series(
+            node_name=helper_manager.node_name
+        )
         keys = list(result.keys())
         keys.sort()
         assert keys == [
@@ -365,7 +366,8 @@ class TestRedisCache:
         assert max_time == 1722013490
 
         # get two items from every node who start at 1722013464
-        result, max_time = helper_manager.obj.get_data_from_redis(
+        result, max_time = helper_manager.obj.get_redis_time_series(
+            node_name=helper_manager.node_name,
             from_time=1722013464,
             nb_items=2
         )
@@ -380,7 +382,8 @@ class TestRedisCache:
 
         # Get two items of 'V' key from pytest_1 node
         # who start at 1722013464
-        result, max_time = helper_manager.obj.get_data_from_redis(
+        result, max_time = helper_manager.obj.get_redis_time_series(
+            node_name=helper_manager.node_name,
             from_time=1722013464,
             nb_items=2,
             structure={
@@ -393,9 +396,9 @@ class TestRedisCache:
 
         assert max_time == 1722013482
 
-    def test_get_data_from_cache(self, helper_manager):
-        """Test get_data_from_cache method"""
-        helper_manager.init_redis_cache()
+    def test_get_data_time_series(self, helper_manager):
+        """Test get_data_time_series method"""
+        helper_manager.init_redis_h_time_series()
         # init nodes test
         helper_manager.init_nodes_test()
 
@@ -405,7 +408,9 @@ class TestRedisCache:
         helper_manager.add_more_data_test()
 
         # get all items for all nodes
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache()
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+            node_name=helper_manager.node_name
+        )
         keys = list(result.keys())
         keys.sort()
         assert keys == [
@@ -422,7 +427,8 @@ class TestRedisCache:
         assert last_time == 1722013491
 
         # get fist for time  keys from data cache
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache(
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+           node_name=helper_manager.node_name,
            nb_items=4
         )
         assert result == {
@@ -443,7 +449,8 @@ class TestRedisCache:
         assert last_time == 1722013461
 
         # get all items from time 1722013488
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache(
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+           node_name=helper_manager.node_name,
            from_time=1722013488
         )
         assert result == {
@@ -462,7 +469,8 @@ class TestRedisCache:
         assert last_time == 1722013491
 
         # get all pytest_1 node data
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache(
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+           node_name=helper_manager.node_name,
            structure={'pytest_1': ['V', 'I']}
         )
         assert result == {
@@ -481,7 +489,8 @@ class TestRedisCache:
         assert last_time == 1722013491
 
         # get four items from every node who start at 1722013460
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache(
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+            node_name=helper_manager.node_name,
             structure={'pytest_1': ['V']}
         )
 
@@ -501,7 +510,8 @@ class TestRedisCache:
         assert last_time == 1722013491
 
         # get seven items from every node who start at 1722013460
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache(
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+            node_name=helper_manager.node_name,
             from_time=1722013484,
             nb_items=4
         )
@@ -526,7 +536,8 @@ class TestRedisCache:
 
         # Get two items of 'V' key from pytest_1 node
         # who start at 1722013464
-        result, last_time, max_time = helper_manager.obj.get_data_from_cache(
+        result, last_time, max_time = helper_manager.obj.get_data_time_series(
+            node_name=helper_manager.node_name,
             from_time=1722013484,
             nb_items=4,
             structure={
@@ -541,9 +552,3 @@ class TestRedisCache:
         }
         assert max_time == 1722013487
         assert last_time == 1722013488
-
-    def test_get_time_interval(self, helper_manager):
-        """Test get_time_interval method"""
-        helper_manager.init_redis_cache()
-        # init nodes test
-        helper_manager.init_data_test()

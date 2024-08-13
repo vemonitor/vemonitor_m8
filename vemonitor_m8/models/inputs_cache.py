@@ -38,12 +38,6 @@ class InputsCache(ABC):
             result = True
         return result
 
-    @staticmethod
-    def is_from_time(item_time: int, from_time: int = 0):
-        """Test if item must be returned."""
-        return from_time == 0 \
-            or (0 < from_time <= item_time)
-
     @abstractmethod
     def has_data(self):
         """Test if instance has data cache."""

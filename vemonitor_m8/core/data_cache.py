@@ -3,7 +3,7 @@
 """Inputs data cache Helper"""
 import logging
 from typing import Optional
-from ve_utils.utype import UType as Ut
+from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.models.inputs_cache import InputsCache
 
 __author__ = "Eli Serra"
@@ -193,7 +193,7 @@ class DataCache(InputsCache):
                 result = [
                     time_key
                     for time_key in time_keys
-                    if InputsCache.is_from_time(
+                    if Ut.is_from_time(
                         item_time=time_key,
                         from_time=from_time
                     )

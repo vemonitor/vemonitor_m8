@@ -7,6 +7,7 @@ from vemonitor_m8.workers.redis.redis_app import RedisApp
 from vemonitor_m8.models.workers import InputDictWorker
 from vemonitor_m8.models.workers import OutputWorker
 from vemonitor_m8.core.exceptions import SettingInvalidException
+from vemonitor_m8.workers.redis.redis_h_time_series import HmapTimeSeriesApp
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -174,7 +175,7 @@ class RedisOutputWorker(OutputWorker):
             if Ut.is_dict(worker, not_null=True)\
                     and worker.get('active'):
                 worker.pop('active')
-            self.worker = RedisApp(worker)
+            self.worker = HmapTimeSeriesApp(worker)
             result = True
         elif isinstance(worker, RedisApp):
             self.worker = worker
@@ -208,3 +209,10 @@ class RedisOutputWorker(OutputWorker):
                   input_structure: dict
                   ) -> bool:
         """Send data to redis worker."""
+        result = False
+        if self.is_ready()\
+                and Ut.is_dict(data, not_null=True)\
+                and Ut.is_dict(input_structure, not_null=True):
+            result = True
+        return result
+
