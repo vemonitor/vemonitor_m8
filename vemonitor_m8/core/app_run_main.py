@@ -96,7 +96,7 @@ class AppBlockRun:
                 logger.info(
                     "Start Memory Data Cache..."
                 )
-                self.inputs_data = DataCache(max_rows=15)
+                self.inputs_data = DataCache(max_rows=120)
                 result = True
         return result
 
