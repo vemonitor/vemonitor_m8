@@ -109,7 +109,7 @@ class VedirectWorker(InputWorker):
                     "source_name": "VedirectWorker",
                     "auto_start": True,
                     "wait_connection": True,
-                    "wait_timeout": 5,
+                    "wait_timeout": 10,
                     "min_interval": Ut.get_int(min_interval, 1),
                     "max_read_error": 0
                 }
