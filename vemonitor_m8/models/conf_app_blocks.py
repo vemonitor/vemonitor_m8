@@ -39,7 +39,7 @@ class ConfigAppBlocks(AppBlockHelper):
             and Ut.is_int(index, mini=0)\
             and len(
                 self.app_blocks  # type: ignore
-            ) < index\
+            ) > index\
             and ConfigAppBlocks.is_app_block(
                 block=self.app_blocks[index]  # type: ignore
             )
