@@ -4,6 +4,7 @@
 import logging
 import time
 import sys
+import signal
 import threading
 from typing import Optional
 from vemonitor_m8.core.app_run_main import AppBlockRun
@@ -28,16 +29,18 @@ class AsyncAppBlockRun(AppBlockRun):
     def __init__(self, conf: Config):
         AppBlockRun.__init__(self, conf=conf)
         self._threads = ThreadsController()
+        signal.signal(signal.SIGINT, self.signal_handler)
 
-    def sig_handler(self, signum, frame):
-        """Signal handler"""
-        logger.critical(
-            "[AsyncAppBlockRun:sig_handler] handling signal: %s\n",
-            signum
-        )
+    def exit_handler(self):
+        """Exit handler"""
         self._run = False
         self.cancel_all_timers()
+        time.sleep(5)
         sys.exit(1)
+
+    def signal_handler(self, sig, frame):
+        """Sig handler"""
+        self.exit_handler()
 
     def cancel_all_timers(self):
         """Cancell all Thread timers."""
@@ -206,7 +209,7 @@ class AsyncAppBlockRun(AppBlockRun):
                     structure=worker.columns
                 )
                 data, last_time, max_time = data_cache
-                interval = max_time - worker.last_saved_time
+                interval = last_time - worker.last_saved_time
                 is_time_interval = (
                     worker.last_saved_time == 0
                     or interval >= (
@@ -229,31 +232,43 @@ class AsyncAppBlockRun(AppBlockRun):
 
     def run_block(self):
         """Run Block inputs and outputs."""
-        if AppBlockRun.is_conf(self.conf):
-            # self.events.subscribe_worker_data_ready(self.run_output_item)
-            # inputs workers blocks run on background (Threads),
-            # executed by a timer
-            self.add_input_items_timer()
-            # inputs workers blocks run
-            self.setup_outputs_workers()
-            if not self.workers.get_workers_status():
-                self.cancel_all_timers()
-                logger.error(
-                    "Fatal Error: Some output workers fails. "
-                    "Please control all outputs conectors, "
-                    "are up and ready."
-                )
-                raise WorkerException(
-                    "Fatal Error: Some output workers fails. "
-                    "Unable to open a connexion with some output connectors. "
-                    "Workers Status : "
-                    f"{self.workers.get_output_workers_status()}"
-                )
-            time.sleep(1)
-            while self._run:
-                self.run_output_workers()
+        try:
+            if AppBlockRun.is_conf(self.conf):
+                # self.events.subscribe_worker_data_ready(self.run_output_item)
+                # inputs workers blocks run on background (Threads),
+                # executed by a timer
+                self.add_input_items_timer()
+                # inputs workers blocks run
+                self.setup_outputs_workers()
+                if not self.workers.get_workers_status():
+                    self.cancel_all_timers()
+                    logger.error(
+                        "Fatal Error: Some output workers fails. "
+                        "Please control all outputs conectors, "
+                        "are up and ready."
+                    )
+                    raise WorkerException(
+                        "Fatal Error: Some output workers fails. "
+                        "Unable to open a connexion with some output connectors. "
+                        "Workers Status : "
+                        f"{self.workers.get_output_workers_status()}"
+                    )
+                time.sleep(1)
+                while self._run:
+                    self.run_output_workers()
 
-                time.sleep(0.1)
+                    time.sleep(0.1)
+        except (
+                    SystemExit,
+                    KeyboardInterrupt
+                ) as ex:
+            logger.warning(
+                "Exit vemonitor... "
+                "ex: %s",
+                ex
+            )
+            self.exit_handler()
+
 
     @staticmethod
     def set_thread_interval(current_thread: RepeatTimer,
