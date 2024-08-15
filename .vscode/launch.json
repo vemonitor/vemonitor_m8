@@ -16,6 +16,18 @@
                 "--block=VedirectToRedis"
             ],
             "jinja": true
+        },
+        {
+            "name": "Python : veMonitor VedirectToEmoncms",
+            "type": "debugpy",
+            "request": "launch",
+            "justMyCode": false,
+            "program": "${workspaceFolder}/__main__.py",
+            "args": [
+                "--debug",
+                "--block=VedirectToEmoncms"
+            ],
+            "jinja": true
         }
     ]
 }
