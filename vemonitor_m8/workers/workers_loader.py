@@ -6,11 +6,6 @@ from vemonitor_m8.workers.redis.redis_worker import RedisInputWorker
 from vemonitor_m8.workers.redis.redis_worker import RedisOutputWorker
 from vemonitor_m8.workers.vedirect.vedirect_worker import VedirectWorker
 from vemonitor_m8.core.exceptions import VeMonitorError
-try:
-    from emon_worker_m8.emoncms_worker import EmoncmsWorker  # type: ignore
-except ImportError:
-    class EmoncmsWorker(BaseException):
-        """Dummy EmoncmsWorker class"""
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -21,6 +16,14 @@ __version__ = "1.0.0"
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
+
+try:
+    from emon_worker_m8.emoncms_worker import EmoncmsWorker  # type: ignore
+except ImportError as ex:
+    logger.warning(
+        "EmoncmsWorker is not installed."
+    )
+    EmoncmsWorker = None
 
 
 class WorkersLoader:
@@ -136,7 +139,7 @@ class WorkersLoader:
                             enum_key: int,
                             item: dict) -> EmoncmsWorker:
         """Initialise Serial vedirect worker."""
-        if not isinstance(EmoncmsWorker, OutputWorker):
+        if EmoncmsWorker is None:
             raise VeMonitorError(
                 "Fatal Error: "
                 "EmoncmsWorker is unreachable. "
