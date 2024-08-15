@@ -188,7 +188,12 @@ class WorkersManager(Workers):
                 worker_name=worker_name,
                 worker_status=result.get_worker_status()
             )
-
+            logger.info(
+                "New Output Worker Initialized, "
+                "(name, key): (%s, %s)",
+                worker_name,
+                worker_key
+            )
         else:
             result = self.get_output_worker(worker_name)
             self.add_output_worker_status(
