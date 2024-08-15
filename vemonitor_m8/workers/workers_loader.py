@@ -137,7 +137,7 @@ class WorkersLoader:
     def init_emoncms_worker(connector: dict,
                             worker_key: str,
                             enum_key: int,
-                            item: dict) -> EmoncmsWorker:
+                            item: dict) -> OutputWorker:
         """Initialise Serial vedirect worker."""
         if EmoncmsWorker is None:
             raise VeMonitorError(
