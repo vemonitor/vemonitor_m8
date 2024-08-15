@@ -3,7 +3,7 @@
 """Redis vemonitor Helper"""
 import logging
 from operator import itemgetter
-from typing import Optional
+from typing import Optional, Union
 from ve_utils.ujson import UJson
 from vemonitor_m8.core.exceptions import RedisAppException
 from vemonitor_m8.core.utils import Utils as Ut
@@ -92,7 +92,7 @@ class HmapTimeSeriesApp(RedisApp):
                            node_keys: list,
                            nb_items: int,
                            from_time: int = 0
-                           ) -> int:
+                           ) -> Optional[Union[list, dict]]:
         """Get time interval from hmap keys."""
         structure = None
         if Ut.is_list(node_keys, not_null=True):
@@ -133,9 +133,12 @@ class HmapTimeSeriesApp(RedisApp):
                         nb_items=nb_items,
                         from_time=from_time,
                     )
-
-                    for node, cache_keys in structure.items():
-                        yield node, cache_keys
+                    if Ut.is_dict(structure, not_null=True):
+                        for node, cache_keys in structure.items():
+                            yield node, cache_keys
+                    elif Ut.is_list(structure, not_null=True):
+                        for node, cache_keys in structure:
+                            yield node, cache_keys
                 else:
                     for node in node_keys:
                         yield node, self.get_keys_by_node(
@@ -402,7 +405,11 @@ class HmapTimeSeriesApp(RedisApp):
                     rows.append(item_time - tmp)
                 tmp = item_time
                 i += 1
-            result = min(rows)
+            nb_rows = len(rows)
+            if nb_rows > 1:
+                result = min(rows)
+            elif nb_rows == 1:
+                result = rows[0]
         return result
 
     @staticmethod
