@@ -31,6 +31,18 @@ class VedirectWorker(InputWorker):
         if self.set_conf(conf):
             self.set_worker_status()
 
+    def close(self) -> bool:
+        """Properly close worker instance."""
+        result = False
+        if self.is_ready():
+            try:
+                self.worker.ve._com.ser.close()
+                self.worker.ve._com.ser.__del__()
+                result = True
+            except BaseException:
+                pass
+        return result
+
     def is_ready(self) -> bool:
         """Test if worker is ready."""
         return isinstance(self.worker, VedirectApp)\
