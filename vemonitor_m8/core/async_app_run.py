@@ -33,19 +33,43 @@ class AsyncAppBlockRun(AppBlockRun):
 
     def exit_handler(self):
         """Exit handler"""
-        self._run = False
         self.cancel_all_timers()
-        time.sleep(5)
         sys.exit(1)
 
     def signal_handler(self, sig, frame):
         """Sig handler"""
         self.exit_handler()
 
+    def close_input_workers(self) -> bool:
+        """Read and get data from inputs workers."""
+        result = False
+        for key, worker in self.workers.loop_on_input_workers():
+            try:
+                worker.close()
+                result = True
+            except BaseException:
+                pass
+
+        return result
+
+    def close_output_workers(self) -> bool:
+        """Read and get data from inputs workers."""
+        result = True
+        for key, worker in self.workers.loop_on_output_workers():
+            try:
+                worker.close()
+            except BaseException:
+                pass
+
+        return result
+
     def cancel_all_timers(self):
         """Cancell all Thread timers."""
+        self._run = False
         self._threads.cancel_all_timers()
-        time.sleep(3)
+        time.sleep(0.2)
+        self.close_input_workers()
+        self.close_output_workers()
 
     def format_input_data(self,
                           data: dict,
@@ -249,7 +273,8 @@ class AsyncAppBlockRun(AppBlockRun):
                     )
                     raise WorkerException(
                         "Fatal Error: Some output workers fails. "
-                        "Unable to open a connexion with some output connectors. "
+                        "Unable to open a connexion "
+                        "with some output connectors. "
                         "Workers Status : "
                         f"{self.workers.get_output_workers_status()}"
                     )
@@ -268,7 +293,6 @@ class AsyncAppBlockRun(AppBlockRun):
                 ex
             )
             self.exit_handler()
-
 
     @staticmethod
     def set_thread_interval(current_thread: RepeatTimer,

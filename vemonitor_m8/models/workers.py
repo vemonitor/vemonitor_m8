@@ -40,6 +40,10 @@ class Worker(ABC):
         self.worker = None
         self._status = False
 
+    def close(self) -> bool:
+        """Properly close worker instance."""
+        return True
+
     def get_worker_status(self) -> bool:
         """Test if instance has name property."""
         return self._status is True
@@ -434,7 +438,7 @@ class Workers:
         """Get input workers."""
         result = None
         if self.has_output_workers():
-            result = self.outputs.get_workers()
+            result = self.inputs.get_workers()
         return result
 
     def loop_on_input_workers(self):

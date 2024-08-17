@@ -215,4 +215,3 @@ class RedisOutputWorker(OutputWorker):
                 and Ut.is_dict(input_structure, not_null=True):
             result = True
         return result
-
