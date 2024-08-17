@@ -1,7 +1,6 @@
 """Vemonitor_m8 Setup"""
 import pathlib
 from setuptools import setup
-from vemonitor_m8.version import VERSION
 
 # The directory containing this file
 HERE = pathlib.Path(__file__).parent
@@ -11,7 +10,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='vemonitor_m8',
-    version=VERSION,
+    version="0.0.5",
     description='Solar Plant Monitoring',
     url='https://github.com/vemonitor/vemonitor_m8',
     author='Eli Serra',
@@ -62,7 +61,7 @@ setup(
         'simplejson>=3.19.2',
         'redis>=5.0.8',
         'vedirect_m8>=1.3.2.4',
-        've-utils>=2.5.3',
+        've-utils>=2.5.3'
     ],
     extras_require={
         "TEST": [
