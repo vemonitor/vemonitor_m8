@@ -36,8 +36,7 @@ class VedirectWorker(InputWorker):
         result = False
         if self.is_ready():
             try:
-                self.worker.ve._com.ser.close()
-                self.worker.ve._com.ser.__del__()
+                self.worker.ve.close_serial(delete=True)
                 result = True
             except BaseException:
                 pass
