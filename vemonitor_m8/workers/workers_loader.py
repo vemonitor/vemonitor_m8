@@ -19,7 +19,7 @@ logger = logging.getLogger("vemonitor")
 
 try:
     from emon_worker_m8.emoncms_worker import EmoncmsWorker  # type: ignore
-except ImportError as ex:
+except ImportError:
     logger.warning(
         "EmoncmsWorker is not installed."
     )
@@ -46,6 +46,11 @@ class WorkersLoader:
                 item=item
             )
         elif worker_key == "redis":
+            logger.error(
+                "[WorkersLoader] "
+                "Sorry redis input worker is not operational."
+                "Please use any other input worker."
+            )
             worker = WorkersLoader.init_redis_input_worker(
                 connector=connector,
                 worker_key=worker_key,
@@ -53,9 +58,17 @@ class WorkersLoader:
                 item=item
             )
         elif worker_key == "influxDb2":
-            pass
+            raise VeMonitorError(
+                "[WorkersLoader] "
+                "Sorry influxDb2 input worker is not operational."
+                "Please use any other input worker."
+            )
         elif worker_key == "tuya":
-            pass
+            raise VeMonitorError(
+                "[WorkersLoader] "
+                "Sorry tuya input worker is not operational."
+                "Please use any other input worker."
+            )
 
         return worker
 
@@ -68,6 +81,11 @@ class WorkersLoader:
         """Get Output worker by key."""
         worker = None
         if worker_key == "redis":
+            logger.error(
+                "[WorkersLoader] "
+                "Sorry redis output worker is not operational."
+                "Please use any other output worker."
+            )
             worker = WorkersLoader.init_redis_output_worker(
                 connector=connector,
                 worker_key=worker_key,
@@ -75,7 +93,11 @@ class WorkersLoader:
                 item=item
             )
         elif worker_key == "influxDb2":
-            pass
+            raise VeMonitorError(
+                "[WorkersLoader] "
+                "Sorry influxDb2 output worker is not operational."
+                "Please use any other output worker."
+            )
         elif worker_key == "emoncms":
             worker = WorkersLoader.init_emoncms_worker(
                 connector=connector,
@@ -84,7 +106,11 @@ class WorkersLoader:
                 item=item
             )
         elif worker_key == "tuya":
-            pass
+            raise VeMonitorError(
+                "[WorkersLoader] "
+                "Sorry tuya output worker is not operational."
+                "Please use any other output worker."
+            )
 
         return worker
 

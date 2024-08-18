@@ -11,7 +11,7 @@ appBlocks:
     # Define a block item
     - # block item name
         # str : (required, must be unique)
-        name: "bmvFakeSerial"
+        name: "BatteryMonitor"
         # app name of the block item
         # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
         app: "batSerialMonitor"
@@ -30,7 +30,108 @@ appBlocks:
         # the oldest item is deleted and the new one is added. 
         redis_cache:
             source: "local"
-            max_data_points: 120
+            max_data_points: 3600
+        # inputs of app block item.
+        # Used to get data from variety of AppConnectors.
+        # Every AppConnector, has different type of configuration parameters.
+        # dict : {AppConnector key: list of connector inputs}
+        inputs:
+            serial:
+                -   name: "bmv700"
+                    source: "bmv700"
+                    time_interval: 1
+                    device: "BMV"
+                    ref_cols: [
+                        [ 'bat_voltage', 'V' ],
+                        [ 'bat_current', 'I' ],
+                        [ 'bat_power', 'P' ],
+                        [ 'bat_temperature', 't_bat' ],
+                        [ 'loc_temperature', 't_int' ]
+                    ]
+                    columns: [
+                        'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                        'AR', 'Relay','H2', 'H17', 'H18'
+                    ]
+                -   name: "bmv_extra"
+                    source: "bmv700"
+                    time_interval: 2
+                    device: "BMV"
+                    columns: [
+                        'TTG', 'H1', 'H3', 'H4', 'H5'
+                    ]
+                -   name: "bmv_extra2"
+                    source: "bmv700"
+                    time_interval: 5
+                    device: "BMV"
+                    columns: [
+                        'H6', 'H7', 'H8', 'H9', 'H10'
+                    ]
+                -   name: "bmv_extra3"
+                    source: "bmv700"
+                    time_interval: 10
+                    device: "BMV"
+                    columns: [
+                        'H11', 'H12', 'H13', 'H14', 'H15', 'H16'
+                    ]
+
+        outputs:
+            emoncms:
+                -   name: "bat_t1"
+                    source: "local"
+                    columns:
+                        bmv700: [
+                            'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+                            'AR', 'Relay','H2', 'H17', 'H18'
+                        ]
+                    time_interval: 1
+                    cache_interval: 10 # number of items to send at same time
+                -   name: "bat_extra"
+                    source: "local"
+                    columns:
+                        bmv_extra: [
+                            'TTG', 'H1', 'H3', 'H4', 'H5'
+                        ]                        
+                    time_interval: 2
+                    cache_interval: 20 # number of items to send at same time
+                -   name: "bat_extra2"
+                    source: "local"
+                    columns:
+                        bmv_extra2: [
+                            'H6', 'H7', 'H8', 'H9', 'H10'
+                        ]
+                    time_interval: 5
+                    cache_interval: 30 # number of items to send at same time
+                -   name: "bat_extra3"
+                    source: "local"
+                    columns:
+                        bmv_extra3: [
+                            'H11', 'H12'
+                        ]
+                    time_interval: 10
+                    cache_interval: 60 # number of items to send at same time
+
+    - # block item name
+        # str : (required, must be unique)
+        name: "BatteryAndPannelsMonitor"
+        # app name of the block item
+        # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
+        app: "batSerialMonitor"
+        # args add extra data to app.
+        # related to batteryBank and/or solarPlant sections.
+        # dict :
+        #       -> {extra object names: extra object item names}
+        #       -> {['batteryBanks', 'solar_plant']: extra object item names}
+        args:
+            batteryBanks: "project1"
+        # Redis Cache (Optional)
+        # if not defined data is cached by Memory
+        # Define the Redis server used for cache. (View appConnectors)
+        # And max_data_points for length max of cache data
+        # When max_data_points is reached, 
+        # the oldest item is deleted and the new one is added. 
+        redis_cache:
+            source: "local"
+            max_data_points: 3600
         # inputs of app block item.
         # Used to get data from variety of AppConnectors.
         # Every AppConnector, has different type of configuration parameters.
@@ -108,28 +209,45 @@ appBlocks:
 
         outputs:
             emoncms:
-                -   name: "solar_plant_t1"
+                -   name: "bat_t1"
                     source: "local"
                     columns:
                         bmv700: [
                             'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
                             'AR', 'Relay','H2', 'H17', 'H18', 'time_ref'
                         ]
+                    time_interval: 1
+                    cache_interval: 10 # number of items to send at same time
+                -   name: "bat_extra"
+                    source: "local"
+                    columns:
                         bmv_extra: [
                             'TTG', 'H1', 'H3', 'H4', 'H5', 'time_ref'
-                        ]
+                        ]                        
+                    time_interval: 2
+                    cache_interval: 20 # number of items to send at same time
+                -   name: "bat_extra2"
+                    source: "local"
+                    columns:
                         bmv_extra2: [
                             'H6', 'H7', 'H8', 'H9', 'H10', 'time_ref'
                         ]
+                    time_interval: 5
+                    cache_interval: 30 # number of items to send at same time
+                -   name: "bat_extra3"
+                    source: "local"
+                    columns:
                         bmv_extra3: [
-                            'H11', 'H12', 'H13', 'H14', 'H15', 'H16', 'time_ref'
+                            'H11', 'H12', 'time_ref'
                         ]
+                    time_interval: 10
+                    cache_interval: 60 # number of items to send at same time
+
+                -   name: "mppt_base"
+                    source: "local"
+                    columns:
                         smart_solar: [
                             'V', 'I', 'VPV', 'PPV', 'H19', 'H22','H23', 'ERR', 'CS', 'time_ref'
                         ]
-                        mppt_extra: [
-                            'Relay', 'H19', 'H20', 'H21', 'HSDS', 'time_ref'
-                        ]
-                        rel_monitor: ['r_pmp', 'r_wat', 'r_sec', 'r_ge']
                     time_interval: 1
-                    cache_interval: 5 # number of items to send at same time
+                    cache_interval: 10
