@@ -60,7 +60,7 @@ setup(
         'pyyaml>=6.0.2',
         'simplejson>=3.19.2',
         'redis>=5.0.8',
-        'vedirect_m8>=1.3.2.4',
+        'vedirect_m8>=1.3.3',
         've-utils>=2.5.3'
     ],
     extras_require={
