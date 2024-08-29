@@ -15,7 +15,15 @@
 >
 > It is strongly recommended to test your configuration using a monitoring tool like Telegraf/Grafana or Redis/Grafana to supervise and control disk read/writes and HTTP requests, ensuring they follow expected patterns.
 
-VeMonitor M8 is a Python library designed to facilitate data monitoring. It currently supports reading and formatting data from any device using the Serial Victron Energy VE.Direct text protocol and then sending the data to an EmonCms Web Server via a Redis/memory cache system.
+VeMonitor M8 is a Python library designed to assist with monitoring solar plant data.
+
+It currently supports:
+- Reading and formatting data from:
+    - Any device using the Serial Victron Energy VE.Direct text protocol
+- Sending the compiled and formatted data to:
+    - EmonCms Web Server
+
+A cache system, which can be configured to use either memory or a Redis server, is available to reduce input reads and/or output requests.  
 
 ## Installation
 
