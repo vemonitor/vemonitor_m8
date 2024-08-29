@@ -8,16 +8,22 @@
 > **Note**
 > This repository is under active development and is not yet fully tested.
 
-> **Warning**
-> Install and use this package at your own risk. 
-> Misconfiguration or bugs in this application can result 
-> in an abnormal quantity of disk read/writes and/or 
-> requests to designated servers (e.g., the EmonCms Server).
-> Ensure you fully understand and control:
+> **Warning**  
+> Use this package at your own risk. Misconfiguration or bugs in this application can lead to an excessive number of disk read/writes and/or requests to designated servers (e.g., the EmonCms Server). It is essential that you fully understand and manage:
 > - Your VeMonitor configuration file settings.
 > - Your Redis server settings.
+>
+> It is strongly recommended to test your configuration using a monitoring tool like Telegraf/Grafana or Redis/Grafana to supervise and control disk read/writes and HTTP requests, ensuring they follow expected patterns.
 
-VeMonitor M8 is a Python library for monitoring data from the Serial Victron Energy VE.Direct text protocol and more. Currently, it supports sending data from any device using the Serial Victron Energy VE.Direct text protocol to EmonCms web application Server.
+VeMonitor M8 is a Python library designed to assist with monitoring solar plant data.
+
+It currently supports:
+- Reading and formatting data from:
+    - Any device using the Serial Victron Energy VE.Direct text protocol
+- Sending the compiled and formatted data to:
+    - EmonCms Web Server
+
+A cache system, which can be configured to use either memory or a Redis server, is available to reduce input reads and/or output requests.  
 
 ## Installation
 
@@ -30,88 +36,90 @@ To install from PypI :
 ```
 python3 -m pip install vemonitor_m8
 ```
-## Configuration files
-To run this app, you need to provide some YAML configuration files. See the [sample configuration files](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample) to understand the overall structure.
+
+## Configuration Files
+
+To run this application, you need to provide YAML configuration files. Refer to the [sample configuration files](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample) to understand the overall structure.
 
 All configuration files must be placed in one of the following directories:
+
 On Linux/Unix:
-- `/opt/vemonitor_m8/conf/` or
-- `/opt/vemonitor/conf/` or
-- `/${HOME}/.vemonitor` or  
+- `/opt/vemonitor_m8/conf/`
+- `/opt/vemonitor/conf/`
+- `${HOME}/.vemonitor`
+
 On Windows:
-- `/${HOME}/.vemonitor`
+- `${HOME}/.vemonitor`
 
 
-## Vedirect to EmonCms
-The library reads data from the Serial VE.Direct text protocol and writes the defined data at a specified interval to the [EmonCms](https://emoncms.org/) web application.
+## VE.Direct to EmonCms
 
-> Note: You need to install the [Emoncms worker extra package](https://github.com/vemonitor/emon_worker_m8).
+This library reads data from devices using the Serial VE.Direct text protocol and sends the specified data at regular intervals to the [EmonCms](https://emoncms.org/) web application.
+
+> **Note:** You need to install the [Emoncms worker extra package](https://github.com/vemonitor/emon_worker_m8).
 ```
 pip install emon_worker_m8
 ```
 If you want to install and run EmonCms locally, see the [EmonCms repository](https://github.com/emoncms/emoncms).
 
 ### Configuration Files
-> See the [sample configuration files](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample/vedirect_to_emoncms)
 
-You can copy these configuration files directly to your own configuration directory and then update the necessary settings.
+> See the [sample configuration files](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample/vedirect_to_emoncms).
 
-### Run Vemonitor
-First, you need to install any additional worker packages you require.
+You can copy these sample configuration files to your own configuration directory and then update them with the necessary settings.
 
-Next, set up your configuration files in your configuration directory.
+### Running VeMonitor
 
-#### How it works
-In the [main sample configuration file](https://github.com/vemonitor/vemonitor_m8/blob/main/config_sample/vedirect_to_emoncms/vm_conf.yaml) `vm_conf.yaml`, there are two different AppBlocks:
+First, ensure that you have installed any additional worker packages you require.
+
+Next, set up your configuration files in the appropriate configuration directory.
+
+#### How It Works
+
+In the [main sample configuration file](https://github.com/vemonitor/vemonitor_m8/blob/main/config_sample/vedirect_to_emoncms/vm_conf.yaml) (`vm_conf.yaml`), there are two different `AppBlocks`:
 - `BatteryMonitor`
 - `BatteryAndPannelsMonitor`
 
-For example, we can run BatteryMonitor for testing purposes.
+For example, you can run `BatteryMonitor` for testing purposes.
 
-From the configuration settings, this app will read data from the VE.Direct Serial Device bmv700, and the data will be cached on the local Redis server:
-- Every second get values from:
-```python
-[
-    'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
-    'AR', 'Relay','H2', 'H17', 'H18'
-]
-```
-- Every 2 seconds get values from:
-```python
-[
-    'TTG', 'H1', 'H3', 'H4', 'H5'
-]
-```
-- Every 5 seconds get values from:
-```python
-[
-    'H6', 'H7', 'H8', 'H9', 'H10'
-]
-```
-- Every 10 seconds get values from:
-```python
-[
-    'H11', 'H12', 'H13', 'H14', 'H15', 'H16'
-]
-```
+Based on the configuration settings, this app will read data from the VE.Direct Serial Device (e.g., BMV700), and the data will be cached on the local Redis server:
 
-Then the data will be sent to the EmonCms Server. See the [Emoncms worker extra package](https://github.com/vemonitor/emon_worker_m8) for more details.
+- Every second, retrieve values from:
+    ```python
+    [
+        'V', 'I', 'P', 'CE', 'SOC', 'Alarm',
+        'AR', 'Relay', 'H2', 'H17', 'H18'
+    ]
+    ```
+- Every 2 seconds, retrieve values from:
+    ```python
+    [
+        'TTG', 'H1', 'H3', 'H4', 'H5'
+    ]
+    ```
+- Every 5 seconds, retrieve values from:
+    ```python
+    [
+        'H6', 'H7', 'H8', 'H9', 'H10'
+    ]
+    ```
+- Every 10 seconds, retrieve values from:
+    ```python
+    [
+        'H11', 'H12', 'H13', 'H14', 'H15', 'H16'
+    ]
+    ```
 
-#### Run 
-To run `BatteryMonitor` app block:  
+The data will then be sent to the EmonCms Server. For more details, see the [Emoncms worker extra package](https://github.com/vemonitor/emon_worker_m8).
+
+#### Running the Application
+
+To run the `BatteryMonitor` app block:  
 ```
 python vemonitor_m8 --block BatteryMonitor --debug
 ```
 
-To run `BatteryAndPannelsMonitor` app block:  
+To run the `BatteryAndPannelsMonitor` app block: 
 ```
 python vemonitor_m8 --block BatteryAndPannelsMonitor --debug
 ```
-
-Be aware, install and use this package at your own risks.
-Missconfiguration or bug in this app can produce anormal quantity of:
-- disk read/writes and/or
-- requests on determined servers(Here EmonCms Server)
-Be sure control and understant:
-- your vemonitor configuration files settings,
-- your Redis server settings.
