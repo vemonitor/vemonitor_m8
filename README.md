@@ -13,7 +13,7 @@
 > - Your VeMonitor configuration file settings.
 > - Your Redis server settings.
 >
-> It is strongly recommended to test your configuration using a monitoring tool like Telegraf/Grafana or Redis/Grafana to supervise and control disk read/writes and HTTP requests, ensuring they follow expected patterns.
+> It is strongly recommended to test your configuration using a monitoring tool like Telegraf/Grafana and Redis/Grafana to supervise and control disk read/writes and HTTP requests, ensuring they follow expected patterns.
 
 VeMonitor M8 is a Python library designed to assist with monitoring solar plant data.
 
@@ -39,7 +39,7 @@ python3 -m pip install vemonitor_m8
 
 ## Configuration Files
 
-To run this application, you need to provide YAML configuration files. Refer to the [sample configuration files](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample) to understand the overall structure.
+To run this application, you need to provide YAML configuration files. Refer to the [sample configuration files directory](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample) to understand the overall structure.
 
 All configuration files must be placed in one of the following directories:
 
@@ -51,10 +51,69 @@ On Linux/Unix:
 On Windows:
 - `${HOME}/.vemonitor`
 
+### Structure
+
+You can choose your preferred configuration architecture. You may opt for a single configuration file or divide it into multiple files.
+
+To effectively manage data input/output and server connections, you need to configure at least both `appBlocks` and `appConnectors` in your setup.
+
+Here’s a basic example of the required configuration:
+
+```yaml
+    # Configuration for appBlocks
+    appBlocks:
+        - "(...)"
+    
+    # Configuration for appConnectors
+    # Here, configure both input and output connection data for the necessary workers
+    appConnectors:
+        "(...)"
+
+```
+#### Unique configuration file
+
+If you choose to consolidate all configuration settings into a single file, you can omit the `Import` setting key parameters from the sample configuration example.
+
+To do this, copy the contents of [`vm_appConnectors.yaml`](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample/vm_appConnectors.yaml) and append it to the end of [`vm_conf.yaml`](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample/vm_conf.yaml).
+
+Optionally, you can also include the content of other configuration files as needed.
+
+#### Multiple Configuration files
+Refer to [sample configuration files directory](https://github.com/vemonitor/vemonitor_m8/tree/main/config_sample) to example of possible structure.
+
+You need to set `Imports` setting parameters on the main configuration file to load needed configuration settings as fallow:
+
+```yaml
+    # Imports settings parameters
+    # List of file names to load and add to configuration
+
+    Imports:
+        # example of batteryBanks settings file
+        - "vm_batteryBank.yaml"
+        # example of an appConnectors settings file
+        - "vm_appConnectors.yaml"
+```
+> **Note**  
+> - All file names must correspond to existing files in the current configuration directory.
+> - File names should contain only alphanumeric characters, underscores (`_`), or hyphens (`-`), and must start with an alphanumeric character.
+> - Only `.yaml` and `.yml` extensions are accepted.
+
+### Settings
+
+As mentioned above, only two configuration setting keys are required:
+
+- **appBlocks**: Contains the configuration settings for inputs and outputs.
+- **appConnectors**: Contains the connection data for inputs and outputs needed by the workers.
+
+Additionally, some optional configuration setting keys are available:
+
+- **Imports**: Used to import external files into the configuration.
+- **batteryBanks**: Used by the internal batteryBanks middleware.
+
 
 ## VE.Direct to EmonCms
 
-This library reads data from devices using the Serial VE.Direct text protocol and sends the specified data at regular intervals to the [EmonCms](https://emoncms.org/) web application.
+This example demonstrates how to read data from devices using the Serial VE.Direct text protocol and send the specified data at regular intervals to the [EmonCms](https://emoncms.org/) web application.
 
 > **Note:** You need to install the [Emoncms worker extra package](https://github.com/vemonitor/emon_worker_m8).
 ```
