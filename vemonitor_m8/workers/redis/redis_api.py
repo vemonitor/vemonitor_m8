@@ -7,6 +7,7 @@ from redis.commands.timeseries import TimeSeries
 from redis.exceptions import RedisError
 from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.core.exceptions import RedisConnectionException, RedisVeError
+from vemonitor_m8.version import VERSION
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
@@ -72,6 +73,9 @@ class RedisCli:
         try:
             if not RedisCli.is_redis_credentials(credentials):
                 credentials = self._credentials
+            else:
+                self._credentials = credentials
+
             self.cli = Redis(**credentials)
 
             if not self.is_ready() or not self.is_connected():
@@ -189,6 +193,27 @@ class RedisBase(RedisCli):
 
     def __init__(self, credentials: dict):
         RedisCli.__init__(self, **credentials)
+
+    def get_dbs_size(self, db: str) -> dict:
+        """Get Meta Data from db number."""
+        result = None
+        if self.is_ready():
+            name = f"db{Ut.get_int(db, 0)}"
+            result = self.get_redis_info_usage(
+                keys=[name]
+            )
+            if Ut.is_dict(result, not_null=True):
+                result = result.get(name)
+            else:
+                result = None
+        return result
+
+    def get_current_db_size(self) -> int:
+        """Get Meta Data from current db."""
+        result = None
+        if self.is_ready():
+            result = self.cli.dbsize()
+        return result
 
     def get_key_type(self, key: str, client: Redis = None):
         """
@@ -359,6 +384,114 @@ class RedisApi(RedisBase):
                 "You must provide a valid host and port values."
             )
         RedisBase.__init__(self, credentials)
+        self._meta_name = "vemonitor_meta"
+        self.run_db_selector()
+
+    def get_db_meta(self, client: Redis) -> Redis:
+        """Get Meta Data from current db."""
+        result = None
+        if self.is_ready():
+            result = self.get_hmap_data(
+                name=self._meta_name,
+                client=client
+            )
+            if not Ut.is_dict(result, not_null=True):
+                result = None
+        return result
+
+    def is_db_meta(self, client: Redis) -> Redis:
+        """Get Meta Data from current db."""
+        result = False
+        if self.is_ready():
+            data = self.get_db_meta(client=client)
+            if Ut.is_dict(data, not_null=True)\
+                    and data.get("controled_by") == "vemonitor_m8":
+                result = True
+        return result
+
+    def init_db_meta(self, client: Redis) -> Redis:
+        """Get Meta Data from current db."""
+        result = None
+        if self.is_ready():
+            meta = {
+                "controled_by": "vemonitor_m8",
+                "version": VERSION
+            }
+            result = self.set_hmap_data(
+                name=self._meta_name,
+                values=meta,
+                client=client
+            )
+            if not Ut.is_dict(result, not_null=True):
+                result = None
+        return result
+
+    def control_current_db(self, client: Optional[Redis] = None) -> bool:
+        """Control current db meta."""
+        result = False
+        if self.is_ready():
+            current_db = self._credentials.get('db')
+            current_size = self.get_dbs_size(db=current_db)
+            if Ut.is_dict(current_size, not_null=True)\
+                    and Ut.is_int(current_size.get('keys'))\
+                    and current_size.get('keys') > 0:
+                if self.is_db_meta(client=client):
+                    result = True
+                    logger.info(
+                        "[RedisApi::run_db_selector] "
+                        "Actual Redis db %s is already initialized.",
+                        current_db
+                    )
+                else:
+                    logger.warning(
+                    "[RedisApi::run_db_selector] "
+                    "Try another Redis db. "
+                    "Current db %s is not empty, "
+                    "and meta data is unreachable. ",
+                    current_db
+                )
+            else:
+                self.init_db_meta(client=client)
+                logger.info(
+                    "[RedisApi::run_db_selector] "
+                    "New Redis db %s succesfully initialized.",
+                    current_db
+                )
+                result = True
+        return result
+
+    def run_db_selector(self, client: Optional[Redis] = None) -> bool:
+        """Get Meta Data from current db."""
+        result = False
+        if self.is_ready():
+            db_test = self.control_current_db(client=client)
+            if db_test is True:
+                result = True
+            else:
+                current_db = self._credentials.get('db')
+                connector = dict(self._credentials)
+                for i in range(16):
+                    if current_db != i:
+                        connector['db'] = i
+                        self.connect_to_redis(credentials=connector)
+                        db_test = self.control_current_db(client=client)
+                        if db_test is True:
+                            result = True
+                            break
+
+        if db_test is False:
+            logger.error(
+                "[RedisApi::run_db_selector] "
+                "Unable to get empty or initialized Redis db. "
+                "To avoid data corruption flush a db and set it as vemonitor db."
+            )
+            raise RedisVeError(
+                "[RedisApi::run_db_selector] "
+                "Fatal error: Unable to get valid Redis db. "
+                "DataBase used by vemonitor must be empty "
+                "or initialized by vemonitor instance."
+            )
+        return result
 
     def get_hmap_len(self,
                      key: str,
