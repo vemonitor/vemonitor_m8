@@ -54,6 +54,10 @@ appConnectors:
 ```
 ### Input Worker
 
+> **Warning**
+> At this time Redis Input worker is not available.
+> And do nothing 
+
 To read data from Redis, you can set up a Redis input block item in the main configuration file as follows:
 
 ```yaml
