@@ -312,3 +312,70 @@ class TestRedisOutputWorker:
             helper_manager.obj.set_conf(
                 conf={'a': 1}
             )
+
+    def test_send_data(self, helper_manager):
+        """Test send_data method"""
+        helper_manager.init_output_worker()
+        data = {
+            1725018311: {
+                'bmv700': {
+                    'V': 12.065, 'I': -7.539,
+                    'P': -91.0, 'CE': -65.577,
+                    'SOC': 83.8, 'Alarm': 0,
+                    'AR': 0, 'Relay': 0,
+                    'H2': -82.854, 'H17': 68.43,
+                    'H18': 85.27
+                }
+            },
+            1725018312: {
+                'bmv700': {
+                    'V': 12.065, 'I': -7.524,
+                    'P': -91.0, 'CE': -65.579,
+                    'SOC': 83.8, 'Alarm': 0,
+                    'AR': 0, 'Relay': 0,
+                    'H2': -82.854, 'H17': 68.43,
+                    'H18': 85.27
+                }
+            },
+            1725018313: {
+                'bmv700': {
+                    'V': 12.065, 'I': -7.559,
+                    'P': -91.0, 'CE': -65.581,
+                    'SOC': 83.8, 'Alarm': 0,
+                    'AR': 0, 'Relay': 0,
+                    'H2': -82.854, 'H17': 68.43,
+                    'H18': 85.27
+                }
+            },
+            1725018314: {
+                'bmv700': {
+                    'V': 12.064, 'I': -7.546,
+                    'P': -91.0, 'CE': -65.583,
+                    'SOC': 83.8, 'Alarm': 0,
+                    'AR': 0, 'Relay': 0,
+                    'H2': -82.854, 'H17': 68.43,
+                    'H18': 85.27
+                }
+            },
+            1725018315: {
+                'bmv700': {
+                    'V': 12.064,
+                    'I': -7.557, 'P': -91.0,
+                    'CE': -65.585, 'SOC': 83.8,
+                    'Alarm': 0, 'AR': 0,
+                    'Relay': 0, 'H2': -82.854,
+                    'H17': 68.43, 'H18': 85.27
+                }
+            }
+        }
+        input_structure = {
+            "bmv700": [
+                'V', 'I', 'P', 'CE', 'SOC',
+                'Alarm', 'AR', 'Relay', 'H2', 'H17', 'H18'
+            ]
+        }
+        result = helper_manager.obj.send_data(
+            data=data,
+            input_structure=input_structure
+        )
+        assert result is True
