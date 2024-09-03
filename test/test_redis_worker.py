@@ -26,8 +26,8 @@ def helper_manager_fixture():
             self.conf = {
                 "item": {
                     "name": "RedisInputWorkerTest",
+                    "redis_node": "inputRedTst",
                     "time_interval": 1,
-                    "cache_interval": 1,
                     "columns": {
                         "bmv700": ["V", "I", "P"]
                     },
@@ -50,6 +50,7 @@ def helper_manager_fixture():
             self.conf = {
                 "item": {
                     "name": "RedisOutputWorkerTest",
+                    "redis_node": "outputRedTst",
                     "time_interval": 1,
                     "cache_interval": 1,
                     "columns": {

@@ -17,7 +17,7 @@ def helper_manager_fixture():
             self.host = '127.0.0.1'
             self.port = 6379
             self.db = 2
-            self.node_name = "Pytest"
+            self.node_name = "pytest"
 
         def init_redis_h_time_series(self):
             """Init HmapTimeSeriesApp"""
@@ -146,8 +146,8 @@ class TestHmapTimeSeriesApp:
             nodes=['pytest_1', 'pytest_2']
         )
         assert Ut.is_list(data, eq=2)
-        assert 'n_pytest_1' in data
-        assert 'n_pytest_2' in data
+        assert 'pytest_pytest_1' in data
+        assert 'pytest_pytest_2' in data
 
         # test bad name type
         with pytest.raises(RedisVeError):
@@ -170,14 +170,14 @@ class TestHmapTimeSeriesApp:
 
         # get cache keys by node
         data = helper_manager.obj.get_keys_by_node(
-            formatted_node='n_pytest_1'
+            formatted_node='pytest_pytest_1'
         )
         assert Ut.is_list(data, eq=3)
         assert data == [1722013447, 1722013448, 1722013449]
 
         # get cache keys by node
         data = helper_manager.obj.get_keys_by_node(
-            formatted_node='n_pytest_1',
+            formatted_node='pytest_pytest_1',
             from_time=1722013448
         )
         assert Ut.is_list(data, eq=2)
@@ -230,20 +230,20 @@ class TestHmapTimeSeriesApp:
         helper_manager.add_more_data_test()
 
         result = helper_manager.obj.get_keys_structure(
-            node_keys=['n_pytest_3', 'n_pytest_1', 'n_pytest_2'],
+            node_keys=['pytest_pytest_3', 'pytest_pytest_1', 'pytest_pytest_2'],
             from_time=1722013464,
             nb_items=2
         )
-        assert result == {'n_pytest_3': [1722013465, 1722013470]}
+        assert result == {'pytest_pytest_3': [1722013465, 1722013470]}
 
         result = helper_manager.obj.get_keys_structure(
-            node_keys=['n_pytest_3', 'n_pytest_1', 'n_pytest_2'],
+            node_keys=['pytest_pytest_3', 'pytest_pytest_1', 'pytest_pytest_2'],
             from_time=1722013460,
             nb_items=5
         )
         assert result == {
-            'n_pytest_3': [1722013460, 1722013465, 1722013470],
-            'n_pytest_2': [1722013472, 1722013474]
+            'pytest_pytest_3': [1722013460, 1722013465, 1722013470],
+            'pytest_pytest_2': [1722013472, 1722013474]
         }
 
     def test_enum_node_keys(self, helper_manager):
@@ -255,30 +255,30 @@ class TestHmapTimeSeriesApp:
         for node, keys in helper_manager.obj.enum_node_keys(
                 node_name=helper_manager.node_name):
 
-            if node == 'n_pytest_1':
+            if node == 'pytest_pytest_1':
                 assert keys == [1722013447, 1722013448, 1722013449]
             else:
                 assert keys is None
 
         for node, keys in helper_manager.obj.enum_node_keys(
                 node_name=helper_manager.node_name,
-                nodes=['n_pytest_1', 'n_pytest_2']):
+                nodes=['pytest_pytest_1', 'pytest_pytest_2']):
 
-            if node == 'n_pytest_1':
+            if node == 'pytest_pytest_1':
                 assert keys == [1722013447, 1722013448, 1722013449]
-            elif node == 'n_pytest_2':
+            elif node == 'pytest_pytest_2':
                 assert keys is None
             else:
                 assert False
 
         for node, keys in helper_manager.obj.enum_node_keys(
                 node_name=helper_manager.node_name,
-                nodes=['n_pytest_1', 'n_pytest_2'],
+                nodes=['pytest_pytest_1', 'pytest_pytest_2'],
                 from_time=1722013448):
 
-            if node == 'n_pytest_1':
+            if node == 'pytest_pytest_1':
                 assert keys == [1722013448, 1722013449]
-            elif node == 'n_pytest_2':
+            elif node == 'pytest_pytest_2':
                 assert keys is None
             else:
                 assert False
@@ -305,19 +305,19 @@ class TestHmapTimeSeriesApp:
         # add more cache data
         helper_manager.add_more_data_test()
 
-        data_n_pytest_1 = helper_manager.obj.api.get_hmap_data(
-            "n_pytest_1"
+        data_pytest_pytest_1 = helper_manager.obj.api.get_hmap_data(
+            "pytest_pytest_1"
         )
-        data_n_pytest_2 = helper_manager.obj.api.get_hmap_data(
-            "n_pytest_2"
+        data_pytest_pytest_2 = helper_manager.obj.api.get_hmap_data(
+            "pytest_pytest_2"
         )
-        data_n_pytest_3 = helper_manager.obj.api.get_hmap_data(
-            "n_pytest_3"
+        data_pytest_pytest_3 = helper_manager.obj.api.get_hmap_data(
+            "pytest_pytest_3"
         )
 
-        assert len(data_n_pytest_1) == 10
-        assert len(data_n_pytest_2) == 10
-        assert len(data_n_pytest_3) == 10
+        assert len(data_pytest_pytest_1) == 10
+        assert len(data_pytest_pytest_2) == 10
+        assert len(data_pytest_pytest_3) == 10
 
     def test_enum_node_data_interval(self, helper_manager):
         """Test enum_node_data_interval method"""
@@ -326,7 +326,7 @@ class TestHmapTimeSeriesApp:
         helper_manager.init_data_test()
 
         for key, values in helper_manager.obj.enum_node_data_interval(
-            formatted_node='n_pytest_1',
+            formatted_node='pytest_pytest_1',
             keys=[1722013447, 1722013448]
         ):
             if key == 1722013447:
