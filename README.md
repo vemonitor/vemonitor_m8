@@ -33,7 +33,6 @@ Whether you are looking to monitor a single device or manage a large network of 
 It currently supports:
 - Reading and formatting data from:
     - Any device using the Serial Victron Energy VE.Direct text protocol
-    - Redis Server
 - Sending the compiled and formatted data to:
     - Redis Server
     - EmonCms Web Server
