@@ -1,8 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Redis vemonitor Helper"""
+"""
+Redis HmapTimeSeries Helper.
+"""
 import logging
 from operator import itemgetter
+import time
 from typing import Optional, Union
 from ve_utils.ujson import UJson
 from vemonitor_m8.core.exceptions import RedisAppException
@@ -14,7 +17,15 @@ logger = logging.getLogger("vemonitor")
 
 
 class HmapTimeSeriesApp(RedisApp):
-    """Redis Hmap Time Series Helper"""
+    """
+    Redis HmapTimeSeries Helper.
+    This module store Hmap time series formated data on redis server.
+    Store architecture is based on two data types:
+    - redis_node key from configuration is used to store set of nodes,
+      corresponding to data structure from block item.
+      Egg:
+        - data_structure: 
+    """
     def __init__(self,
                  credentials: dict,
                  max_rows: int = 3600
@@ -23,6 +34,9 @@ class HmapTimeSeriesApp(RedisApp):
         self._nodes = []
         self._max_rows = 3600
         self.node_base = 'n'
+        self.last_added_key = None
+        self.control_time = None
+        self._control_interval = 10
         self.set_max_rows(max_rows)
 
     def set_max_rows(self, value: int) -> bool:
@@ -197,8 +211,8 @@ class HmapTimeSeriesApp(RedisApp):
                 and Ut.is_str(formatted_node, not_null=True)\
                 and Ut.is_dict(data, not_null=True):
             data_in = self.api.get_hmap_data(
-                formatted_node,
-                str(time_key)
+                name=formatted_node,
+                keys=str(time_key)
             )
             if Ut.is_str(data_in, not_null=True):
                 result = UJson.loads_json(data_in)
@@ -206,9 +220,9 @@ class HmapTimeSeriesApp(RedisApp):
                     result.update(data)
                     is_updated = True
                 else:
-                    result = data
+                    result = dict(data)
             else:
-                result = data
+                result = dict(data)
         return result, is_updated
 
     def control_node_data_len(self,
@@ -244,16 +258,61 @@ class HmapTimeSeriesApp(RedisApp):
         result = False
         node = HmapTimeSeriesApp.get_map_key(
             key=node,
-            node_base=self.node_base
+            node_base=node_name
         )
-        if Ut.is_str(node, not_null=True)\
-                and node not in self._nodes:
-            if self.api.add_set_members(
-                        node_name,
-                        [node]
-                    ) == 1:
+        is_valid_nodes = Ut.is_str(node, not_null=True)\
+            and Ut.is_str(node_name, not_null=True)
+        is_registered =  is_valid_nodes\
+            and node in self._nodes
+        if is_registered:
+            result = True
+        elif is_valid_nodes and not is_registered:
+            self.node_base = node_name
+            self.api.add_set_members(
+                node_name,
+                [node]
+            )
+            if node not in self._nodes:
                 self._nodes.append(node)
-                result = True
+            result = True
+        return result
+
+    def control_server_structure(self,
+                                 redis_node: str
+                                 ):
+        """Control redis server cache structure."""
+        result = True
+        now = time.time()
+        is_control_time =  Ut.is_int(self.control_time, positive=True)\
+            and now >= self.control_time
+        if is_control_time:
+            redis_nodes = self.get_nodes_keys_list(redis_node)
+            is_redis_nodes =  Ut.is_list(redis_nodes, not_null=True)
+            if Ut.is_list(self._nodes, not_null=True):
+                is_valid = True
+                for node in self._nodes:
+                    if is_redis_nodes\
+                            and node not in redis_nodes:
+                        is_valid = False
+                    elif not is_redis_nodes:
+                        is_valid = False
+                if not is_valid:
+                    nb_added = self.api.add_set_members(
+                        redis_node,
+                        self._nodes
+                    )
+
+                    logger.info(
+                        "[RedisHmapTimeSeries] "
+                        "Update nodes Set data on Redis Server. "
+                        "Nb Added: %s",
+                        nb_added
+                    )
+            else:
+                logger.warning(
+                    "[RedisHmapTimeSeries] "
+                    "Nodes Set data is unreachable on Redis Server. "
+                )
         return result
 
     def add_time_serie_to_node(self,
@@ -269,25 +328,136 @@ class HmapTimeSeriesApp(RedisApp):
                 key=node,
                 node_base=self.node_base
             )
-            data, is_updated = self.update_or_set_data_node_key(
+            data_out, is_updated = self.update_or_set_data_node_key(
                 formatted_node=formatted_node,
                 time_key=time_key,
                 data=data
             )
-            if Ut.is_dict(data, not_null=True):
-                data_in = UJson.dumps_json(data)
+
+            if Ut.is_dict(data_out, not_null=True):
+                json_data = UJson.dumps_json(data_out)
                 nb_added = self.api.set_hmap_data(
                     formatted_node,
                     Ut.get_str(time_key),
-                    values=data_in
+                    values=json_data
                 )
                 # nb_added
                 if nb_added == 1\
                         or (is_updated is True and nb_added == 0):
                     result = True
+                    self.last_added_key = time_key
+                    self.control_time = time_key + self._control_interval
+
             self.control_node_data_len(
                 formatted_node=formatted_node
             )
+        return result
+
+    def prepare_point_data(self,
+                           redis_node: str,
+                           data_point: dict,
+                           time_point: int,
+                           input_structure: dict
+                           ) -> Optional[dict]:
+        """Send data to redis worker."""
+        result = None
+        if Ut.is_dict(data_point, not_null=True)\
+            and Ut.is_numeric(time_point, positive=True):
+            result = {}
+            nodes = list(input_structure.keys())
+            for node, points in data_point.items():
+                if node in nodes:
+                    is_node_registered = self.register_node(
+                        node_name=redis_node,
+                        node=node
+                    )
+                    is_valid_points = Ut.is_dict(points, not_null=True)
+                    if is_node_registered and is_valid_points:
+                        out_points = Ut.get_items_from_dict(
+                            dict(points),
+                            input_structure.get(node)
+                        )
+                        if Ut.is_dict(out_points, not_null=True):
+                            result[node] = dict(out_points)
+        return result
+
+    def prepare_bulk_data(self,
+                          redis_node: str,
+                          data: dict,
+                          input_structure: dict
+                          ) -> Optional[dict]:
+        """Prepare Hmap time series bulk data to send."""
+        result = None
+        if Ut.is_str(redis_node, not_null=True)\
+                and Ut.is_dict(data, not_null=True)\
+                and Ut.is_dict(input_structure, not_null=True):
+            result = {}
+            for time_point, data_point in data.items():
+                out_points = self.prepare_point_data(
+                    redis_node=redis_node,
+                    data_point=data_point,
+                    time_point=time_point,
+                    input_structure=input_structure
+                )
+                if Ut.is_dict(out_points, not_null=True):
+                    for node, point in out_points.items():
+                        formatted_node = HmapTimeSeriesApp.get_map_key(
+                            key=node,
+                            node_base=self.node_base
+                        )
+                        if not Ut.is_dict(result.get(formatted_node), not_null=True):
+                            result[formatted_node] = {}
+                        result[formatted_node].update({
+                            Ut.get_str(
+                                time_point, 'error'): UJson.dumps_json(
+                                    point
+                                )
+                        })
+        return result
+
+    def send_data(self,
+                  redis_node: str,
+                  data: dict,
+                  input_structure: dict
+                  ) -> bool:
+        """Send data to redis worker."""
+        result, nb_total = False, 0
+        if self.is_ready():
+            out_points = self.prepare_bulk_data(
+                redis_node=redis_node,
+                data=data,
+                input_structure=input_structure
+            )
+            if Ut.is_dict(out_points, not_null=True)\
+                    and self.api.set_pipeline():
+                for node, points in out_points.items():
+
+                    self.api.set_hmap_data(
+                        name=node,
+                        values=points,
+                        client=self.api.pipe
+                    )
+                    logger.debug(
+                        "Add HmapTimeSeries to redis for node %s"
+                        " - data : %s",
+                        node,
+                        points
+                    )
+                    self.control_node_data_len(
+                        formatted_node=node
+                    )
+                # execute pipe
+                added = self.api.pipe.execute()
+                nb_total = 0
+                if Ut.is_list(added, not_null=True):
+                    nb_total = sum(added)
+                logger.debug(
+                        "Add total %s of HmapTimeSeries to redis",
+                        nb_total
+                    )
+                if nb_total >= 1:
+                    result = True
+            result = True
         return result
 
     def enum_node_data_interval(self,
