@@ -103,7 +103,15 @@
                     },
                     "port": {
                         "description": "Redis AppConnector item port.",
-                        "type": "integer"
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 65535
+                    },
+                    "db": {
+                        "description": "Redis AppConnector item db.",
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 16
                     },
                     "password": {
                         "description": "Redis AppConnector item password.",
