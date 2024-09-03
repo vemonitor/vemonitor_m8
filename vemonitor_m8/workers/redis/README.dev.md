@@ -12,9 +12,7 @@ ToDo:
 ## HmapTimeSeriesApp
 
 ToDo: 
-- `redis_node` configuration value need to be affected to `self.node_base` in `HmapTimeSeriesApp` class. Used to prefix hMap nodes names to avoid data colisions with `columns` node names on different block items.
 - nodes names and keys values need to be validated.
 - cache data must be validated
-- use pipelines in loops with redis server requests
 - columns items names must be updated by `ref_cols` setting values
 - achieve unnit test class and simplify the code
