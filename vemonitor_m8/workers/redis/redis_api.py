@@ -547,8 +547,8 @@ class RedisApi(RedisBase):
     def set_hmap_data(self,
                       name: str,
                       key: Optional[str] = None,
-                      values: Optional[str] = None,
-                      client: Redis = None
+                      values: Optional[Union[str, dict]] = None,
+                      client: Optional[Redis] = None
                       ) -> int:
         """
         Set hmap data on redis server.
@@ -573,7 +573,7 @@ class RedisApi(RedisBase):
             elif Ut.is_dict(values, not_null=True):
                 result = client.hset(
                     name=name,
-                    mapping=values
+                    mapping=dict(values)
                 )
         except (RedisError, TypeError) as ex:
             logger.debug(

@@ -133,3 +133,4 @@ appBlocks:
                         rel_monitor: ['r_pmp', 'r_wat', 'r_sec', 'r_ge']
                     time_interval: 1
                     cache_interval: 5 # number of items to send at same time
+    

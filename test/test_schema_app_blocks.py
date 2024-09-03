@@ -260,11 +260,14 @@ class TestAppBlocksSchema:
         schema_manager.init_data()
         # test block serial max items
         val = schema_manager.obj[0]['outputs']['redis']
+
         for i in range(0, 6):
             schema_manager.obj[0]['outputs']['redis'].append(val)
+
         with pytest.raises(ValidationError):
             SchemaValidate.validate_data_from_schema(
                 schema_manager.obj, schema_manager.schema)
+
         schema_manager.obj[0]['outputs']['redis'] = val
 
         # test block serial item bad key

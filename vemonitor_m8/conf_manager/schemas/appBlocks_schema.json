@@ -208,12 +208,15 @@
                 "description": "Redis AppConnector input block",
                 "type": "object",
                 "minProperties": 3,
-                "maxProperties": 7,
+                "maxProperties": 8,
                 "additionalProperties": false,
                 "required": [ "name", "source", "redis_node", "time_interval", "columns" ],
                 "properties" : {
                     "name": {
                         "$ref": "/schemas/name"
+                    },
+                    "redis_data_structure": {
+                        "$ref": "/schemas/redis_data_structure"
                     },
                     "source": {
                         "$ref": "/schemas/source"
@@ -247,12 +250,15 @@
                 "description": "Redis AppConnector output block",
                 "type": "object",
                 "minProperties": 3,
-                "maxProperties": 7,
+                "maxProperties": 8,
                 "additionalProperties": false,
                 "required": [ "source", "redis_node", "time_interval", "columns" ],
                 "properties" : {
                     "source": {
                         "$ref": "/schemas/source"
+                    },
+                    "redis_data_structure": {
+                        "$ref": "/schemas/redis_data_structure"
                     },
                     "time_interval": {
                         "$ref": "/schemas/time_interval"
@@ -358,6 +364,13 @@
                     }
                 }
             }
+        },
+        "redis_data_structure": {
+            "$id": "/schemas/redis_data_structure",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Redis Data Structure Type",
+            "type": "string",
+            "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
         "source": {
             "$id": "/schemas/source",

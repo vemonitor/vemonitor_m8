@@ -233,7 +233,7 @@ class AsyncAppBlockRun(AppBlockRun):
                     structure=worker.columns
                 )
                 data, last_time, max_time = data_cache
-                interval = last_time - worker.last_saved_time
+                interval = abs(last_time - worker.last_saved_time)
                 is_time_interval = (
                     worker.last_saved_time == 0
                     or interval >= (

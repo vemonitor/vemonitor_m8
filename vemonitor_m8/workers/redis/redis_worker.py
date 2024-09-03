@@ -59,15 +59,39 @@ class RedisWorkerHelper:
                 "time_interval": conf['item'].get('time_interval'),
                 "cache_interval": conf['item'].get('cache_interval'),
                 "redis_node": conf['item'].get('redis_node'),
+                "redis_data_structure": conf['item'].get('redis_data_structure'),
                 "columns": conf['item'].get('columns'),
                 "ref_cols": conf['item'].get('ref_cols')
             }
         return result
 
 
-class RedisInputWorker(InputDictWorker):
+class RedisCommonWorker:
+    """Redis worker shared Helper"""
+    def __init__(self):
+        self.redis_node: Optional[str] = None
+        self.redis_data_structure: Optional[str] = None
+
+    def set_redis_node(self, value: str) -> bool:
+        """Set redis_node property."""
+        result = False
+        if Ut.is_str(value, not_null=True):
+            self.redis_node = value
+            result = True
+        return result
+
+    def set_redis_data_structure(self, value: str) -> bool:
+        """Set redis_data_structure property."""
+        result = False
+        if Ut.is_str(value, not_null=True):
+            self.redis_data_structure = value
+            result = True
+        return result
+
+class RedisInputWorker(RedisCommonWorker, InputDictWorker):
     """Redis reader app Helper"""
     def __init__(self, conf: dict):
+        RedisCommonWorker.__init__(self)
         InputDictWorker.__init__(self)
         if self.set_conf(conf):
             self.set_worker_status()
@@ -112,6 +136,37 @@ class RedisInputWorker(InputDictWorker):
             )
         return result
 
+    def set_worker_conf(self,
+                        conf: dict
+                        ) -> bool:
+        """
+        Set Worker configuration data.
+
+        the conf dictionary must contain :
+            - name: str: required
+            - redis_node: str: required
+            - redis_data_structure: str: optional
+            - worker_key: str: required
+            - enum_key: int: required
+            - time_interval: Union[int, float]: required
+            - columns: dict: required
+            - cache_interval: Union[int, float]: optional
+            - ref_cols: list: optional
+
+        """
+        result = False
+        if Ut.is_dict(conf)\
+                and self.set_name(conf.get('name'))\
+                and self.set_worker_key(conf.get('worker_key'))\
+                and self.set_enum_key(conf.get('enum_key'))\
+                and self.set_time_interval(conf.get('time_interval'))\
+                and self.set_columns(conf.get('columns'))\
+                and self.set_redis_node(conf.get('redis_node')):
+            self.set_redis_data_structure(conf.get('redis_data_structure'))
+            self.set_ref_cols(conf.get('ref_cols'))
+            result = True
+        return result
+
     def set_conf(self, conf: dict) -> bool:
         """Set Configuration data."""
         result = False
@@ -135,12 +190,13 @@ class RedisInputWorker(InputDictWorker):
         """Get input data from Redis controller."""
         if self.is_ready()\
                 and self.has_columns():
-            pass
+            self.worker.api.get_set_members('inputs_cache')
 
 
-class RedisOutputWorker(OutputWorker):
+class RedisOutputWorker(OutputWorker, RedisCommonWorker):
     """Redis Output Worker Helper"""
     def __init__(self, conf: dict):
+        RedisCommonWorker.__init__(self)
         OutputWorker.__init__(self)
         self.cache_interval = 5
         self.set_min_req_interval(1)
@@ -187,6 +243,38 @@ class RedisOutputWorker(OutputWorker):
             )
         return result
 
+    def set_worker_conf(self,
+                        conf: dict
+                        ) -> bool:
+        """
+        Set Worker configuration data.
+
+        the conf dictionary must contain :
+            - name: str: optional
+            - redis_node: str: required
+            - redis_data_structure: str: optional
+            - worker_key: str: required
+            - enum_key: int: required
+            - time_interval: Union[int, float]: required
+            - columns: dict: required
+            - cache_interval: Union[int, float]: optional
+            - ref_cols: list: optional
+
+        """
+        result = False
+        if Ut.is_dict(conf)\
+                and self.set_worker_key(conf.get('worker_key'))\
+                and self.set_enum_key(conf.get('enum_key'))\
+                and self.set_time_interval(conf.get('time_interval'))\
+                and self.set_columns(conf.get('columns'))\
+                and self.set_redis_node(conf.get('redis_node')):
+            self.set_name(conf.get('name'))
+            self.set_redis_data_structure(conf.get('redis_data_structure'))
+            self.set_cache_interval(conf.get('cache_interval'))
+            self.set_ref_cols(conf.get('ref_cols'))
+            result = True
+        return result
+
     def set_conf(self, conf: dict) -> bool:
         """Set Configuration data."""
         result = False
@@ -210,8 +298,10 @@ class RedisOutputWorker(OutputWorker):
                   ) -> bool:
         """Send data to redis worker."""
         result = False
-        if self.is_ready()\
-                and Ut.is_dict(data, not_null=True)\
-                and Ut.is_dict(input_structure, not_null=True):
-            result = True
+        if self.is_ready():
+            result = self.worker.send_data(
+                redis_node=self.redis_node,
+                data=data,
+                input_structure=input_structure
+            )
         return result

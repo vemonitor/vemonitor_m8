@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Redis vemonitor Helper"""
+"""
+Redis vemonitor Helper.
+"""
 import logging
 from typing import Optional, Union
 from vemonitor_m8.core.exceptions import DataCacheError
@@ -210,11 +212,16 @@ class RedisCache(RedisConnector, InputsCache):
                        data: dict
                        ):
         """Set inputs data cache key on redis."""
-        return self.app.add_time_serie_to_node(
+        isvalid_structure = self.app.control_server_structure(
+            redis_node=self.cache_name
+        )
+
+        is_added = self.app.add_time_serie_to_node(
             time_key=time_key,
             node=node,
             data=data
         )
+        return is_added and isvalid_structure
 
     def enum_node_data_cache_interval(self,
                                       formatted_node: str,
