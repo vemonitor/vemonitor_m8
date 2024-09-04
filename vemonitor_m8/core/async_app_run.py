@@ -295,7 +295,7 @@ class AsyncAppBlockRun(AppBlockRun):
                         "Workers Status : "
                         f"{self.workers.get_output_workers_status()}"
                     )
-                time.sleep(1)
+                time.sleep(2)
                 while self._run:
                     self.run_output_workers()
 
