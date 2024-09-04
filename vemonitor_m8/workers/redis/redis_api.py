@@ -194,7 +194,7 @@ class RedisBase(RedisCli):
     def __init__(self, credentials: dict):
         RedisCli.__init__(self, **credentials)
 
-    def get_dbs_size(self, db: str) -> dict:
+    def get_db_info(self, db: str) -> dict:
         """Get Meta Data from db number."""
         result = None
         if self.is_ready():
@@ -206,6 +206,18 @@ class RedisBase(RedisCli):
                 result = result.get(name)
             else:
                 result = None
+        return result
+
+    def get_db_nb_keys(self, db: str) -> int:
+        """Get Meta Data from db number."""
+        result = 0
+        if self.is_ready():
+            info = self.get_db_info(
+                db=db
+            )
+            if Ut.is_dict(info, not_null=True)\
+                    and Ut.is_int(info.get('keys'), positive=True):
+                result = info.get('keys')
         return result
 
     def get_current_db_size(self) -> int:
@@ -387,7 +399,9 @@ class RedisApi(RedisBase):
         self._meta_name = "vemonitor_meta"
         self.run_db_selector()
 
-    def get_db_meta(self, client: Redis) -> Redis:
+    def get_db_meta(self,
+                    client: Optional[Redis] = None
+                    ) -> Optional[dict]:
         """Get Meta Data from current db."""
         result = None
         if self.is_ready():
@@ -399,7 +413,9 @@ class RedisApi(RedisBase):
                 result = None
         return result
 
-    def is_db_meta(self, client: Redis) -> Redis:
+    def is_db_meta(self,
+                   client: Optional[Redis] = None
+                   ) -> bool:
         """Get Meta Data from current db."""
         result = False
         if self.is_ready():
@@ -409,32 +425,34 @@ class RedisApi(RedisBase):
                 result = True
         return result
 
-    def init_db_meta(self, client: Redis) -> Redis:
+    def init_db_meta(self,
+                     client: Optional[Redis] = None
+                     ) -> bool:
         """Get Meta Data from current db."""
-        result = None
+        result = False
         if self.is_ready():
             meta = {
                 "controled_by": "vemonitor_m8",
                 "version": VERSION
             }
-            result = self.set_hmap_data(
+            nb_added = self.set_hmap_data(
                 name=self._meta_name,
                 values=meta,
                 client=client
             )
-            if not Ut.is_dict(result, not_null=True):
-                result = None
+            if nb_added >= 0:
+                result = True
         return result
 
-    def control_current_db(self, client: Optional[Redis] = None) -> bool:
+    def control_current_db(self,
+                           client: Optional[Redis] = None
+                           ) -> bool:
         """Control current db meta."""
         result = False
         if self.is_ready():
             current_db = self._credentials.get('db')
-            current_size = self.get_dbs_size(db=current_db)
-            if Ut.is_dict(current_size, not_null=True)\
-                    and Ut.is_int(current_size.get('keys'))\
-                    and current_size.get('keys') > 0:
+            nb_keys = self.get_db_nb_keys(db=current_db)
+            if Ut.is_int(nb_keys, positive=True):
                 if self.is_db_meta(client=client):
                     result = True
                     logger.info(
