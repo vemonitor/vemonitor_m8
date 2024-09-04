@@ -52,6 +52,10 @@ def helper_manager_fixture():
         def add_hmap_test(self):
             """Init RedisApi"""
             assert self.obj.flush() is True
+
+            if isinstance(self.obj, RedisApi):
+                self.obj.init_db_meta()
+
             nb = self.obj.cli.hset(
                 name='data_test',
                 key='key_test_0',
