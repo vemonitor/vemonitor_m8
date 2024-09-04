@@ -2,6 +2,7 @@
 """Vemonitor EventsManager Helper"""
 from typing import Optional
 from ve_utils.utype import UType as Ut
+from vemonitor_m8.events.event import Event
 
 
 class EventsManager:
