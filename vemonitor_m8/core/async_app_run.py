@@ -105,15 +105,23 @@ class AsyncAppBlockRun(AppBlockRun):
             if WorkersHelper.is_worker(worker):
                 interval = worker.time_interval
                 with self._threads.lock:
+                    diff = current_thread.set_exec_time()
                     test = AppBlockRun.read_worker_data(
                         self,
                         worker_key=worker_key
                     )
-                AsyncAppBlockRun.set_thread_interval(
-                    current_thread=current_thread,
+                new_interval = AsyncAppBlockRun.get_thread_interval(
+                    diff=diff,
                     interval=interval,
                     start=start
                 )
+                logger.debug(
+                    "[AsyncAppBlockRun::read_worker_data] "
+                    "New interval set to : %s s.",
+                    new_interval
+                )
+                if new_interval <= interval:
+                    current_thread.interval = new_interval
         except VeMonitorError as ex:
             logger.error(
                 "[AsyncAppBlockRun::read_worker_data] "
@@ -295,28 +303,18 @@ class AsyncAppBlockRun(AppBlockRun):
             self.exit_handler()
 
     @staticmethod
-    def set_thread_interval(current_thread: RepeatTimer,
+    def get_thread_interval(diff: float,
                             interval: int,
-                            start: int) -> bool:
-        """Test if valid conf"""
-        result = -1
+                            start: float) -> int:
+        """Get new thread interval"""
+        result = interval
         now = time.perf_counter()
-        if isinstance(current_thread, RepeatTimer)\
-                and Ut.is_int(interval, positive=True)\
-                and Ut.is_float(start, positive=True):
-            result = current_thread.interval
-            diff = abs(now - start)
-            new_interval = round(abs(interval - diff), 6)
-            if new_interval > 0:
-                current_thread.interval = new_interval
-                result = new_interval
-                logger.debug(
-                    "[AsyncAppBlockRun::set_thread_interval] "
-                    "New thread interval : %s - "
-                    "Worker Interval : %s - "
-                    "Read time: %s",
-                    new_interval,
-                    interval,
-                    diff
-                )
+        if Ut.is_int(interval, positive=True)\
+                and Ut.is_float(start, positive=True)\
+                and Ut.is_float(diff, positive=True):
+            exact_time = round(abs(diff - 1), 6)
+            if 0 < exact_time <= 1:
+                now_int = Ut.get_int(now, 0)
+                next_exec = round(abs(now_int + interval + exact_time), 6)
+                result = round(abs(now - next_exec), 6)
         return result
