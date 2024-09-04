@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """Vemonitor Event Helper"""
 
+
 class Event:
-    """Event Helper"""
+    """Vemonitor Event Helper"""
     def __init__(self):
         self.__event_handlers = []
 
