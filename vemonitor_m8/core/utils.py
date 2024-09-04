@@ -62,3 +62,86 @@ class Utils(Ut):
             and 0 < from_time <= item_time
         return is_from_time_null \
             or is_valid
+
+    @staticmethod
+    def rename_keys_from_dict(data: dict,
+                              ref_keys: list):
+        """Rename keys from dict"""
+        result = dict(data)
+        if Ut.is_dict(data, not_null=True)\
+                and Ut.is_list(ref_keys, not_null=True):
+            for keys in ref_keys:
+                if Ut.is_list(keys, eq=2):
+                    new, current = keys
+                    if Ut.is_str(new, not_null=True)\
+                            and Ut.is_str(current, not_null=True)\
+                            and current in data:
+                        result[new] = result.pop(current)
+        return result
+
+    @staticmethod
+    def rename_keys_from_sub_dict(data: dict,
+                                  ref_keys: list):
+        """Rename keys from sub dict of dict"""
+        result = dict(data)
+        if Ut.is_dict(data, not_null=True)\
+                and Ut.is_list(ref_keys, not_null=True):
+            for node, node_data in data.items():
+                new_cols = Utils.rename_keys_from_dict(
+                    data=node_data,
+                    ref_keys=ref_keys
+                )
+                if Ut.is_dict(new_cols, not_null=True):
+                    result[node] = new_cols
+        return result
+
+    @staticmethod
+    def rename_keys_from_sub_sub_dict(data: dict,
+                                       ref_keys: list):
+        """Rename keys from sub sub dict of dict"""
+        result = dict(data)
+        if Ut.is_dict(data, not_null=True)\
+                and Ut.is_list(ref_keys, not_null=True):
+            for time_key, cols_data in data.items():
+                new_items = Utils.rename_keys_from_sub_dict(
+                    data=cols_data,
+                    ref_keys=ref_keys
+                )
+                if Ut.is_dict(new_items, not_null=True):
+                    result[time_key] = new_items
+        return result
+
+    @staticmethod
+    def rename_keys_from_list(data: list,
+                              ref_keys: list
+                              ) -> list:
+        """Rename keys from dict"""
+        result = list(data)
+        if Ut.is_list(data, not_null=True)\
+                and Ut.is_list(ref_keys, not_null=True):
+            for keys in ref_keys:
+                 if Ut.is_list(data, not_null=True):
+                    for i, col in enumerate(data):
+                        if Ut.is_list(keys, eq=2):
+                            new, current = keys
+                            if Ut.is_str(new, not_null=True)\
+                                    and Ut.is_str(current, not_null=True):
+                                if current == col:
+                                    result[i] = new
+        return result
+
+    @staticmethod
+    def rename_keys_from_dict_of_lists(data: dict,
+                                       ref_keys: list):
+        """Rename keys from dict"""
+        result = dict(data)
+        if Ut.is_dict(data, not_null=True)\
+                and Ut.is_list(ref_keys, not_null=True):
+            for node, columns in data.items():
+                new_cols = Utils.rename_keys_from_list(
+                     data=columns,
+                     ref_keys=ref_keys
+                )
+                if Ut.is_list(new_cols, not_null=True):
+                    result[node] = new_cols
+        return result
