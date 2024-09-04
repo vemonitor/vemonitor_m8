@@ -14,10 +14,6 @@ from vemonitor_m8.workers.redis.redis_h_time_series\
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
-__deprecated__ = False
-__license__ = "GPLv3"
-__status__ = "Production"
-__version__ = "1.0.0"
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
