@@ -171,7 +171,10 @@ class AppBlockRun:
                                     time_key - int(time_key/1000) * 1000, 3
                                     )
                         })
-
+                        data = Ut.rename_keys_from_dict(
+                            data=data,
+                            ref_keys=worker.ref_cols
+                        )
                         self.inputs_data.add_data_cache(
                             time_key=time_key,
                             node=worker.get_name(),
