@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """App block run events Helper"""
 import logging
-from vemonitor_m8.core.event import Event
+from vemonitor_m8.events.event import Event
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
