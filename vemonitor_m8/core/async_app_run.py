@@ -235,12 +235,17 @@ class AsyncAppBlockRun(AppBlockRun):
                 and self.workers.has_output_workers():
             result = True
             for key, worker in self.workers.loop_on_output_workers():
+
                 data_cache = self.inputs_data.get_data_from_cache(
                     from_time=worker.get_last_saved_time(),
                     nb_items=worker.get_cache_interval(),
                     structure=worker.columns
                 )
                 data, last_time, max_time = data_cache
+                data = Ut.rename_keys_from_sub_sub_dict(
+                    data=data,
+                    ref_keys=worker.ref_cols
+                )
                 interval = abs(last_time - worker.last_saved_time)
                 is_time_interval = (
                     worker.last_saved_time == 0
@@ -252,9 +257,13 @@ class AsyncAppBlockRun(AppBlockRun):
                     and len(data) == worker.cache_interval\
                     and is_time_interval
                 if is_interval:
+                    new_cols = Ut.rename_keys_from_dict_of_lists(
+                        data=worker.columns,
+                        ref_keys=worker.ref_cols
+                    )
                     is_data_send = worker.send_data(
                         data=data,
-                        input_structure=worker.columns
+                        input_structure=new_cols
                     )
                     if not is_data_send:
                         result = False
