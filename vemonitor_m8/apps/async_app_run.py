@@ -7,9 +7,9 @@ import sys
 import signal
 import threading
 from typing import Optional
-from vemonitor_m8.core.app_run_main import AppBlockRun
+from vemonitor_m8.apps.app_run_main import AppBlockRun
 from vemonitor_m8.core.utils import Utils as Ut
-from vemonitor_m8.core.threads_controller import RepeatTimer, ThreadsController
+from vemonitor_m8.core.threads_controller import ThreadsController
 from vemonitor_m8.models.config import Config
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.core.exceptions import VeMonitorError, WorkerException

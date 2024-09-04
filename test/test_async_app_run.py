@@ -5,7 +5,7 @@ import time
 from os import path as Opath
 import pytest
 from vemonitor_m8.conf_manager.config_loader import ConfigLoader
-from vemonitor_m8.core.async_app_run import AsyncAppBlockRun
+from vemonitor_m8.apps.async_app_run import AsyncAppBlockRun
 
 
 @pytest.fixture(name="helper_manager", scope="class")
