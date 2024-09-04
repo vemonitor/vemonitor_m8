@@ -19,7 +19,7 @@ def helper_manager_fixture():
             self.obj = None
             self.host = '127.0.0.1'
             self.port = 6379
-            self.db = 2
+            self.db = 15
 
         def init_redis_cli(self):
             """Init RedisCli"""
@@ -210,6 +210,55 @@ class TestRedisCli:
 class TestRedisBase:
     """Test RedisBase module"""
 
+    def test_get_db_info(self, helper_manager):
+        """Test get_db_info method"""
+        helper_manager.init_redis_base()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+        info = helper_manager.obj.get_db_info(
+            db=helper_manager.db
+        )
+        assert Ut.is_dict(info, not_null=True)
+        assert Ut.is_int(info.get('keys'), positive=True)
+
+        assert helper_manager.obj.flush() is True
+
+        info = helper_manager.obj.get_db_info(
+            db=helper_manager.db
+        )
+        assert info is None
+
+    def test_get_db_nb_keys(self, helper_manager):
+        """Test get_db_nb_keys method"""
+        helper_manager.init_redis_base()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+        nb_keys = helper_manager.obj.get_db_nb_keys(
+            db=helper_manager.db
+        )
+        assert Ut.is_int(nb_keys, positive=True)
+
+        assert helper_manager.obj.flush() is True
+
+        nb_keys = helper_manager.obj.get_db_nb_keys(
+            db=helper_manager.db
+        )
+        assert nb_keys == 0
+
+    def test_get_current_db_size(self, helper_manager):
+        """Test get_current_db_size method"""
+        helper_manager.init_redis_base()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+
+        db_size = helper_manager.obj.get_current_db_size()
+        assert db_size > 0
+
+        assert helper_manager.obj.flush() is True
+        db_size = helper_manager.obj.get_current_db_size()
+        assert db_size == 0
+
+
     def test_get_key_type(self, helper_manager):
         """Test get_key_type method"""
         helper_manager.init_redis_base()
@@ -289,6 +338,109 @@ class TestRedisBase:
 
 class TestRedisApi:
     """Test RedisApi module"""
+
+    def test_get_db_meta(self, helper_manager):
+        """Test get_db_meta method"""
+        helper_manager.init_redis_api()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+        # Test with empty db
+        assert helper_manager.obj.flush() is True
+        meta = helper_manager.obj.get_db_meta()
+        assert meta is None
+        # Test initialized db
+        helper_manager.obj.init_db_meta()
+        meta = helper_manager.obj.get_db_meta()
+        assert Ut.is_dict(meta, not_null=True)
+        assert meta.get("controled_by") == "vemonitor_m8"
+
+    def test_is_db_meta(self, helper_manager):
+        """Test is_db_meta method"""
+        helper_manager.init_redis_api()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+        # Test with empty db
+        assert helper_manager.obj.flush() is True
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is False
+        # Test initialized db
+        helper_manager.obj.init_db_meta()
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is True
+
+    def test_init_db_meta(self, helper_manager):
+        """Test init_db_meta method"""
+        helper_manager.init_redis_api()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+        # Test initialized db
+        assert helper_manager.obj.init_db_meta() is True
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is True
+
+    def test_control_current_db(self, helper_manager):
+        """Test control_current_db method"""
+        helper_manager.init_redis_api()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+
+        # Test with empty db
+        # and test db initialization for empty db's
+        assert helper_manager.obj.flush() is True
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is False
+        is_db = helper_manager.obj.control_current_db()
+        assert is_db is True
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is True
+
+        # Test initialized db
+        is_db = helper_manager.obj.control_current_db()
+        assert is_db is True
+
+        # Test with db used by other process
+        # without vemonitor meta data
+        assert helper_manager.obj.flush() is True
+        nb_added = helper_manager.obj.set_hmap_data(
+            name="test_name",
+            key="test_key",
+            values="data_test"
+        )
+        assert nb_added > 0
+        is_db = helper_manager.obj.control_current_db()
+        assert is_db is False
+
+    def test_run_db_selector(self, helper_manager):
+        """Test run_db_selector method"""
+        helper_manager.init_redis_api()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+
+        # Test with empty db
+        # and test db initialization for empty db's
+        assert helper_manager.obj.flush() is True
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is False
+        is_db = helper_manager.obj.run_db_selector()
+        assert is_db is True
+        is_meta = helper_manager.obj.is_db_meta()
+        assert is_meta is True
+
+        helper_manager.init_redis_api()
+        # Add Hmap keys
+        helper_manager.add_hmap_test()
+        db_start = helper_manager.obj._credentials.get('db')
+        assert helper_manager.obj.flush() is True
+        nb_added = helper_manager.obj.set_hmap_data(
+            name="test_name",
+            key="test_key",
+            values="data_test"
+        )
+        assert nb_added > 0
+        is_db = helper_manager.obj.run_db_selector()
+        assert is_db is True
+        db_end = helper_manager.obj._credentials.get('db')
+        assert db_start != db_end
 
     def test_get_hmap_len(self, helper_manager):
         """Test get_hmap_len method"""
