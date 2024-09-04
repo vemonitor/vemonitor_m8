@@ -111,7 +111,7 @@
                         "description": "Redis AppConnector item db.",
                         "type": "integer",
                         "minimum": 0,
-                        "maximum": 16
+                        "maximum": 15
                     },
                     "password": {
                         "description": "Redis AppConnector item password.",
