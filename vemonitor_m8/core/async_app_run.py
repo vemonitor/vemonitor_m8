@@ -117,7 +117,9 @@ class AsyncAppBlockRun(AppBlockRun):
                 )
                 logger.debug(
                     "[AsyncAppBlockRun::read_worker_data] "
-                    "New interval set to : %s s.",
+                    "New interval for input worker %s "
+                    "set to : %s s.",
+                    worker.get_name(),
                     new_interval
                 )
                 if new_interval <= interval:
