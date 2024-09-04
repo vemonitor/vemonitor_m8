@@ -15,6 +15,30 @@ class RepeatTimer(threading.Timer):
 
     def __init__(self, interval, function, args=None, kwargs=None):
         threading.Timer.__init__(self, interval, function, args, kwargs)
+        self.last_exec = time.perf_counter()
+        self.min_exec_diff = 0
+
+    def update_last_exec(self) -> float:
+        """Update last execution time value."""
+        self.last_exec = time.perf_counter()
+        return self.last_exec
+
+    def update_min_exec_diff(self):
+        """Update last execution diff time value."""
+        now = time.perf_counter()
+        last_value = self.min_exec_diff
+        current_diff = round(now - self.last_exec, 6)
+        if last_value == 0:
+            self.min_exec_diff = current_diff
+        else:
+            self.min_exec_diff = min(last_value, current_diff)
+        return self.min_exec_diff
+
+    def set_exec_time(self):
+        """Update last execution diff time value."""
+        diff = self.update_min_exec_diff()
+        self.update_last_exec()
+        return diff
 
     def run(self):
         """Run Timer."""
@@ -116,7 +140,7 @@ class ThreadsController:
     def sleep_time_to_start():
         """Sleep time before run thread."""
         now = time.time()
-        time_sleep = 10 - (now % 10)
+        time_sleep = 2 - (now % 2)
         logger.info(
             "[ThreadsController:sleep_time_to_start] "
             "sleeping %s before start timers. "
