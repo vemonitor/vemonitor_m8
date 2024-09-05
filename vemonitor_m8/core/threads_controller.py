@@ -3,8 +3,9 @@
 import time
 import logging
 import threading
-from typing import Union
+from typing import Optional, Union
 from ve_utils.utype import UType as Ut
+from vemonitor_m8.events.events_manager import EventsGroup
 
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
@@ -17,6 +18,19 @@ class RepeatTimer(threading.Timer):
         threading.Timer.__init__(self, interval, function, args, kwargs)
         self.last_exec = time.perf_counter()
         self.min_exec_diff = 0
+        self.events = None
+
+    def has_events(self):
+        """Test if instance has events"""
+        return isinstance(self.events, EventsGroup)
+
+    def set_events(self, events: EventsGroup) -> bool:
+        """Update last execution time value."""
+        result = False
+        if isinstance(events, EventsGroup):
+            self.events = events
+            result = True
+        return result
 
     def update_last_exec(self) -> float:
         """Update last execution time value."""
@@ -101,6 +115,7 @@ class ThreadsController:
                       key: str,
                       interval: Union[int, float],
                       callback,
+                      events: Optional[dict] = None,
                       args=None,
                       kwargs=None) -> bool:
         """Add RepeatTimer to _timers property."""
@@ -117,6 +132,7 @@ class ThreadsController:
                     args,
                     kwargs
                 )
+                self._timers[key].set_events(events)
                 result = True
         elif not (Ut.is_str(key, not_null=True)
                   and Ut.is_numeric(interval, positive=True)):
