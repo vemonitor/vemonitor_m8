@@ -5,8 +5,8 @@ import logging
 import time
 from typing import Optional
 from vemonitor_m8.core.utils import Utils as Ut
-from vemonitor_m8.events.app_block_events import AppBlockEvents
 from vemonitor_m8.core.data_cache import DataCache
+from vemonitor_m8.events.events_manager import EventsManager
 from vemonitor_m8.models.workers import WorkersHelper
 from vemonitor_m8.workers.redis.redis_cache import RedisCache
 from vemonitor_m8.models.inputs_cache import InputsCache
@@ -31,7 +31,7 @@ class AppBlockRun:
     def __init__(self, conf: Config):
         self._run = False
         self.conf: Optional[Config] = None
-        self.events = AppBlockEvents()
+        self.events = EventsManager()
         self.inputs_data: Optional[InputsCache] = None
         self.workers = WorkersManager()
         if self.set_conf(conf)\
@@ -145,12 +145,6 @@ class AppBlockRun:
             item_key,
             source
         )
-
-    def is_worker_data_ready(self):
-        """On worker data ready event"""
-        if Ut.is_dict(self.inputs_data.data, not_null=True)\
-                and len(self.inputs_data.data) >= 5:
-            self.events.on_worker_data_ready()
 
     def read_worker_data(self,
                          worker_key: str
