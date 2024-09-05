@@ -165,11 +165,11 @@ class AppBlockRun:
                 if Ut.is_dict(data, not_null=True):
                     data = self.format_input_data(data, worker.columns)
                     if Ut.is_dict(data, not_null=True):
-                        data.update({'time': time_key})
                         data.update({
+                            'time': time_key,
                             'time_ref': Ut.get_rounded_float(
-                                    time_key - int(time_key/1000) * 1000, 3
-                                    )
+                                time_key - int(time_key/1000) * 1000, 3
+                            )
                         })
                         data = Ut.rename_keys_from_dict(
                             data=data,
