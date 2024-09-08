@@ -40,7 +40,7 @@ class AsyncOutputsRun(AsyncMiddlewaresRun):
     def init_events(self):
         """Init AppBlock run events"""
         AsyncMiddlewaresRun.init_events(self)
-    
+
     def loop_outputs_items(self):
         """Run block inputs."""
         if Ut.is_dict(self.conf.app_blocks[0].get('outputs'), not_null=True):
