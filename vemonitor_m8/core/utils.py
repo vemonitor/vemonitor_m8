@@ -41,6 +41,39 @@ class Utils(Ut):
         return Ut.is_int(value) and 0 < value <= 65535
 
     @staticmethod
+    def is_key_pattern(data: str) -> bool:
+        """Test if is valid key pattern."""
+        return Utils.is_str(data)\
+            and Utils.is_list(
+                re.compile(
+                    r"(?=\w{1,30}$)^([a-zA-Z\d]+(?:_[a-zA-Z\d]+)*)$"
+                    ).findall(data),
+                not_null=True
+            )
+
+    @staticmethod
+    def is_attr_pattern(data: str) -> bool:
+        """Test if is valid key pattern."""
+        return Utils.is_str(data)\
+            and Utils.is_list(
+                re.compile(
+                    r"(?=[a-zA-Z\d_-]{1,30}$)^([a-zA-Z\d]+(?:(?:_|-)[a-zA-Z\d]+)*)$"
+                    ).findall(data),
+                not_null=True
+            )
+
+    @staticmethod
+    def is_text_pattern(data: str) -> bool:
+        """Test if is valid key pattern."""
+        return Utils.is_str(data)\
+            and Utils.is_list(
+                re.compile(
+                    r"^([a-zA-Z\d_ ()-]{1,30})$"
+                    ).findall(data),
+                not_null=True
+            )
+
+    @staticmethod
     def is_valid_host(value: str):
         """Compare if all iterable values are equal."""
         regex = re.compile(
