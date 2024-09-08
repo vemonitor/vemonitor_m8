@@ -146,6 +146,12 @@ class AppBlockRun:
             source
         )
 
+    def read_worker_data_callback(self,
+                                  time_key: int,
+                                  data: dict):
+        """Get connector by key item and source."""
+        return data
+
     def read_worker_data(self,
                          worker_key: str
                          ):
@@ -165,15 +171,30 @@ class AppBlockRun:
                                 time_key - int(time_key/1000) * 1000, 3
                             )
                         })
+                        # Rename ref_cols keys
                         data = Ut.rename_keys_from_dict(
                             data=data,
                             ref_keys=worker.ref_cols
                         )
+                        # add data to cache
                         self.inputs_data.add_data_cache(
                             time_key=time_key,
                             node=worker.get_name(),
                             data=data
                         )
+                        # Run middlwares
+                        mid_data = self.read_worker_data_callback(
+                            time_key=Ut.get_int(time_key, 0),
+                            data=data
+                        )
+                        if Ut.is_dict(mid_data, not_null=True):
+                            for node, data_item in  mid_data.items():
+                                # add data to cache
+                                self.inputs_data.add_data_cache(
+                                    time_key=time_key,
+                                    node=node,
+                                    data=data_item
+                                )
                         test = True
                     else:
                         logger.debug(
