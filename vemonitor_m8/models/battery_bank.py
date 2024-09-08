@@ -7,7 +7,7 @@ import logging
 from typing import Optional, TypedDict, Union
 from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.models.battery import BatteryModel
-from vemonitor_m8.middlewares.batteries.battery_flooded import BatteryFloodedModel
+from vemonitor_m8.models.battery import BatteryFloodedModel
 from vemonitor_m8.models.battery_data import ChargeSettingsType
 
 __author__ = "Eli Serra"
