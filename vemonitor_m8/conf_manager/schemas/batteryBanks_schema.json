@@ -32,26 +32,36 @@
                     "additionalProperties": {
                         "description": "Single Battery bank properties.", 
                         "type": "object",
-                        "minProperties": 4,
-                        "maxProperties": 4,
+                        "minProperties": 1,
+                        "maxProperties": 7,
                         "additionalProperties": false,
-                        "required": [ "battery_type", "battery_key", "in_series", "in_parallel" ],
+                        "required": [ "battery_key" ],
                         "properties" : {
-                            "battery_type": {
-                                "description": "Type of Batteries.", 
-                                "$ref": "/schemas/battery_type"
-                            },
                             "battery_key": {
                                 "description": "Battery key fom batteryDatas.",
                                 "$ref": "/schemas/battery_key"
                             },
                             "in_series": {
                                 "description": "Number of Batteries in series.",
-                                "$ref": "/schemas/in_series"
+                                "$ref": "/schemas/bank_couplage"
                             },
                             "in_parallel": {
                                 "description": "Number of Batteries in parallel.",
-                                "$ref": "/schemas/in_parallel"
+                                "$ref": "/schemas/bank_couplage"
+                            },
+                            "system_voltage": {
+                                "$ref": "/schemas/system_voltage"
+                            },
+                            "t_bat": {
+                                "description": "Model name of the battery.",
+                                "$ref": "/schemas/temp_value_item"
+                            },
+                            "t_loc": {
+                                "description": "Local Temperrature Value of Battery Bank.",
+                                "$ref": "/schemas/temp_value_item"
+                            },
+                            "charge_settings": {
+                                "$ref": "/schemas/charge_settings"
                             }
                         }
                     }
@@ -62,33 +72,42 @@
         "batteryBankArgs": {
             "type": "object",
             "minProperties": 6,
-            "maxProperties": 6,
+            "maxProperties": 9,
             "additionalProperties": false,
-            "required": [ "name", "battery_type", "battery_key", "battery", "in_series", "in_parallel" ],
+            "required": [ "battery_key", "battery" ],
             "properties" : {
                 "name": {
                     "description": "Name of BatteryBank.", 
                     "$ref": "/schemas/name"
-                },
-                "battery_type": {
-                    "description": "Type of Batteries.", 
-                    "$ref": "/schemas/battery_type"
                 },
                 "battery_key": {
                     "description": "Battery key fom batteryDatas.",
                     "$ref": "/schemas/battery_key"
                 },
                 "battery": {
-                    "description": "Battery key fom batteryDatas.",
                     "$ref": "/schemas/battery"
                 },
                 "in_series": {
                     "description": "Number of Batteries in series.",
-                    "$ref": "/schemas/in_series"
+                    "$ref": "/schemas/bank_couplage"
                 },
                 "in_parallel": {
                     "description": "Number of Batteries in parallel.",
-                    "$ref": "/schemas/in_parallel"
+                    "$ref": "/schemas/bank_couplage"
+                },
+                "system_voltage": {
+                    "$ref": "/schemas/system_voltage"
+                },
+                "t_bat": {
+                    "description": "Model name of the battery.",
+                    "$ref": "/schemas/temp_value_item"
+                },
+                "t_loc": {
+                    "description": "Local Temperrature Value of Battery Bank.",
+                    "$ref": "/schemas/temp_value_item"
+                },
+                "charge_settings": {
+                    "$ref": "/schemas/charge_settings"
                 }
             }
         }
@@ -99,10 +118,10 @@
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Battery item.",
             "type": "object",
-            "minProperties": 5,
+            "minProperties": 1,
             "maxProperties": 7,
             "additionalProperties": false,
-            "required": [ "manufacturer", "model", "cell_voltage", "nb_cells", "capacity" ],
+            "required": [ "battery_type" ],
             "properties" : {
                 "manufacturer": {
                     "description": "Manufacturer name of the battery.",
@@ -112,24 +131,21 @@
                     "description": "Model name of the battery.",
                     "$ref": "/schemas/model"
                 },
-                "cell_voltage": {
+                "battery_type": {
+                    "$ref": "/schemas/battery_type"
+                },
+                "bat_voltage": {
                     "description": "Voltage of single battery cell.",
-                    "$ref": "/schemas/cell_voltage"
+                    "$ref": "/schemas/bat_voltage"
                 },
                 "nb_cells": {
                     "description": "Number of battery cells.",
                     "$ref": "/schemas/nb_cells"
                 },
-                "bulk_voltage": {
-                    "description": "Bulk Voltage of single battery cell.",
-                    "$ref": "/schemas/bulk_voltage"
-                },
-                "float_voltage": {
-                    "description": "Float Voltage of single battery cell.",
-                    "$ref": "/schemas/float_voltage"
+                "charge_settings": {
+                    "$ref": "/schemas/charge_settings"
                 },
                 "capacity": {
-                    "description": "Battery capacity Array values.",
                     "$ref": "/schemas/capacity"
                 }
             }
@@ -148,13 +164,21 @@
             "type": "string",
             "pattern": "(?=[a-zA-Z0-9_\\-./ ]{1,30}$)^([a-zA-Z0-9 ]+(?:_[a-zA-Z0-9\\-./ ]+)*(?:[a-zA-Z0-9\\-./ ]+)*)$"
         },
-        "cell_voltage": {
-            "$id": "/schemas/cell_voltage",
+        "battery_type": {
+            "$id": "/schemas/battery_type",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Type of Batteries.", 
+            "type": "string",
+            "emum": ["flooded", "gel", "agm", "li"],
+            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "bat_voltage": {
+            "$id": "/schemas/bat_voltage",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Voltage of single battery cell.",
             "type": "number",
-            "minimum": 0.1,
-            "maximum": 100
+            "minimum": 2,
+            "maximum": 24
         },
         "nb_cells": {
             "$id": "/schemas/nb_cells",
@@ -162,23 +186,46 @@
             "description": "Number of battery cells.",
             "type": "integer",
             "minimum": 1,
-            "maximum": 100
+            "maximum": 12
         },
-        "bulk_voltage": {
-            "$id": "/schemas/bulk_voltage",
+        "bat_charge_v": {
+            "$id": "/schemas/bat_charge_v",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Bulk Voltage of single battery cell.",
+            "description": "Battery charge voltage.",
             "type": "number",
             "minimum": 0.1,
             "maximum": 100
         },
-        "float_voltage": {
-            "$id": "/schemas/float_voltage",
+        "charge_settings": {
+            "$id": "/schemas/charge_settings",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Float Voltage of single battery cell.",
-            "type": "number",
-            "minimum": 0.1,
-            "maximum": 100
+            "description": "Battery Charge Settings.",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 5,
+            "additionalProperties": false,
+            "required": [ ],
+            "properties" : {
+                "charge_t_coef": {
+                    "$ref": "/schemas/charge_t_coef"
+                },
+                "charge_absorption_u": {
+                    "description": "Bulk Voltage of single battery cell.",
+                    "$ref": "/schemas/bat_charge_v"
+                },
+                "charge_float_u": {
+                    "description": "Float Voltage of single battery cell.",
+                    "$ref": "/schemas/bat_charge_v"
+                },
+                "charge_storage_u": {
+                    "description": "Storage Voltage of single battery cell.",
+                    "$ref": "/schemas/bat_charge_v"
+                },
+                "charge_egalization_u": {
+                    "description": "Equalization Voltage of single battery cell.",
+                    "$ref": "/schemas/bat_charge_v"
+                }
+            }
         },
         "capacity": {
             "$id": "/schemas/capacity",
@@ -221,14 +268,6 @@
             "type": "string",
             "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
-        "battery_type": {
-            "$id": "/schemas/battery_type",
-            "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Type of Batteries.", 
-            "type": "string",
-            "emum": ["flooded", "gel", "agm", "li"],
-            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
-        },
         "battery_key": {
             "$id": "/schemas/battery_key",
             "$schema": "http://json-schema.org/draft-07/schema#",
@@ -236,21 +275,68 @@
             "type": "string",
             "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
         },
-        "in_series": {
-            "$id": "/schemas/in_series",
+        "bank_couplage": {
+            "$id": "/schemas/bank_couplage",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Number of Batteries in series.",
+            "description": "Number of Batteries in series or in parallel.",
             "type": "integer",
             "minimum": 1,
             "maximum": 100
         },
-        "in_parallel": {
-            "$id": "/schemas/in_parallel",
+        "system_voltage": {
+            "$id": "/schemas/system_voltage",
             "$schema": "http://json-schema.org/draft-07/schema#",
-            "description": "Number of Batteries in parallel.",
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 100
+            "description": "System Voltage of Battery bank.",
+            "type": "number",
+            "minimum": 2,
+            "maximum": 48
+        },
+        "temp_source": {
+            "$id": "/schemas/temp_source",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Source of Temperrature data value.", 
+            "type": "string",
+            "emum": ["fixed", "node", "cache"],
+            "pattern": "(?=[a-zA-Z0-9_]{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
+        },
+        "charge_t_coef": {
+            "$id": "/schemas/charge_t_coef",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Temperrature coeficient for charge correction.",
+            "type": "number",
+            "minimum": -1000.0,
+            "maximum": 1000.0
+        },
+        "temp_value": {
+            "$id": "/schemas/temp_value",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Temperrature Value.",
+            "type": "number",
+            "minimum": -70.0,
+            "maximum": 120.0
+        },
+        "temp_value_item": {
+            "$id": "/schemas/temp_value_item",
+            "$schema": "http://json-schema.org/draft-07/schema#",
+            "description": "Temperrature value Item.",
+            "type": "object",
+            "minProperties": 2,
+            "maxProperties": 3,
+            "additionalProperties": false,
+            "required": [ "source" ],
+            "properties" : {
+                "source": {
+                    "$ref": "/schemas/temp_source"
+                },
+                "node_name": {
+                    "description": "Temperrature Source Node Name.",
+                    "$ref": "/schemas/name"
+                },
+                "value": {
+                    "description": "Fixed Temperrature value.",
+                    "$ref": "/schemas/temp_value"
+                }
+            }
         }
     }
 }
