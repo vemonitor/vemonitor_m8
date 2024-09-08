@@ -272,7 +272,7 @@ class TestConfigConfigBatteryBanks:
             args=helper_manager.obj.app_blocks[0].get('args')
         )
         assert Ut.is_dict(battery_banks, not_null=True)
-        assert battery_banks.get('battery_type') == 'flooded'
+        assert battery_banks['battery'].get('battery_type') == 'flooded'
         assert battery_banks.get('battery_key') == 'project1'
 
 

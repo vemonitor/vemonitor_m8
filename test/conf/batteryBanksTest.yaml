@@ -3,259 +3,259 @@
 # Use YAML syntax
 # Major break changes from vemonitor_m8 version > 0.1.2
 # ---------------------------
-batteryDatas:
-    # Available Batteries items
-    batteries:
-        # Battery Name (Defined by User)
-        # str: Alphanumeric characters or '_'
-        existant:
-            # Battery manufacturer name
+    batteryDatas:
+        # Available Batteries items
+        batteries:
+            # Battery Name (Defined by User)
             # str: Alphanumeric characters or '_'
-            manufacturer: "BlackBull"
-            # Battery model name
-            # str: Alphanumeric characters or '_'
-            model: "BOX-C"
-            # Battery type
-            # str: ["flooded", "gel", "agm", "li"]
-            battery_type: 'flooded'
-            # Battery output voltage
-            # number: 2 <= bat_voltage <= 24
-            bat_voltage: 12
-            # Nb Cells in Battery
-            # int: 1 <= bat_voltage <= 12
-            nb_cells: 6
-            # Charge settings
-            # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
-            charge_settings:
-                # Temperrature coeficient for charge correction
-                # number: mV/°C: -1000 <= charge_t_coef <= 1000
-                charge_t_coef: -16.2
-                # Charge Bulk voltage setting
-                # number: 0.1 <= charge_absorption_u <= 100
-                charge_absorption_u: 14.1
-                # Charge Float voltage setting
-                # number: 0.1 <= charge_float_u <= 100
-                charge_float_u: 13.8
-                # Charge Storage voltage setting
-                # number: 0.1 <= charge_storage_u <= 100
-                charge_storage_u: 2.62
-                # Charge Equalization voltage setting
-                # number: 0.1 <= charge_egalization_u <= 100
-                charge_egalization_u: 2.62
-            # Battery Capacity Properties
-            # list: [hour rate value, capacity value, current value]
-            capacity: [
-                [5, 185, 37],
-                [20, 220, 11],
-                [100, 250, 2.5]
-            ]
-        # Battery Name (Defined by User)
-        # str: Alphanumeric characters or '_'
-        project1:
-            # Battery manufacturer name
-            # str: Alphanumeric characters or '_'
-            manufacturer: "Rolls"
-            # Battery model name
-            # str: Alphanumeric characters or '_'
-            model: "S6-305"
-            # Battery type
-            # str: ["flooded", "gel", "agm", "li"]
-            battery_type: 'flooded'
-            # Battery output voltage
-            # number: 2 <= bat_voltage <= 24
-            bat_voltage: 6
-            # Nb Cells in Battery
-            # int: 1 <= bat_voltage <= 12
-            nb_cells: 3
-            # Charge settings
-            # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
-            charge_settings:
-                # Temperrature coeficient for charge correction
-                # number: mV/°C: -1000 <= charge_t_coef <= 1000
-                charge_t_coef: -16.2
-                # Charge Bulk voltage setting
-                # number: 0.1 <= charge_absorption_u <= 100
-                charge_absorption_u: 14.1
-                # Charge Float voltage setting
-                # number: 0.1 <= charge_float_u <= 100
-                charge_float_u: 13.8
-                # Charge Storage voltage setting
-                # number: 0.1 <= charge_storage_u <= 100
-                charge_storage_u: 2.62
-                # Charge Equalization voltage setting
-                # number: 0.1 <= charge_egalization_u <= 100
-                charge_egalization_u: 2.62
-            # Battery Capacity Properties
-            # list: [hour rate value, capacity value, current value]
-            capacity: [
-                [1, 128, 128],
-                [5, 253, 50.56],
-                [8, 275, 34.4],
-                [10, 282, 28.16],
-                [15, 304, 20.27],
-                [20, 320, 16],
-                [50, 381, 7.62],
-                [72, 403, 5.6],
-                [100, 410, 4.10]
-            ]
-    # Available Battery Banks items
-    bankItems:
-        # Battery Bank Name (Defined by User)
-        # str: Alphanumeric characters or '_'
-        existant:
-            # Battery data key selected from Available Batteries items
-            # str: Alphanumeric characters or '_'
-            battery_key: "existant"
-            # Nb Battery in series
-            # int: 1 <= in_series <= 100
-            in_series: 2
-            # Nb Battery in parallel
-            # int: 1 <= in_parallel <= 100
-            in_parallel: 1
-            # System voltage of Battery Bank
-            # number: 2 <= system_voltage <= 24
-            system_voltage: 24
-            # Battery Temperrature data value source
-            # default: fixed at 25°C
-            # dict: optional
-            t_bat:
-                # Battery Temperrature value source name
-                # str: ["fixed", "node", "cache"]
-                source: "node"
-                # node name who is stored the data
+            existant:
+                # Battery manufacturer name
                 # str: Alphanumeric characters or '_'
-                node_name: "arduive_bat"
-            # Battery Bank local Temperrature data value source
-            # default: fixed at 25°C
-            # dict: optional
-            t_loc:
-                # Battery Temperrature value source name
-                # str: ["fixed", "node", "cache"]
-                source: "cache"
-                # node name who is stored the data
+                manufacturer: "BlackBull"
+                # Battery model name
                 # str: Alphanumeric characters or '_'
-                node_name: "arduive_bat"
-            # Charge settings
-            # Will overwrite Battery Charge settings for this project
-            # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
-            charge_settings:
-                # Temperrature coeficient for charge correction
-                # number: mV/°C: -1000 <= charge_t_coef <= 1000
-                charge_t_coef: -16.2
-                # Charge Bulk voltage setting
-                # number: 0.1 <= charge_absorption_u <= 100
-                charge_absorption_u: 14.1
-                # Charge Float voltage setting
-                # number: 0.1 <= charge_float_u <= 100
-                charge_float_u: 13.8
-                # Charge Storage voltage setting
-                # number: 0.1 <= charge_storage_u <= 100
-                charge_storage_u: 2.62
-                # Charge Equalization voltage setting
-                # number: 0.1 <= charge_egalization_u <= 100
-                charge_egalization_u: 2.62
-        # Battery Bank Name (Defined by User)
-        # str: Alphanumeric characters or '_'
-        project1:
-            # Battery data key selected from Available Batteries items
+                model: "BOX-C"
+                # Battery type
+                # str: ["flooded", "gel", "agm", "li"]
+                battery_type: 'flooded'
+                # Battery output voltage
+                # number: 2 <= bat_voltage <= 24
+                bat_voltage: 12
+                # Nb Cells in Battery
+                # int: 1 <= bat_voltage <= 12
+                nb_cells: 6
+                # Charge settings
+                # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
+                charge_settings:
+                    # Temperrature coeficient for charge correction
+                    # number: mV/°C: -1000 <= charge_t_coef <= 1000
+                    charge_t_coef: -16.2
+                    # Charge Bulk voltage setting
+                    # number: 0.1 <= charge_absorption_u <= 100
+                    charge_absorption_u: 14.1
+                    # Charge Float voltage setting
+                    # number: 0.1 <= charge_float_u <= 100
+                    charge_float_u: 13.8
+                    # Charge Storage voltage setting
+                    # number: 0.1 <= charge_storage_u <= 100
+                    charge_storage_u: 2.62
+                    # Charge Equalization voltage setting
+                    # number: 0.1 <= charge_egalization_u <= 100
+                    charge_egalization_u: 2.62
+                # Battery Capacity Properties
+                # list: [hour rate value, capacity value, current value]
+                capacity: [
+                    [5, 185, 37],
+                    [20, 220, 11],
+                    [100, 250, 2.5]
+                ]
+            # Battery Name (Defined by User)
             # str: Alphanumeric characters or '_'
-            battery_key: "project1"
-            # Nb Battery in series
-            # int: 1 <= in_series <= 100
-            in_series: 4
-            # Nb Battery in parallel
-            # int: 1 <= in_parallel <= 100
-            in_parallel: 1
-            # System voltage of Battery Bank
-            # number: 2 <= system_voltage <= 24
-            system_voltage: 24
-            # Battery Temperrature data value source
-            # default: fixed at 25°C
-            # dict: optional
-            t_bat:
-                # Battery Temperrature value source name
-                # str: ["fixed", "node", "cache"]
-                source: "fixed"
-                # Battery Temperrature Fixed Value
-                # number: -50 <= value <= 120
-                value: 25
-            # Battery Bank local Temperrature data value source
-            # default: fixed at 25°C
-            # dict: optional
-            t_loc:
-                # Battery Temperrature value source name
-                # str: ["fixed", "node", "cache"]
-                source: "fixed"
-                # Battery Temperrature Fixed Value
-                # number: -50 <= value <= 120
-                value: 25
-            # Charge settings
-            # Will overwrite Battery Charge settings for this project
-            # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
-            charge_settings:
-                # Temperrature coeficient for charge correction
-                # number: mV/°C: -1000 <= charge_t_coef <= 1000
-                charge_t_coef: -16.2
-                # Charge Bulk voltage setting
-                # number: 0.1 <= charge_absorption_u <= 100
-                charge_absorption_u: 14.1
-                # Charge Float voltage setting
-                # number: 0.1 <= charge_float_u <= 100
-                charge_float_u: 13.8
-                # Charge Storage voltage setting
-                # number: 0.1 <= charge_storage_u <= 100
-                charge_storage_u: 2.62
-                # Charge Equalization voltage setting
-                # number: 0.1 <= charge_egalization_u <= 100
-                charge_egalization_u: 2.62
-        
-        sim_ve:
-            # Battery data key selected from Available Batteries items
+            project1:
+                # Battery manufacturer name
+                # str: Alphanumeric characters or '_'
+                manufacturer: "Rolls"
+                # Battery model name
+                # str: Alphanumeric characters or '_'
+                model: "S6-305"
+                # Battery type
+                # str: ["flooded", "gel", "agm", "li"]
+                battery_type: 'flooded'
+                # Battery output voltage
+                # number: 2 <= bat_voltage <= 24
+                bat_voltage: 6
+                # Nb Cells in Battery
+                # int: 1 <= bat_voltage <= 12
+                nb_cells: 3
+                # Charge settings
+                # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
+                charge_settings:
+                    # Temperrature coeficient for charge correction
+                    # number: mV/°C: -1000 <= charge_t_coef <= 1000
+                    charge_t_coef: -16.2
+                    # Charge Bulk voltage setting
+                    # number: 0.1 <= charge_absorption_u <= 100
+                    charge_absorption_u: 14.1
+                    # Charge Float voltage setting
+                    # number: 0.1 <= charge_float_u <= 100
+                    charge_float_u: 13.8
+                    # Charge Storage voltage setting
+                    # number: 0.1 <= charge_storage_u <= 100
+                    charge_storage_u: 2.62
+                    # Charge Equalization voltage setting
+                    # number: 0.1 <= charge_egalization_u <= 100
+                    charge_egalization_u: 2.62
+                # Battery Capacity Properties
+                # list: [hour rate value, capacity value, current value]
+                capacity: [
+                    [1, 128, 128],
+                    [5, 253, 50.56],
+                    [8, 275, 34.4],
+                    [10, 282, 28.16],
+                    [15, 304, 20.27],
+                    [20, 320, 16],
+                    [50, 381, 7.62],
+                    [72, 403, 5.6],
+                    [100, 410, 4.10]
+                ]
+        # Available Battery Banks items
+        bankItems:
+            # Battery Bank Name (Defined by User)
             # str: Alphanumeric characters or '_'
-            battery_key: "existant"
-            # Nb Battery in series
-            # int: 1 <= in_series <= 100
-            in_series: 1
-            # Nb Battery in parallel
-            # int: 1 <= in_parallel <= 100
-            in_parallel: 1
-            # System voltage of Battery Bank
-            # number: 2 <= system_voltage <= 24
-            system_voltage: 12
-            # Battery Temperrature data value source
-            # default: fixed at 25°C
-            # dict: optional
-            t_bat:
-                # Battery Temperrature value source name
-                # str: ["fixed", "node", "cache"]
-                source: "fixed"
-                value: 25
-            # Battery Bank local Temperrature data value source
-            # default: fixed at 25°C
-            # dict: optional
-            t_loc:
-                # Battery Temperrature value source name
-                # str: ["fixed", "node", "cache"]
-                source: "fixed"
-                # Battery Temperrature Fixed Value
-                # number: -50 <= value <= 120
-                value: 25
-            # Charge settings
-            # Will overwrite Battery Charge settings for this project
-            # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
-            charge_settings:
-                # Temperrature coeficient for charge correction
-                # number: mV/°C: -1000 <= charge_t_coef <= 1000
-                charge_t_coef: -16.2
-                # Charge Bulk voltage setting
-                # number: 0.1 <= charge_absorption_u <= 100
-                charge_absorption_u: 14.1
-                # Charge Float voltage setting
-                # number: 0.1 <= charge_float_u <= 100
-                charge_float_u: 13.8
-                # Charge Storage voltage setting
-                # number: 0.1 <= charge_storage_u <= 100
-                charge_storage_u: 2.62
-                # Charge Equalization voltage setting
-                # number: 0.1 <= charge_egalization_u <= 100
-                charge_egalization_u: 2.62
+            existant:
+                # Battery data key selected from Available Batteries items
+                # str: Alphanumeric characters or '_'
+                battery_key: "existant"
+                # Nb Battery in series
+                # int: 1 <= in_series <= 100
+                in_series: 2
+                # Nb Battery in parallel
+                # int: 1 <= in_parallel <= 100
+                in_parallel: 1
+                # System voltage of Battery Bank
+                # number: 2 <= system_voltage <= 24
+                system_voltage: 24
+                # Battery Temperrature data value source
+                # default: fixed at 25°C
+                # dict: optional
+                t_bat:
+                    # Battery Temperrature value source name
+                    # str: ["fixed", "node", "cache"]
+                    source: "node"
+                    # node name who is stored the data
+                    # str: Alphanumeric characters or '_'
+                    node_name: "arduive_bat"
+                # Battery Bank local Temperrature data value source
+                # default: fixed at 25°C
+                # dict: optional
+                t_loc:
+                    # Battery Temperrature value source name
+                    # str: ["fixed", "node", "cache"]
+                    source: "cache"
+                    # node name who is stored the data
+                    # str: Alphanumeric characters or '_'
+                    node_name: "arduive_bat"
+                # Charge settings
+                # Will overwrite Battery Charge settings for this project
+                # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
+                charge_settings:
+                    # Temperrature coeficient for charge correction
+                    # number: mV/°C: -1000 <= charge_t_coef <= 1000
+                    charge_t_coef: -16.2
+                    # Charge Bulk voltage setting
+                    # number: 0.1 <= charge_absorption_u <= 100
+                    charge_absorption_u: 14.1
+                    # Charge Float voltage setting
+                    # number: 0.1 <= charge_float_u <= 100
+                    charge_float_u: 13.8
+                    # Charge Storage voltage setting
+                    # number: 0.1 <= charge_storage_u <= 100
+                    charge_storage_u: 2.62
+                    # Charge Equalization voltage setting
+                    # number: 0.1 <= charge_egalization_u <= 100
+                    charge_egalization_u: 2.62
+            # Battery Bank Name (Defined by User)
+            # str: Alphanumeric characters or '_'
+            project1:
+                # Battery data key selected from Available Batteries items
+                # str: Alphanumeric characters or '_'
+                battery_key: "project1"
+                # Nb Battery in series
+                # int: 1 <= in_series <= 100
+                in_series: 4
+                # Nb Battery in parallel
+                # int: 1 <= in_parallel <= 100
+                in_parallel: 1
+                # System voltage of Battery Bank
+                # number: 2 <= system_voltage <= 24
+                system_voltage: 24
+                # Battery Temperrature data value source
+                # default: fixed at 25°C
+                # dict: optional
+                t_bat:
+                    # Battery Temperrature value source name
+                    # str: ["fixed", "node", "cache"]
+                    source: "fixed"
+                    # Battery Temperrature Fixed Value
+                    # number: -50 <= value <= 120
+                    value: 25
+                # Battery Bank local Temperrature data value source
+                # default: fixed at 25°C
+                # dict: optional
+                t_loc:
+                    # Battery Temperrature value source name
+                    # str: ["fixed", "node", "cache"]
+                    source: "fixed"
+                    # Battery Temperrature Fixed Value
+                    # number: -50 <= value <= 120
+                    value: 25
+                # Charge settings
+                # Will overwrite Battery Charge settings for this project
+                # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
+                charge_settings:
+                    # Temperrature coeficient for charge correction
+                    # number: mV/°C: -1000 <= charge_t_coef <= 1000
+                    charge_t_coef: -16.2
+                    # Charge Bulk voltage setting
+                    # number: 0.1 <= charge_absorption_u <= 100
+                    charge_absorption_u: 14.1
+                    # Charge Float voltage setting
+                    # number: 0.1 <= charge_float_u <= 100
+                    charge_float_u: 13.8
+                    # Charge Storage voltage setting
+                    # number: 0.1 <= charge_storage_u <= 100
+                    charge_storage_u: 2.62
+                    # Charge Equalization voltage setting
+                    # number: 0.1 <= charge_egalization_u <= 100
+                    charge_egalization_u: 2.62
+            
+            sim_ve:
+                # Battery data key selected from Available Batteries items
+                # str: Alphanumeric characters or '_'
+                battery_key: "existant"
+                # Nb Battery in series
+                # int: 1 <= in_series <= 100
+                in_series: 1
+                # Nb Battery in parallel
+                # int: 1 <= in_parallel <= 100
+                in_parallel: 1
+                # System voltage of Battery Bank
+                # number: 2 <= system_voltage <= 24
+                system_voltage: 12
+                # Battery Temperrature data value source
+                # default: fixed at 25°C
+                # dict: optional
+                t_bat:
+                    # Battery Temperrature value source name
+                    # str: ["fixed", "node", "cache"]
+                    source: "fixed"
+                    value: 25
+                # Battery Bank local Temperrature data value source
+                # default: fixed at 25°C
+                # dict: optional
+                t_loc:
+                    # Battery Temperrature value source name
+                    # str: ["fixed", "node", "cache"]
+                    source: "fixed"
+                    # Battery Temperrature Fixed Value
+                    # number: -50 <= value <= 120
+                    value: 25
+                # Charge settings
+                # Will overwrite Battery Charge settings for this project
+                # dict: {bulk_voltage: 12.47, float_voltage: 12.47, equalization_voltage: 12.47}
+                charge_settings:
+                    # Temperrature coeficient for charge correction
+                    # number: mV/°C: -1000 <= charge_t_coef <= 1000
+                    charge_t_coef: -16.2
+                    # Charge Bulk voltage setting
+                    # number: 0.1 <= charge_absorption_u <= 100
+                    charge_absorption_u: 14.1
+                    # Charge Float voltage setting
+                    # number: 0.1 <= charge_float_u <= 100
+                    charge_float_u: 13.8
+                    # Charge Storage voltage setting
+                    # number: 0.1 <= charge_storage_u <= 100
+                    charge_storage_u: 2.62
+                    # Charge Equalization voltage setting
+                    # number: 0.1 <= charge_egalization_u <= 100
+                    charge_egalization_u: 2.62

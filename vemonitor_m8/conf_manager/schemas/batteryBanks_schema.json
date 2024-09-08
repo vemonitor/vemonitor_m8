@@ -119,7 +119,7 @@
             "description": "Battery item.",
             "type": "object",
             "minProperties": 1,
-            "maxProperties": 7,
+            "maxProperties": 8,
             "additionalProperties": false,
             "required": [ "battery_type" ],
             "properties" : {
@@ -135,6 +135,10 @@
                     "$ref": "/schemas/battery_type"
                 },
                 "bat_voltage": {
+                    "description": "Voltage of battery.",
+                    "$ref": "/schemas/bat_voltage"
+                },
+                "cell_voltage": {
                     "description": "Voltage of single battery cell.",
                     "$ref": "/schemas/bat_voltage"
                 },
@@ -177,8 +181,8 @@
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Voltage of single battery cell.",
             "type": "number",
-            "minimum": 2,
-            "maximum": 24
+            "exclusiveMinimum": 0,
+            "maximum": 1000
         },
         "nb_cells": {
             "$id": "/schemas/nb_cells",
@@ -186,15 +190,15 @@
             "description": "Number of battery cells.",
             "type": "integer",
             "minimum": 1,
-            "maximum": 12
+            "maximum": 1000
         },
         "bat_charge_v": {
             "$id": "/schemas/bat_charge_v",
             "$schema": "http://json-schema.org/draft-07/schema#",
             "description": "Battery charge voltage.",
             "type": "number",
-            "minimum": 0.1,
-            "maximum": 100
+            "exclusiveMinimum": 0,
+            "maximum": 1000
         },
         "charge_settings": {
             "$id": "/schemas/charge_settings",
@@ -281,7 +285,7 @@
             "description": "Number of Batteries in series or in parallel.",
             "type": "integer",
             "minimum": 1,
-            "maximum": 100
+            "maximum": 1000
         },
         "system_voltage": {
             "$id": "/schemas/system_voltage",

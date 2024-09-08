@@ -65,11 +65,11 @@ class TestBatteryBankSchema:
             ('battery_key',
              schema_manager.obj['batteryDatas']['bankItems']['existant']),
             ('battery_type',
-             schema_manager.obj['batteryDatas']['bankItems']['existant']),
+             schema_manager.obj['batteryDatas']['batteries']['existant']),
             ('battery_key',
              schema_manager.obj['batteryDatas']['bankItems']['project1']),
             ('battery_type',
-             schema_manager.obj['batteryDatas']['bankItems']['project1'])
+             schema_manager.obj['batteryDatas']['batteries']['project1'])
         ]
         schema_manager.run_test_values(datas=datas, key="string_key")
 
@@ -95,15 +95,15 @@ class TestBatteryBankSchema:
             ('bat_voltage',
              schema_manager.obj['batteryDatas']['batteries']['existant']),
             ('charge_absorption_u',
-             schema_manager.obj['batteryDatas']['batteries']['existant']),
+             schema_manager.obj['batteryDatas']['batteries']['existant']['charge_settings']),
             ('charge_float_u',
-             schema_manager.obj['batteryDatas']['batteries']['existant']),
+             schema_manager.obj['batteryDatas']['batteries']['existant']['charge_settings']),
             ('bat_voltage',
              schema_manager.obj['batteryDatas']['batteries']['project1']),
             ('charge_absorption_u',
-             schema_manager.obj['batteryDatas']['batteries']['project1']),
+             schema_manager.obj['batteryDatas']['batteries']['project1']['charge_settings']),
             ('charge_float_u',
-             schema_manager.obj['batteryDatas']['batteries']['project1']),
+             schema_manager.obj['batteryDatas']['batteries']['project1']['charge_settings']),
         ]
         schema_manager.run_test_values(datas=datas, key="positive_number")
 
@@ -131,7 +131,6 @@ class TestBatteryBankSchema:
         schema_manager.load_battery_bank_conf('batteryBankArgs')
         datas = [
             ('name', schema_manager.obj['batteryBankArgs']),
-            ('battery_type', schema_manager.obj['batteryBankArgs']),
             ('battery_key', schema_manager.obj['batteryBankArgs'])
         ]
         schema_manager.run_test_values(datas=datas, key="string_key")
@@ -141,6 +140,7 @@ class TestBatteryBankSchema:
         schema_manager.load_battery_bank_conf('batteryBankArgs')
         datas = [
             ('manufacturer', schema_manager.obj['batteryBankArgs']['battery']),
+            #('battery_type', schema_manager.obj['batteryBankArgs']['battery']),
             ('model', schema_manager.obj['batteryBankArgs']['battery'])
         ]
         schema_manager.run_test_values(datas=datas, key="string_text")
@@ -151,9 +151,13 @@ class TestBatteryBankSchema:
         datas = [
             ('bat_voltage', schema_manager.obj['batteryBankArgs']['battery']),
             ('charge_absorption_u',
-             schema_manager.obj['batteryBankArgs']['battery']),
+             schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
             ('charge_float_u',
-             schema_manager.obj['batteryBankArgs']['battery']),
+             schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
+             ('charge_storage_u',
+             schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
+             ('charge_egalization_u',
+             schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
         ]
         schema_manager.run_test_values(datas=datas, key="positive_number")
 
