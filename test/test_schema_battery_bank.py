@@ -92,17 +92,17 @@ class TestBatteryBankSchema:
         """Test bad key patterns on data"""
         schema_manager.load_battery_bank_conf('batteryDatas')
         datas = [
-            ('cell_voltage',
+            ('bat_voltage',
              schema_manager.obj['batteryDatas']['batteries']['existant']),
-            ('bulk_voltage',
+            ('charge_absorption_u',
              schema_manager.obj['batteryDatas']['batteries']['existant']),
-            ('float_voltage',
+            ('charge_float_u',
              schema_manager.obj['batteryDatas']['batteries']['existant']),
-            ('cell_voltage',
+            ('bat_voltage',
              schema_manager.obj['batteryDatas']['batteries']['project1']),
-            ('bulk_voltage',
+            ('charge_absorption_u',
              schema_manager.obj['batteryDatas']['batteries']['project1']),
-            ('float_voltage',
+            ('charge_float_u',
              schema_manager.obj['batteryDatas']['batteries']['project1']),
         ]
         schema_manager.run_test_values(datas=datas, key="positive_number")
@@ -149,10 +149,10 @@ class TestBatteryBankSchema:
         """Test bad key patterns on data"""
         schema_manager.load_battery_bank_conf('batteryBankArgs')
         datas = [
-            ('cell_voltage', schema_manager.obj['batteryBankArgs']['battery']),
-            ('bulk_voltage',
+            ('bat_voltage', schema_manager.obj['batteryBankArgs']['battery']),
+            ('charge_absorption_u',
              schema_manager.obj['batteryBankArgs']['battery']),
-            ('float_voltage',
+            ('charge_float_u',
              schema_manager.obj['batteryBankArgs']['battery']),
         ]
         schema_manager.run_test_values(datas=datas, key="positive_number")

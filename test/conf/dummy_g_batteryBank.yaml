@@ -8,10 +8,10 @@ batteryBanks:
             existant:
                 manufacturer: "BlackBull"
                 model: "BOX-C"
-                cell_voltage: 12
+                bat_voltage: 12
                 nb_cells: 6
-                bulk_voltage: 2.47
-                float_voltage: 2.25
+                charge_absorption_u: 2.47
+                charge_float_u: 2.25
                 capacity: [
                     [5, 185, 37],
                     [20, 220, 11],
@@ -20,10 +20,10 @@ batteryBanks:
             project1:
                 manufacturer: "Rolls"
                 model: "S6-305"
-                cell_voltage: 6
+                bat_voltage: 6
                 nb_cells: 3
-                bulk_voltage: 2.47
-                float_voltage: 2.25
+                charge_absorption_u: 2.47
+                charge_float_u: 2.25
                 capacity: [
                     [1, 128, 128],
                     [5, 253, 50.56],
