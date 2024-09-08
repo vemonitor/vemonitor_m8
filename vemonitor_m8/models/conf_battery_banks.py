@@ -79,3 +79,22 @@ class ConfigBatteryBanks(ConfigDataStructures):
                         if Ut.is_dict(self.battery_banks.get(arg)):
                             return self.battery_banks.get(arg)
         return res
+
+    def get_battery_bank(self) -> None:
+        """Get Battery Bank from Args"""
+        res = None
+        project_name = None
+        if self.has_app_block_key(0)\
+                and self.has_battery_banks()\
+                and Ut.is_dict(
+                    self.app_blocks[0].get('args'),
+                    not_null=True):
+            project_name = self.app_blocks[0]['args'].get('batteryBanks')
+
+        if Ut.is_str(project_name, not_null=True)\
+                and self.has_battery_banks()\
+                and Ut.is_dict(
+                    self.battery_banks.get(project_name),
+                    not_null=True):
+            res = self.battery_banks.get(project_name)
+        return res
