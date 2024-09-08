@@ -121,7 +121,6 @@ class AsyncInputsRun(AppBlockRun):
                 if new_interval <= interval:
                     current_thread.interval = new_interval
 
-                
         except VeMonitorError as ex:
             logger.error(
                 "[AsyncAppBlockRun::read_worker_data] "
@@ -219,4 +218,3 @@ class AsyncInputsRun(AppBlockRun):
                 next_exec = round(abs(now_int + interval + exact_time), 6)
                 result = round(abs(now - next_exec), 6)
         return result
-
