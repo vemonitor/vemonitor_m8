@@ -49,7 +49,7 @@ class TestAppBlocksSchema:
         datas = [
             ('name', schema_manager.obj[0]),
             ('app', schema_manager.obj[0], 'bad'),
-            ('batteryBanks', schema_manager.obj[0]['args']),
+            ('batteryBanks', schema_manager.obj[0]['middlewares']),
             ('source', schema_manager.obj[0]['inputs']['serial'][0]),
             ('device', schema_manager.obj[0]['inputs']['serial'][0]),
             ('source', schema_manager.obj[0]['outputs']['redis'][0]),
@@ -60,7 +60,7 @@ class TestAppBlocksSchema:
 
             ('name', schema_manager.obj[1]),
             ('app', schema_manager.obj[1], 'bad'),
-            ('batteryBanks', schema_manager.obj[1]['args']),
+            ('batteryBanks', schema_manager.obj[1]['middlewares']),
             ('source', schema_manager.obj[1]['inputs']['redis'][0]),
             ('redis_node', schema_manager.obj[1]['inputs']['redis'][0]),
             ('source', schema_manager.obj[1]['outputs']['influxDb2'][0]),
@@ -104,7 +104,7 @@ class TestAppBlocksSchema:
                 schema_manager.obj, schema_manager.schema)
         schema_manager.obj[0]['app'] = val
 
-        del schema_manager.obj[0]['args']
+        del schema_manager.obj[0]['middlewares']
         del schema_manager.obj[0]['inputs']
         del schema_manager.obj[0]['outputs']
 
@@ -114,25 +114,25 @@ class TestAppBlocksSchema:
             not_null=True
         )
 
-    def test_block_args(self, schema_manager):
+    def test_block_middlewares(self, schema_manager):
         """Test block data"""
         schema_manager.init_data()
-        # test block args bad key
-        val = schema_manager.obj[0]['args']
-        schema_manager.obj[0]['args'].update(
-            {'hello': schema_manager.obj[0]['args'].get('batteryBanks')}
+        # test block middlewares bad key
+        val = schema_manager.obj[0]['middlewares']
+        schema_manager.obj[0]['middlewares'].update(
+            {'hello': schema_manager.obj[0]['middlewares'].get('batteryBanks')}
         )
         with pytest.raises(ValidationError):
             SchemaValidate.validate_data_from_schema(
                 schema_manager.obj, schema_manager.schema)
-        schema_manager.obj[0]['args'] = val
+        schema_manager.obj[0]['middlewares'] = val
 
-        # test empty block args
-        del schema_manager.obj[0]['args']['batteryBanks']
+        # test empty block middlewares
+        del schema_manager.obj[0]['middlewares']['batteryBanks']
         with pytest.raises(ValidationError):
             SchemaValidate.validate_data_from_schema(
                 schema_manager.obj, schema_manager.schema)
-        schema_manager.obj[0]['args'] = val
+        schema_manager.obj[0]['middlewares'] = val
 
     def test_block_inputs_outputs(self, schema_manager):
         """Test block data"""

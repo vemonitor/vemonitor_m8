@@ -15,12 +15,12 @@ appBlocks:
         # app name of the block item
         # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
         app: "batSerialMonitor"
-        # args add extra data to app.
+        # middlewares add extra data to app.
         # related to batteryBank and/or solarPlant sections.
         # dict :
         #       -> {extra object names: extra object item names}
         #       -> {['batteryBanks', 'solar_plant']: extra object item names}
-        args:
+        middlwares:
             batteryBanks: "project1"
         # Redis Cache (Optional)
         # if not defined data is cached by Memory
@@ -116,12 +116,12 @@ appBlocks:
         # app name of the block item
         # str : (required, ['batSerialMonitor', 'simData', 'redVeSimFaker'])
         app: "batSerialMonitor"
-        # args add extra data to app.
+        # middlewares add extra data to app.
         # related to batteryBank and/or solarPlant sections.
         # dict :
         #       -> {extra object names: extra object item names}
         #       -> {['batteryBanks', 'solar_plant']: extra object item names}
-        args:
+        middlewares:
             batteryBanks: "project1"
         # Redis Cache (Optional)
         # if not defined data is cached by Memory

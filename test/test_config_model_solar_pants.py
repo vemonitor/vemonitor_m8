@@ -264,12 +264,12 @@ class TestConfigConfigBatteryBanks:
                 battery_banks={}
             )
 
-    def test_get_battery_banks_from_args(self, helper_manager):
-        """Test get_battery_banks_from_args method """
+    def test_get_battery_banks_from_mid(self, helper_manager):
+        """Test get_battery_banks_from_mid method """
         helper_manager.init_config_with_loader()
 
-        battery_banks = helper_manager.obj.get_battery_banks_from_args(
-            args=helper_manager.obj.app_blocks[0].get('args')
+        battery_banks = helper_manager.obj.get_battery_banks_from_mid(
+            middlewares=helper_manager.obj.app_blocks[0].get('middlewares')
         )
         assert Ut.is_dict(battery_banks, not_null=True)
         assert battery_banks['battery'].get('battery_type') == 'flooded'

@@ -164,7 +164,7 @@ class AppBlockHelper:
         return sources
 
     @staticmethod
-    def is_app_block_args(block: dict) -> bool:
-        """Test if is valid App Block Args"""
+    def is_app_block_middlewares(block: dict) -> bool:
+        """Test if is valid App Block middlewares"""
         return AppBlockHelper.is_app_block(block)\
-            and Ut.is_dict(block.get('args'), not_null=True)
+            and Ut.is_dict(block.get('middlewares'), not_null=True)

@@ -69,11 +69,11 @@ class ConfigBatteryBanks(ConfigDataStructures):
             result = True
         return result
 
-    def get_battery_banks_from_args(self, args: dict) -> Optional[dict]:
-        """Get Battery Banks from Args"""
+    def get_battery_banks_from_mid(self, middlewares: dict) -> Optional[dict]:
+        """Get Battery Banks from middlewares"""
         res = None
-        if Ut.is_dict(args, not_null=True):
-            for key, arg in args.items():
+        if Ut.is_dict(middlewares, not_null=True):
+            for key, arg in middlewares.items():
                 if Ut.is_str(arg) and Ut.is_str(arg):
                     if key == 'batteryBanks':
                         if Ut.is_dict(self.battery_banks.get(arg)):
@@ -87,9 +87,9 @@ class ConfigBatteryBanks(ConfigDataStructures):
         if self.has_app_block_key(0)\
                 and self.has_battery_banks()\
                 and Ut.is_dict(
-                    self.app_blocks[0].get('args'),
+                    self.app_blocks[0].get('middlewares'),
                     not_null=True):
-            project_name = self.app_blocks[0]['args'].get('batteryBanks')
+            project_name = self.app_blocks[0]['middlewares'].get('batteryBanks')
 
         if Ut.is_str(project_name, not_null=True)\
                 and self.has_battery_banks()\

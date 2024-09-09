@@ -23,7 +23,7 @@
                 "enum": ["redisBatMonitor", "batSerialMonitor", "redVeSimFaker"],
                 "pattern": "(?=\\w{1,30}$)^([a-zA-Z0-9]+(?:_[a-zA-Z0-9]+)*)$"
             },
-            "args": {
+            "middlewares": {
                 "description": "Dict selector of extra objects.",
                 "type": "object",
                 "maxProperties": 2,

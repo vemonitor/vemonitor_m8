@@ -64,18 +64,18 @@ class ConfigLoaderHelper:
         return res
 
     @classmethod
-    def get_args_objects_from_conf(cls,
-                                   args: dict,
+    def get_middlewares_objects_from_conf(cls,
+                                   middlewares: dict,
                                    conf: dict
                                    ) -> Optional[dict]:
-        """Get Args data from config."""
+        """Get middlewares data from config."""
         obj = None
-        if Ut.is_dict(args, not_null=True) and Ut.is_dict(conf, not_null=True):
+        if Ut.is_dict(middlewares, not_null=True) and Ut.is_dict(conf, not_null=True):
             obj = {}
-            for key, arg in args.items():
+            for key, arg in middlewares.items():
                 if Ut.is_str(key) and Ut.is_str(arg):
                     if key == 'batteryBanks':
-                        obj[arg] = cls.get_battery_bank_from_arg(
+                        obj[arg] = cls.get_battery_bank_from_mid(
                             arg,
                             conf.get(key)
                         )
@@ -83,11 +83,11 @@ class ConfigLoaderHelper:
         return obj
 
     @classmethod
-    def get_app_blocks_args_objects(cls,
+    def get_app_blocks_middlewares_objects(cls,
                                     app_blocks: list,
                                     conf: dict
                                     ) -> Optional[dict]:
-        """Get App Blocks Args data from config."""
+        """Get App Blocks middlewares data from config."""
         obj = None
         if jValid.is_valid_app_blocks_conf(app_blocks)\
                 and Ut.is_dict(conf, not_null=True):
@@ -95,7 +95,7 @@ class ConfigLoaderHelper:
             for block in app_blocks:
                 if Ut.is_dict(block, not_null=True):
                     obj.update(
-                        cls.get_args_objects_from_conf(block.get('args'), conf)
+                        cls.get_middlewares_objects_from_conf(block.get('middlewares'), conf)
                     )
         return obj
 
@@ -236,11 +236,11 @@ class ConfigLoaderHelper:
         }
 
     @classmethod
-    def get_battery_bank_from_arg(cls,
+    def get_battery_bank_from_mid(cls,
                                   arg: str,
                                   battery_bank: dict
                                   ) -> Optional[dict]:
-        """Get battery banks from Args data config."""
+        """Get battery banks from middlewares data config."""
         if jValid.is_valid_battery_banks_conf(battery_bank):
             bank = cls.get_battery_banks_items_key(arg, battery_bank)
             if Ut.is_dict(bank, not_null=True)\

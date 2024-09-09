@@ -85,7 +85,7 @@ class ConfigLoader(DataStructureLoader):
             )
 
         output.set_battery_banks(
-            cHelp.get_app_blocks_args_objects(
+            cHelp.get_app_blocks_middlewares_objects(
                 app_blocks=output.app_blocks,
                 conf=imp_conf
             )
@@ -127,7 +127,7 @@ class ConfigLoader(DataStructureLoader):
         The returned Config object contains :
             - appBlocks, filtered with app_name and block_name.
             - appConnectors, present on the appBlocks inputs/outputs.
-            - compiled appBlocks args objects.
+            - compiled appBlocks middlewares objects.
             - columns Checkers filtered from appBlocks inputs/outputs columns.
 
 

@@ -73,54 +73,54 @@ class TestConfigLoaderHelper:
         with pytest.raises(ValidationError):
             clh.get_app_blocks_by_app_or_name(app_blocks=['1', '2'])
 
-    def test_get_args_objects_from_conf(self, helper_manager):
+    def test_get_middlewares_objects_from_conf(self, helper_manager):
         """
-        Test get_args_objects_from_conf method
+        Test get_middlewares_objects_from_conf method
         """
         c_loader = ConfigLoader(helper_manager.test_path)
         settings = c_loader.get_settings_from_schema(
             app_name="batSerialMonitor"
         )
         imp_conf = c_loader._get_settings_from_file()
-        res = clh.get_args_objects_from_conf(
-            args=settings.app_blocks[0].get('args'),
+        res = clh.get_middlewares_objects_from_conf(
+            middlewares=settings.app_blocks[0].get('middlewares'),
             conf=imp_conf
         )
         assert Ut.is_dict(res, not_null=True)
 
-        res = clh.get_args_objects_from_conf(
-            args=dict(),
+        res = clh.get_middlewares_objects_from_conf(
+            middlewares=dict(),
             conf=imp_conf
         )
         assert res is None
 
-        res = clh.get_args_objects_from_conf(
-            args=settings.app_blocks[0].get('args'),
+        res = clh.get_middlewares_objects_from_conf(
+            middlewares=settings.app_blocks[0].get('middlewares'),
             conf=dict()
         )
         assert res is None
 
-    def test_get_app_blocks_args_objects(self, helper_manager):
-        """Test get_app_blocks_args_objects method."""
+    def test_get_app_blocks_middlewares_objects(self, helper_manager):
+        """Test get_app_blocks_middlewares_objects method."""
         c_loader = ConfigLoader(helper_manager.test_path)
         settings = c_loader.get_settings_from_schema(
             app_name="batSerialMonitor"
         )
         imp_conf = c_loader._get_settings_from_file()
-        res = clh.get_app_blocks_args_objects(
+        res = clh.get_app_blocks_middlewares_objects(
             app_blocks=settings.app_blocks,
             conf=imp_conf
         )
         assert Ut.is_dict(res, not_null=True)
 
-        res = clh.get_app_blocks_args_objects(
+        res = clh.get_app_blocks_middlewares_objects(
             app_blocks=settings.app_blocks,
             conf=dict()
         )
         assert res is None
 
         with pytest.raises(ValidationError):
-            clh.get_app_blocks_args_objects(
+            clh.get_app_blocks_middlewares_objects(
                 app_blocks=['1', '2'],
                 conf=imp_conf
             )
@@ -239,24 +239,24 @@ class TestConfigLoaderHelper:
         )
         assert Ut.is_dict(res, not_null=True)
 
-    def test_get_battery_bank_from_arg(self, helper_manager):
-        """Test get_battery_bank_from_arg method"""
+    def test_get_battery_bank_from_mid(self, helper_manager):
+        """Test get_battery_bank_from_mid method"""
         c_loader = ConfigLoader(helper_manager.test_path)
         imp_conf = c_loader._get_settings_from_file()
-        res = clh.get_battery_bank_from_arg(
+        res = clh.get_battery_bank_from_mid(
             arg='project1',
             battery_bank=imp_conf.get('batteryBanks')
         )
         assert Ut.is_dict(res, not_null=True)
 
         with pytest.raises(ValidationError):
-            clh.get_battery_bank_from_arg(
+            clh.get_battery_bank_from_mid(
                 arg='project1',
                 battery_bank={'a': 1}
             )
 
         with pytest.raises(SettingInvalidException):
-            clh.get_battery_bank_from_arg(
+            clh.get_battery_bank_from_mid(
                 arg='bad_arg',
                 battery_bank=imp_conf.get('batteryBanks')
             )
