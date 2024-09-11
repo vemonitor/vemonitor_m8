@@ -225,7 +225,7 @@
                     "description": "Storage Voltage of single battery cell.",
                     "$ref": "/schemas/bat_charge_v"
                 },
-                "charge_egalization_u": {
+                "charge_equalization_u": {
                     "description": "Equalization Voltage of single battery cell.",
                     "$ref": "/schemas/bat_charge_v"
                 }

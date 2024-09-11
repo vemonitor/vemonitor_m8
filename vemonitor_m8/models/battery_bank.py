@@ -373,5 +373,5 @@ class BatteryBank:
                 or Ut.is_numeric(data.get('charge_absorption_u'), positive=True)\
                 or Ut.is_numeric(data.get('charge_float_u'), positive=True)\
                 or Ut.is_numeric(data.get('storage_v'), positive=True)\
-                or Ut.is_numeric(data.get('charge_egalization_u'), positive=True)
+                or Ut.is_numeric(data.get('charge_equalization_u'), positive=True)
             )

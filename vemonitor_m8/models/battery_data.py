@@ -18,7 +18,7 @@ class ChargeSettingsType(TypedDict):
     charge_t_coef: float=0.0
     charge_absorption_u: float=0.0
     charge_float_u: float=0.0
-    charge_egalization_u: float=0.0
+    charge_equalization_u: float=0.0
 
 
 class BatteryModelType(TypedDict):

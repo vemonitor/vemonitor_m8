@@ -53,7 +53,7 @@ class BatteryFloodedModel(BatteryModel):
             'charge_absorption_u': 14.1,
             'charge_float_u': 13.8,
             'charge_storage_u': 13.2,
-            'charge_egalization_u': 15.9,
+            'charge_equalization_u': 15.9,
             'charge_t_coef': -16.2
         }
         self.set_defaults_charge_settings(

@@ -41,8 +41,8 @@ batteryBanks:
                     # number: 0.1 <= charge_storage_u <= 100
                     charge_storage_u: 2.62
                     # Charge Equalization voltage setting
-                    # number: 0.1 <= charge_egalization_u <= 100
-                    charge_egalization_u: 2.62
+                    # number: 0.1 <= charge_equalization_u <= 100
+                    charge_equalization_u: 2.62
                 # Battery Capacity Properties
                 # list: [hour rate value, capacity value, current value]
                 capacity: [
@@ -84,8 +84,8 @@ batteryBanks:
                     # number: 0.1 <= charge_storage_u <= 100
                     charge_storage_u: 2.62
                     # Charge Equalization voltage setting
-                    # number: 0.1 <= charge_egalization_u <= 100
-                    charge_egalization_u: 2.62
+                    # number: 0.1 <= charge_equalization_u <= 100
+                    charge_equalization_u: 2.62
                 # Battery Capacity Properties
                 # list: [hour rate value, capacity value, current value]
                 capacity: [
@@ -153,8 +153,8 @@ batteryBanks:
                     # number: 0.1 <= charge_storage_u <= 100
                     charge_storage_u: 2.62
                     # Charge Equalization voltage setting
-                    # number: 0.1 <= charge_egalization_u <= 100
-                    charge_egalization_u: 2.62
+                    # number: 0.1 <= charge_equalization_u <= 100
+                    charge_equalization_u: 2.62
             # Battery Bank Name (Defined by User)
             # str: Alphanumeric characters or '_'
             project1:
@@ -207,8 +207,8 @@ batteryBanks:
                     # number: 0.1 <= charge_storage_u <= 100
                     charge_storage_u: 2.62
                     # Charge Equalization voltage setting
-                    # number: 0.1 <= charge_egalization_u <= 100
-                    charge_egalization_u: 2.62
+                    # number: 0.1 <= charge_equalization_u <= 100
+                    charge_equalization_u: 2.62
             
             sim_ve:
                 # Battery data key selected from Available Batteries items
@@ -258,5 +258,5 @@ batteryBanks:
                     # number: 0.1 <= charge_storage_u <= 100
                     charge_storage_u: 2.62
                     # Charge Equalization voltage setting
-                    # number: 0.1 <= charge_egalization_u <= 100
-                    charge_egalization_u: 2.62
+                    # number: 0.1 <= charge_equalization_u <= 100
+                    charge_equalization_u: 2.62

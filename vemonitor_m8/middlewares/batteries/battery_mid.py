@@ -57,7 +57,7 @@ class BatteryMid(BatteryMidMin):
                     'charge_t_coef': battery_bank.get('charge_t_coef'),
                     'charge_absorption_u': battery_bank.get('charge_absorption_u'),
                     'charge_float_u': battery_bank.get('charge_float_u'),
-                    'charge_egalization_u': battery_bank.get('charge_egalization_u')
+                    'charge_equalization_u': battery_bank.get('charge_equalization_u')
                 }
             }
             self. battery_bank = BatteryBank(**settings)
