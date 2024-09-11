@@ -155,6 +155,7 @@ class TestHmapTimeSeriesApp:
                 node_name=["inputs_cache"]
             )
 
+        assert helper_manager.obj.api.flush() is True
         # test loose redis conection
         helper_manager.obj.api.cli = None
         with pytest.raises(RedisConnectionException):
@@ -189,6 +190,7 @@ class TestHmapTimeSeriesApp:
                 node_name=["inputs_cache"]
             )
 
+        assert helper_manager.obj.api.flush() is True
         # test loose redis conection
         helper_manager.obj.api.cli = None
         with pytest.raises(RedisConnectionException):
@@ -245,6 +247,7 @@ class TestHmapTimeSeriesApp:
             'pytest_pytest_3': [1722013460, 1722013465, 1722013470],
             'pytest_pytest_2': [1722013472, 1722013474]
         }
+        assert helper_manager.obj.api.flush() is True
 
     def test_enum_node_keys(self, helper_manager):
         """Test enum_node_keys method"""
@@ -282,6 +285,7 @@ class TestHmapTimeSeriesApp:
                 assert keys is None
             else:
                 assert False
+        assert helper_manager.obj.api.flush() is True
 
     def test_reset_node_data(self, helper_manager):
         """Test reset_node_data method"""
@@ -293,6 +297,7 @@ class TestHmapTimeSeriesApp:
             node_name=helper_manager.node_name
         )
         assert deleted == [3, 3]
+        assert helper_manager.obj.api.flush() is True
 
     def test_add_time_serie_to_node(self, helper_manager):
         """Test add_time_serie_to_node method"""
@@ -318,6 +323,7 @@ class TestHmapTimeSeriesApp:
         assert len(data_pytest_pytest_1) == 10
         assert len(data_pytest_pytest_2) == 10
         assert len(data_pytest_pytest_3) == 10
+        assert helper_manager.obj.api.flush() is True
 
     def test_enum_node_data_interval(self, helper_manager):
         """Test enum_node_data_interval method"""
@@ -335,6 +341,7 @@ class TestHmapTimeSeriesApp:
                 assert values == {'V': 26.8, 'I': 1.52}
             else:
                 assert False
+        assert helper_manager.obj.api.flush() is True
 
     def test_get_redis_time_series(self, helper_manager):
         """Test get_redis_time_series method"""
@@ -395,6 +402,7 @@ class TestHmapTimeSeriesApp:
         assert keys == [1722013481, 1722013482]
 
         assert max_time == 1722013482
+        assert helper_manager.obj.api.flush() is True
 
     def test_get_data_time_series(self, helper_manager):
         """Test get_data_time_series method"""
@@ -552,3 +560,4 @@ class TestHmapTimeSeriesApp:
         }
         assert max_time == 1722013487
         assert last_time == 1722013488
+        assert helper_manager.obj.api.flush() is True

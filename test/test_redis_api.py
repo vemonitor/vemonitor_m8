@@ -231,6 +231,7 @@ class TestRedisBase:
             db=helper_manager.db
         )
         assert info is None
+        assert helper_manager.obj.flush() is True
 
     def test_get_db_nb_keys(self, helper_manager):
         """Test get_db_nb_keys method"""
@@ -248,6 +249,7 @@ class TestRedisBase:
             db=helper_manager.db
         )
         assert nb_keys == 0
+        assert helper_manager.obj.flush() is True
 
     def test_get_current_db_size(self, helper_manager):
         """Test get_current_db_size method"""
@@ -284,6 +286,7 @@ class TestRedisBase:
                 key=['data_test']
             )
 
+        assert helper_manager.obj.flush() is True
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_key_type(
@@ -308,6 +311,7 @@ class TestRedisBase:
         last_saved_time = info.get('rdb_last_save_time')
         assert now <= last_saved_time
 
+        assert helper_manager.obj.flush() is True
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.save_redis_data_on_disk()
@@ -335,6 +339,7 @@ class TestRedisBase:
         )
         assert Ut.is_dict(info, not_null=True)
 
+        assert helper_manager.obj.flush() is True
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_redis_info_usage()
@@ -357,6 +362,7 @@ class TestRedisApi:
         meta = helper_manager.obj.get_db_meta()
         assert Ut.is_dict(meta, not_null=True)
         assert meta.get("controled_by") == "vemonitor_m8"
+        assert helper_manager.obj.flush() is True
 
     def test_is_db_meta(self, helper_manager):
         """Test is_db_meta method"""
@@ -371,6 +377,7 @@ class TestRedisApi:
         helper_manager.obj.init_db_meta()
         is_meta = helper_manager.obj.is_db_meta()
         assert is_meta is True
+        assert helper_manager.obj.flush() is True
 
     def test_init_db_meta(self, helper_manager):
         """Test init_db_meta method"""
@@ -381,6 +388,7 @@ class TestRedisApi:
         assert helper_manager.obj.init_db_meta() is True
         is_meta = helper_manager.obj.is_db_meta()
         assert is_meta is True
+        assert helper_manager.obj.flush() is True
 
     def test_control_current_db(self, helper_manager):
         """Test control_current_db method"""
@@ -413,6 +421,7 @@ class TestRedisApi:
         assert nb_added > 0
         is_db = helper_manager.obj.control_current_db()
         assert is_db is False
+        assert helper_manager.obj.flush() is True
 
     def test_run_db_selector(self, helper_manager):
         """Test run_db_selector method"""
@@ -445,6 +454,7 @@ class TestRedisApi:
         assert is_db is True
         db_end = helper_manager.obj._credentials.get('db')
         assert db_start != db_end
+        assert helper_manager.obj.flush() is True
 
     def test_get_hmap_len(self, helper_manager):
         """Test get_hmap_len method"""
@@ -462,6 +472,7 @@ class TestRedisApi:
                 key=['data_test']
             )
 
+        assert helper_manager.obj.flush() is True
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_hmap_len(
@@ -485,6 +496,7 @@ class TestRedisApi:
                 key=['data_test']
             )
 
+        assert helper_manager.obj.flush() is True
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.is_hmap_key(
@@ -508,6 +520,7 @@ class TestRedisApi:
                 name=['data_test']
             )
 
+        assert helper_manager.obj.flush() is True
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
             helper_manager.obj.get_hmap_keys(
@@ -541,6 +554,7 @@ class TestRedisApi:
                 keys=['key_test_0', 'key_test_1']
             )
 
+        assert helper_manager.obj.flush() is True
         # test loose redis conection
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
@@ -584,6 +598,7 @@ class TestRedisApi:
                 name=['data_test']
             )
 
+        assert helper_manager.obj.flush() is True
         # test loose redis conection
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
@@ -639,6 +654,7 @@ class TestRedisApi:
                 values='a'
             )
 
+        assert helper_manager.obj.flush() is True
         # test loose redis conection
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
@@ -680,6 +696,7 @@ class TestRedisApi:
                 values=['d']
             )
 
+        assert helper_manager.obj.flush() is True
         # test loose redis conection
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
@@ -734,6 +751,7 @@ class TestRedisApi:
                 values=['d']
             )
 
+        assert helper_manager.obj.flush() is True
         # test loose redis conection
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):
@@ -767,6 +785,7 @@ class TestRedisApi:
                 name=['data_test']
             )
 
+        assert helper_manager.obj.flush() is True
         # test loose redis conection
         helper_manager.obj.cli = None
         with pytest.raises(RedisConnectionException):

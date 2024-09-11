@@ -155,6 +155,7 @@ class TestRedisConnector:
         assert helper_manager.obj.set_redis_app(
             connector=connector
         ) is True
+        assert helper_manager.obj.app.api.flush() is True
 
 
 class TestRedisCache:
@@ -184,6 +185,7 @@ class TestRedisCache:
             helper_manager.obj.get_cache_nodes_keys_list()
         helper_manager.obj.cache_name = "inputs_cache"
 
+        assert helper_manager.obj.app.api.flush() is True
         # test loose redis conection
         helper_manager.obj.app.api.cli = None
         with pytest.raises(RedisConnectionException):
@@ -216,6 +218,7 @@ class TestRedisCache:
             helper_manager.obj.get_cache_nodes_keys_list()
         helper_manager.obj.cache_name = "inputs_cache"
 
+        assert helper_manager.obj.app.api.flush() is True
         # test loose redis conection
         helper_manager.obj.app.api.cli = None
         with pytest.raises(RedisConnectionException):
@@ -248,6 +251,8 @@ class TestRedisCache:
             'inputs_cache_pytest_3': [1722013460, 1722013465, 1722013470],
             'inputs_cache_pytest_2': [1722013472, 1722013474]
         }
+
+        assert helper_manager.obj.app.api.flush() is True
 
     def test_enum_cache_keys(self, helper_manager):
         """Test enum_cache_keys method"""
@@ -285,6 +290,8 @@ class TestRedisCache:
             else:
                 assert False
 
+        assert helper_manager.obj.app.api.flush() is True
+
     def test_reset_data_cache(self, helper_manager):
         """Test reset_data_cache method"""
         helper_manager.init_redis_cache()
@@ -293,6 +300,7 @@ class TestRedisCache:
 
         deleted = helper_manager.obj.reset_data_cache()
         assert deleted == [3, 3]
+        assert helper_manager.obj.app.api.flush() is True
 
     def test_add_data_cache(self, helper_manager):
         """Test add_data_cache method"""
@@ -318,6 +326,7 @@ class TestRedisCache:
         assert len(data_inputs_cache_pytest_1) == 10
         assert len(data_inputs_cache_pytest_2) == 10
         assert len(data_inputs_cache_pytest_3) == 10
+        assert helper_manager.obj.app.api.flush() is True
 
     def test_enum_node_data_cache_interval(self, helper_manager):
         """Test enum_node_data_cache_interval method"""
@@ -335,6 +344,7 @@ class TestRedisCache:
                 assert values == {'V': 26.8, 'I': 1.52}
             else:
                 assert False
+        assert helper_manager.obj.app.api.flush() is True
 
     def test_get_data_from_redis(self, helper_manager):
         """Test get_data_from_redis method"""
@@ -391,6 +401,7 @@ class TestRedisCache:
         assert keys == [1722013481, 1722013482]
 
         assert max_time == 1722013482
+        assert helper_manager.obj.app.api.flush() is True
 
     def test_get_data_from_cache(self, helper_manager):
         """Test get_data_from_cache method"""
@@ -540,6 +551,8 @@ class TestRedisCache:
         }
         assert max_time == 1722013487
         assert last_time == 1722013488
+
+        assert helper_manager.obj.app.api.flush() is True
 
     def test_get_time_interval(self, helper_manager):
         """Test get_time_interval method"""
