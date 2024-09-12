@@ -18,6 +18,53 @@ class BatteryTypes(BaseEnum):
     LIFEPO4="LiFePo4"
 
 
+class EChargeStep(BaseFlag):
+    """Standard voltages Enum"""
+    ABSORPTION='absorption'
+    FLOAT='float'
+    STORAGE='storage'
+    EQUALIZATION='equalization'
+
+    @classmethod
+    def is_member(cls, value) -> float:
+        """Test if value is an member of ChargeCols enum."""
+        return isinstance(value, EChargeStep)
+
+    @classmethod
+    def get_ordered_list(cls) -> list:
+        """Get ordered charge settings list from lower to highter."""
+        return [
+            cls.STORAGE,
+            cls.FLOAT,
+            cls.ABSORPTION,
+            cls.EQUALIZATION
+        ]
+
+
+class ChargeCols(BaseFlag):
+    """External props names reference enum."""
+    ABS_U='absorption_u'
+    FLOAT_U='float_u'
+    STORAGE_U='storage_u'
+    EQ_U='equalization_u'
+    T_COEF_U='coef_temp'
+
+    @classmethod
+    def is_member(cls, value) -> float:
+        """Test if value is an member of ChargeCols enum."""
+        return isinstance(value, ChargeCols)
+
+    @classmethod
+    def get_ordered_list(cls) -> list:
+        """Get ordered charge settings list from lower to highter."""
+        return [
+            cls.STORAGE_U,
+            cls.FLOAT_U,
+            cls.ABS_U,
+            cls.EQ_U
+        ]
+
+
 class BaseVolt(BaseFlag):
     """Standard voltages Enum"""
     U_2V=2
@@ -26,6 +73,11 @@ class BaseVolt(BaseFlag):
     U_12V=12
     U_24V=24
     U_48V=48
+
+    @classmethod
+    def is_member(cls, value) -> float:
+        """Test if value is an instance of BaseVolt enum."""
+        return isinstance(value, BaseVolt)
 
     @classmethod
     def get_default(cls) -> Union[int, float]:
@@ -82,4 +134,35 @@ class BaseVolt(BaseFlag):
                         and diff_percent <= 140:
                     result = member
 
+        return result
+
+
+class ElecEnums:
+    """Elec Enums Helper"""
+    @staticmethod
+    def get_related_charge_cols(member: EChargeStep) -> list:
+        """Translate values from EChargeStep to ChargeCols Enums."""
+        result = None
+        if member == EChargeStep.ABSORPTION:
+            result = ChargeCols.ABS_U
+        elif member == EChargeStep.FLOAT:
+            result = ChargeCols.FLOAT_U
+        elif member == EChargeStep.STORAGE:
+            result = ChargeCols.STORAGE_U
+        elif member == EChargeStep.EQUALIZATION:
+            result = ChargeCols.EQ_U
+        return result
+
+    @staticmethod
+    def get_related_charge_step(member: ChargeCols) -> list:
+        """Translate values from ChargeCols to EChargeStep Enums."""
+        result = None
+        if member == ChargeCols.ABS_U:
+            result = EChargeStep.ABSORPTION
+        elif member == ChargeCols.FLOAT_U:
+            result = EChargeStep.FLOAT
+        elif member == ChargeCols.STORAGE_U:
+            result = EChargeStep.STORAGE
+        elif member == ChargeCols.EQ_U:
+            result = EChargeStep.EQUALIZATION
         return result
