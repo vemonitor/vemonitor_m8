@@ -6,6 +6,9 @@ Battery model
 import logging
 from typing import Optional, TypedDict, Union
 from vemonitor_m8.core.utils import Utils as Ut
+from vemonitor_m8.enums.elec import BaseVolt
+from vemonitor_m8.enums.core import BaseEnum
+from vemonitor_m8.models.battery_charge import BatteryCharge, ChargeCols
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -13,7 +16,7 @@ __copyright__ = "Copyright 2022, Eli Serra"
 logging.basicConfig()
 logger = logging.getLogger("vemonitor")
 
-class ChargeSettingsType(TypedDict):
+class ChargeSettingsProps(TypedDict):
     """Battery Bank Charge Settings Type"""
     charge_t_coef: float=0.0
     charge_absorption_u: float=0.0
@@ -21,37 +24,44 @@ class ChargeSettingsType(TypedDict):
     charge_equalization_u: float=0.0
 
 
-class BatteryModelType(TypedDict):
+class BatteryModelProps(TypedDict):
     """Battery Bank Charge Settings Type"""
     name:Optional[str] = None
     manufacturer:Optional[str] = None
     model:Optional[str] = None
     battery_type:Optional[str] = None
-    charge_settings: Optional[ChargeSettingsType] = None
+    charge_settings: Optional[ChargeSettingsProps] = None
     nb_cells: int = 0
     capacity: Optional[list] = None
 
 
-class BatteryTypes:
-    """Bettery types"""
-    UNDEFINED="flooded"
-    FLOODED="flooded"
-    GEL="gel"
-    AGM="agm"
-    LI="li"
-    LIFEPO4="LiFePo4"
+class RefCols(BaseEnum):
+    """Standard voltages Enum"""
+    NAME='name'
+    MANUFACTURER='manufacturer'
+    MODEL='model'
+    NB_CELLS='nb_cells'
+    CELL_U='cell_voltage'
+    BAT_U='bat_voltage'
+    CAPACITY='capacity'
+    CHARGE_SETTINGS='charge_settings'
+    ABS_U='charge_absorption_u'
+    FLOAT_U='charge_float_u'
+    STORAGE_U='charge_storage_u'
+    EQ_U='charge_equalization_u'
+    CHARGE_T_COEF_U='charge_t_coef'
 
 class BatteryDataModel:
     """
     Battery Data model
     """
-    def __init__(self, **kwargs: BatteryModelType):
+    def __init__(self, **kwargs: BatteryModelProps):
         self.name = None
         self.model = None
 
-        self.init_battery_bank(**kwargs)
+        self.init(**kwargs)
 
-    BATTERY_TYPE = BatteryTypes.UNDEFINED
+    BATTERY_TYPE = None
 
     def has_name(self) -> bool:
         """Has Battery Name."""
@@ -73,6 +83,10 @@ class BatteryDataModel:
             self.name = value
             result = True
         return result
+
+    def has_battery_type(self) -> bool:
+        """Has Battery Type."""
+        return self.BATTERY_TYPE is not None
 
     def has_model_data(self) -> bool:
         """Has Battery Model."""
@@ -133,22 +147,32 @@ class BatteryDataModel:
         result = False
         if Ut.is_dict(data, not_null=True):
             self.model = {}
-            is_set_man = self.set_manufacturer(data.get('manufacturer'))
-            is_set_mod = self.set_model_name(data.get('model'))
+            is_set_man = self.set_manufacturer(data.get(RefCols.MANUFACTURER.value))
+            is_set_mod = self.set_model_name(data.get(RefCols.MODEL.value))
             result = is_set_man and is_set_mod
         return result
 
-    def init_battery_bank(self,
-                          **kwargs: BatteryModelType
-                          ) -> bool:
+    def init(self,
+             **kwargs: BatteryModelProps
+             ) -> bool:
         """Init battery bank data"""
         result = False
         if Ut.is_dict(kwargs, not_null=True):
-            is_set_name = self.set_name(kwargs.get('name'))
-            is_set_model_data = self.set_model_data(
-                Ut.get_items_from_dict(kwargs, ['manufacturer', 'model'])
+            is_set_name = self.set_name(
+                kwargs.get(RefCols.NAME.value)
             )
-            result = is_set_name and is_set_model_data
+            is_set_model_data = self.set_model_data(
+                Ut.get_items_from_dict(
+                    kwargs,
+                    [
+                        RefCols.MANUFACTURER.value,
+                        RefCols.MODEL.value
+                    ]
+                )
+            )
+            result = is_set_name\
+                and is_set_model_data
+
         return result
 
     def is_valid(self) -> bool:
@@ -182,18 +206,24 @@ class BatteryDataModel:
         """
         return str(self.serialize())
 
+    @staticmethod
+    def is_battery_type(value: str) -> float:
+        """Test if charge setting is set."""
+        return Ut.is_str(value, not_null=True)\
+            and value in ["flooded", "gel", "agm", "li"]
+
 
 class BatteryStructureModel(BatteryDataModel):
     """
     Battery Data Structure model
     """
-    def __init__(self, **kwargs: BatteryModelType):
+    def __init__(self, **kwargs: BatteryModelProps):
         BatteryDataModel.__init__(self, **kwargs)
         self.cell_voltage = 0
         self.bat_voltage = 0
         self.nb_cells = 0
 
-        self.init_battery_bank(**kwargs)
+        self.init(**kwargs)
 
     def has_battery_structure(self) -> bool:
         """
@@ -228,15 +258,21 @@ class BatteryStructureModel(BatteryDataModel):
                     logger.warning(
                         "[BatteryModel::validate_bat_voltage] "
                         "Baterry Structure seems to be invalid. "
-                        "Please control BatteryBank keys "
-                        "['nb_cells', 'cell_voltage', 'bat_voltage']"
+                        "Please control BatteryBank props "
+                        "['%s', '%s', '%s']",
+                        RefCols.NB_CELLS.value,
+                        RefCols.CELL_U.value,
+                        RefCols.BAT_U.value
                     )
             else:
                 logger.warning(
                         "[BatteryModel::validate_bat_voltage] "
                         "Baterry Structure seems to be invalid. "
-                        "Please control values BatteryBank keys "
-                        "['nb_cells', 'cell_voltage', 'bat_voltage']"
+                        "Please control values BatteryBank props "
+                        "['%s', '%s', '%s']",
+                        RefCols.NB_CELLS.value,
+                        RefCols.CELL_U.value,
+                        RefCols.BAT_U.value
                     )
                 self.reset_battery_structure()
         elif self.has_bat_voltage():
@@ -340,24 +376,27 @@ class BatteryStructureModel(BatteryDataModel):
         return result
 
     def set_battery_structure(self,
-                              **kwargs: BatteryModelType
+                              **kwargs: BatteryModelProps
                               ) -> bool:
         """Set battery Structure data"""
         result = False
         self.reset_battery_structure()
         if Ut.is_dict(kwargs, not_null=True):
-            self.set_nb_cells(kwargs.get('nb_cells'))
-            self.set_cell_voltage(kwargs.get('cell_voltage'))
-            self.set_bat_voltage(kwargs.get('bat_voltage'))
+            self.set_nb_cells(
+                kwargs.get(RefCols.NB_CELLS.value))
+            self.set_cell_voltage(
+                kwargs.get(RefCols.CELL_U.value))
+            self.set_bat_voltage(
+                kwargs.get(RefCols.BAT_U.value))
             self.calc_missing()
             result = self.validate_battery_structure()
         return result
 
-    def init_battery_bank(self,
-                          **kwargs: BatteryModelType
-                          ) -> bool:
+    def init(self,
+             **kwargs: BatteryModelProps
+             ) -> bool:
         """Init battery bank data"""
-        result = BatteryDataModel.init_battery_bank(
+        result = BatteryDataModel.init(
                 self,
                 **kwargs)
         is_set = self.set_battery_structure(**kwargs)
@@ -400,13 +439,13 @@ class BatteryCapacityModel(BatteryStructureModel):
     """
     Battery Data Structure model
     """
-    def __init__(self, **kwargs: BatteryModelType):
+    def __init__(self, **kwargs: BatteryModelProps):
         BatteryStructureModel.__init__(self, **kwargs)
         self.capacity = None
         self.temp_capacity = None
         self.temp_cycle_life = None
         self.capacity_voltage = None
-        self.init_battery_bank(**kwargs)
+        self.init(**kwargs)
 
     def has_capacity(self) -> bool:
         """Get Battery Capacity properties."""
@@ -427,13 +466,15 @@ class BatteryCapacityModel(BatteryStructureModel):
             result = True
         return result
 
-    def init_battery_bank(self,
-                          **kwargs: BatteryModelType
-                          ) -> bool:
+    def init(self,
+             **kwargs: BatteryModelProps
+             ) -> bool:
         """Init battery bank data"""
-        result = BatteryStructureModel.init_battery_bank(self, **kwargs)
+        result = BatteryStructureModel.init(self, **kwargs)
         if Ut.is_dict(kwargs, not_null=True):
-            is_set = self.set_capacity(kwargs.get('capacity'))
+            is_set = self.set_capacity(
+                kwargs.get(RefCols.CAPACITY.value)
+            )
             result = result is True\
                 and is_set
         return result
@@ -560,201 +601,85 @@ class BatteryCapacityModel(BatteryStructureModel):
         """Get capacity voltage by hour rate columns titles"""
         return ['percent_capacity', 'voltage']
 
+
 class BatteryChargeSettings(BatteryCapacityModel):
     """
     Battery model
     """
-    def __init__(self, **kwargs:BatteryModelType):
-        self.charge_settings = {}
+    def __init__(self, **kwargs:BatteryModelProps):
+        self.charge = BatteryCharge()
         BatteryCapacityModel.__init__(self, **kwargs)
-        self.init_battery_bank(**kwargs)
+
+        self.init(**kwargs)
 
     def has_charge_settings(self) -> bool:
         """Test if instance has battery object"""
-        return Ut.is_dict(self.charge_settings, not_null=True)
+        return isinstance(self.charge, BatteryCharge)\
+            and self.charge.has_charge_settings()
 
     def is_charge_settings(self) -> bool:
         """Test if instance has battery object"""
-        return Ut.is_dict(self.charge_settings)
+        return isinstance(self.charge, BatteryCharge)
 
     def init_charge_settings(self, reset: bool = False) -> bool:
         """Test if instance has battery object"""
         if not self.is_charge_settings()\
                 or reset is True:
-            self.charge_settings = {}
-
-    def has_charge_t_coef(self) -> int:
-        """Has Battery charge temperrature correction coeficient."""
-        return self.is_charge_settings()\
-            and self.is_charge_t_coef(
-                self.charge_settings.get('charge_t_coef')
-            )
-
-    def get_charge_t_coef(self) -> int:
-        """Get Battery charge temperrature correction coeficient."""
-        result = 0
-        if self.has_charge_t_coef():
-            result = self.charge_settings.get('charge_t_coef')
-        return result
-
-    def set_charge_t_coef(self, value: float=0.0) -> float:
-        """Set Battery charge temperrature correction coeficient.."""
-        result = False
-        if self.is_charge_settings()\
-                and self.is_charge_t_coef(value):
-            self.charge_settings.update({
-                'charge_t_coef': value
-            })
-            result = True
-        return result
-
-    def has_charge_absorption_u(self) -> int:
-        """Has Battery charge bulk voltage."""
-        return self.is_charge_settings()\
-            and self.is_charge_voltage(
-                self.charge_settings.get('charge_absorption_u')
-            )
-
-    def get_charge_absorption_u(self) -> int:
-        """Get Battery charge bulk voltage."""
-        result = 0
-        if self.has_charge_absorption_u():
-            result = self.charge_settings.get('charge_absorption_u')
-        return result
-
-    def set_charge_absorption_u(self, value: float=0.0) -> float:
-        """Set Battery charge bulk voltage."""
-        result = False
-        if self.is_charge_settings()\
-                and Ut.is_numeric(value, positive=True):
-            self.charge_settings.update({
-                'charge_absorption_u': value
-            })
-            result = True
-        return result
-
-    def has_charge_float_u(self) -> int:
-        """Has Battery charge float voltage."""
-        return self.is_charge_settings()\
-            and self.is_charge_voltage(
-                self.charge_settings.get('charge_float_u')
-            )
-
-    def get_charge_float_u(self) -> int:
-        """Get Battery charge float voltage."""
-        result = 0
-        if self.has_charge_float_u():
-            result = self.charge_settings.get('charge_float_u')
-        return result
-
-    def set_charge_float_u(self, value: float=0.0) -> float:
-        """Set Battery charge float voltage."""
-        result = False
-        if self.is_charge_settings()\
-                and Ut.is_numeric(value, positive=True):
-            self.charge_settings.update({
-                'charge_float_u': value
-            })
-            result = True
-        return result
-
-    def has_charge_storage_u(self) -> int:
-        """Has Battery charge float voltage."""
-        return self.is_charge_settings()\
-            and self.is_charge_voltage(
-                self.charge_settings.get('charge_storage_u')
-            )
-
-    def get_charge_storage_u(self) -> int:
-        """Get Battery charge float voltage."""
-        result = 0
-        if self.has_charge_storage_u():
-            result = self.charge_settings.get('charge_storage_u')
-        return result
-
-    def set_charge_storage_u(self, value: float=0.0) -> float:
-        """Set Battery charge float voltage."""
-        result = False
-        if self.is_charge_settings()\
-                and Ut.is_numeric(value, positive=True):
-            self.charge_settings.update({
-                'charge_storage_u': value
-            })
-            result = True
-        return result
-
-    def has_charge_egalization_u(self) -> int:
-        """Has Battery charge egalization voltage."""
-        return self.is_charge_settings()\
-            and self.is_charge_voltage(
-                self.charge_settings.get('charge_egalization_u')
-            )
-
-    def get_charge_egalization_u(self) -> int:
-        """Get Battery charge egalization voltage."""
-        result = 0
-        if self.has_charge_egalization_u():
-            result = self.charge_settings.get('charge_egalization_u')
-        return result
-
-    def set_charge_egalization_u(self, value: float=0.0) -> float:
-        """Set charge egalization voltage."""
-        result = False
-        if self.is_charge_settings()\
-                and Ut.is_numeric(value, positive=True):
-            self.charge_settings.update({
-                'charge_egalization_u': value
-            })
-            result = True
-        return result
+            self.charge = BatteryCharge()
 
     def set_charge_settings(self, data: dict) -> bool:
-        """Set Battery Bank Name."""
-        result = False
+        """Set Battery Charge Settings."""
         self.init_charge_settings(reset=True)
-        if Ut.is_dict(data, not_null=True):
-            self.set_charge_t_coef(data.get('charge_t_coef'))
-            self.set_charge_absorption_u(data.get('charge_absorption_u'))
-            self.set_charge_float_u(data.get('charge_float_u'))
-            self.set_charge_storage_u(data.get('charge_storage_u'))
-            self.set_charge_egalization_u(data.get('charge_egalization_u'))
-            result = True
-        return result
+        return self.charge.set_charge_settings(data)
 
     def set_defaults_charge_settings(self, data: dict) -> None:
         """
-        Sets the default values.
+        Sets defaultq Battery Charge Settings.
         """
         self.init_charge_settings()
 
-        if Ut.is_dict(data, not_null=True):
-            if not self.has_charge_absorption_u()\
-                and self.is_charge_voltage(data.get('charge_absorption_u')):
-                self.set_charge_absorption_u(data.get('charge_absorption_u'))
+        if BatteryCharge.is_valid_charge_values(data):
+            if not self.charge.has_charge_setting(ChargeCols.ABS_U.value)\
+                and self.is_charge_voltage(data.get(RefCols.ABS_U.value)):
+                self.charge.set_charge_setting(
+                    key=ChargeCols.ABS_U.value,
+                    value=data.get(RefCols.ABS_U.value)
+                )
 
-            if not self.has_charge_float_u()\
-                and self.is_charge_voltage(data.get('charge_float_u')):
-                self.set_charge_float_u(data.get('charge_float_u'))
+            if not self.charge.has_charge_setting(ChargeCols.FLOAT_U.value)\
+                and self.is_charge_voltage(data.get(RefCols.FLOAT_U.value)):
+                self.charge.set_charge_setting(
+                    key=ChargeCols.FLOAT_U.value,
+                    value=data.get(RefCols.FLOAT_U.value)
+                )
 
-            if not self.has_charge_storage_u()\
-                and self.is_charge_voltage(data.get('charge_storage_u')):
-                self.set_charge_storage_u(data.get('charge_storage_u'))
+            if not self.charge.has_charge_setting(ChargeCols.STORAGE_U.value)\
+                and self.is_charge_voltage(data.get(RefCols.STORAGE_U.value)):
+                self.charge.set_charge_setting(
+                    key=ChargeCols.STORAGE_U.value,
+                    value=data.get(RefCols.STORAGE_U.value)
+                )
 
-            if not self.has_charge_egalization_u()\
-                and self.is_charge_voltage(data.get('charge_egalization_u')):
-                self.set_charge_egalization_u(data.get('charge_egalization_u'))
+            if not self.charge.has_charge_setting(ChargeCols.EQ_U.value)\
+                and self.is_charge_voltage(data.get(RefCols.EQ_U.value)):
+                self.charge.set_charge_setting(
+                    key=ChargeCols.EQ_U.value,
+                    value=data.get(RefCols.EQ_U.value)
+                )
 
-            if not self.has_charge_t_coef()\
-                and self.is_charge_t_coef(data.get('charge_t_coef')):
-                self.set_charge_t_coef(data.get('charge_t_coef'))
+            if not self.charge.has_coef_temp()\
+                and self.is_charge_t_coef(data.get(RefCols.CHARGE_T_COEF_U.value)):
+                self.charge.set_coef_temp(data.get('charge_t_coef'))
 
-    def init_battery_bank(self,
-                          **kwargs: BatteryModelType
-                          ) -> bool:
+    def init(self,
+             **kwargs: BatteryModelProps
+             ) -> bool:
         """Init battery bank data"""
-        result = BatteryCapacityModel.init_battery_bank(self, **kwargs)
+        result = BatteryCapacityModel.init(self, **kwargs)
         if Ut.is_dict(kwargs, not_null=True):
-            is_set = self.set_charge_settings(kwargs.get('charge_settings'))
+            is_set = self.set_charge_settings(
+                kwargs.get(RefCols.CHARGE_SETTINGS.value)
+            )
             result = result is True\
                 and is_set
         return result
@@ -767,7 +692,7 @@ class BatteryChargeSettings(BatteryCapacityModel):
         """
         result = BatteryCapacityModel.serialize(self)
         result.update({
-            'charge_settings': self.charge_settings
+            'charge_settings': self.charge
         })
         return result
 

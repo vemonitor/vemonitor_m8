@@ -5,8 +5,8 @@ Battery model
 """
 import logging
 from vemonitor_m8.models.battery_data import BatteryChargeSettings
-from vemonitor_m8.models.battery_data import BatteryModelType
-from vemonitor_m8.models.battery_data import BatteryTypes
+from vemonitor_m8.models.battery_data import BatteryModelProps
+from vemonitor_m8.enums.elec import BatteryTypes
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
 
@@ -19,7 +19,7 @@ class BatteryModel(BatteryChargeSettings):
     Battery model
     """
     def __init__(self,
-                 **kwargs: BatteryModelType
+                 **kwargs: BatteryModelProps
                  ):
         BatteryChargeSettings.__init__(self, **kwargs)
         # self.voltage_temperature_correction = Ut.get_float(voltage_temperature_correction)
@@ -38,7 +38,7 @@ class BatteryFloodedModel(BatteryModel):
     Battery Flooded model
     """
     def __init__(self,
-                 **kwargs: BatteryModelType
+                 **kwargs: BatteryModelProps
                  ):
         BatteryModel.__init__(self, **kwargs)
         self.set_defaults()
@@ -65,7 +65,7 @@ class BatteryGelModel(BatteryModel):
     Battery Gel model
     """
     def __init__(self,
-                 **kwargs: BatteryModelType
+                 **kwargs: BatteryModelProps
                  ):
         BatteryModel.__init__(self, **kwargs)
         self.set_defaults()
@@ -80,7 +80,7 @@ class BatteryGelModel(BatteryModel):
             'charge_absorption_u': 14.1,
             'charge_float_u': 13.8,
             'charge_storage_u': 13.2,
-            'charge_egalization_u': 15.9,
+            'charge_equalization_u': 15.9,
             'charge_t_coef': -16.2
         }
         self.set_defaults_charge_settings(
@@ -93,7 +93,7 @@ class BatteryAGMModel(BatteryModel):
     Battery AGM model
     """
     def __init__(self,
-                 **kwargs: BatteryModelType
+                 **kwargs: BatteryModelProps
                  ):
         BatteryModel.__init__(self, **kwargs)
         self.set_defaults()
@@ -108,7 +108,7 @@ class BatteryAGMModel(BatteryModel):
             'charge_absorption_u': 14.7,
             'charge_float_u': 13.8,
             'charge_storage_u': 13.2,
-            'charge_egalization_u': 15.9,
+            'charge_equalization_u': 15.9,
             'charge_t_coef': -16.2
         }
         self.set_defaults_charge_settings(
@@ -121,7 +121,7 @@ class BatteryLi(BatteryModel):
     Battery LiFePo4 model
     """
     def __init__(self,
-                 **kwargs: BatteryModelType
+                 **kwargs: BatteryModelProps
                  ):
         BatteryModel.__init__(self, **kwargs)
         self.set_defaults()
@@ -136,7 +136,7 @@ class BatteryLi(BatteryModel):
             'charge_absorption_u': 14.2,
             'charge_float_u': 0,
             'charge_storage_u': 13.5,
-            'charge_egalization_u': 0,
+            'charge_equalization_u': 0,
             'charge_t_coef': 0
         }
         self.set_defaults_charge_settings(
@@ -149,7 +149,7 @@ class BatteryLiFePo4Model(BatteryModel):
     Battery LiFePo4 model
     """
     def __init__(self,
-                 **kwargs: BatteryModelType
+                 **kwargs: BatteryModelProps
                  ):
         BatteryModel.__init__(self, **kwargs)
         self.set_defaults()
@@ -164,7 +164,7 @@ class BatteryLiFePo4Model(BatteryModel):
             'charge_absorption_u': 14.2,
             'charge_float_u': 0,
             'charge_storage_u': 13.5,
-            'charge_egalization_u': 0,
+            'charge_equalization_u': 0,
             'charge_t_coef': 0
         }
         self.set_defaults_charge_settings(
