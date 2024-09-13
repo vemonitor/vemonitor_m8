@@ -6,9 +6,10 @@ Battery Bank model
 import logging
 from typing import Optional, TypedDict, Union
 from vemonitor_m8.core.utils import Utils as Ut
+from vemonitor_m8.enums.core import BaseEnum
 from vemonitor_m8.models.battery import BatteryModel
 from vemonitor_m8.models.battery import BatteryFloodedModel
-from vemonitor_m8.models.battery_data import ChargeSettingsType
+from vemonitor_m8.models.battery_data import ChargeSettingsProps
 
 __author__ = "Eli Serra"
 __copyright__ = "Copyright 2022, Eli Serra"
@@ -31,16 +32,104 @@ class BatteryBankType(TypedDict):
     bank_structure: BankStructureType = None
     charge_settings: BankStructureType = None
 
-class BankBatteryHelper:
+
+class RefCols(BaseEnum):
+    """Dict props references"""
+    NAME='name'
+    BATTERY='battery'
+    IN_SERIES='in_series'
+    IN_PARALLEL='in_parallel'
+    SYS_V='system_voltage'
+    T_BAT='t_bat'
+    T_LOC='t_loc'
+    CHARGE_SETTINGS='charge_settings'
+    ABS_U='charge_absorption_u'
+    FLOAT_U='charge_float_u'
+    STORAGE_U='charge_storage_u'
+    EQ_U='charge_equalization_u'
+    CHARGE_T_COEF_U='charge_t_coef'
+
+class InputKeys(BaseEnum):
+    """
+    Inputs Keys used in middlware
+    """
+    BAT_VOLTAGE = 'bat_voltage'
+    BAT_CURRENT = 'bat_current'
+    BAT_POWER = 'bat_power'
+    T_BAT='t_bat'
+    T_LOC='t_loc'
+
+
+class BatteryBankBase:
     """
     Battery Bank Battery model
     """
     def __init__(self,
                  **kwargs: BatteryBankType
                  )->None:
-        self.battery: Optional[BatteryModel] = None
+        self.name: Optional[str] = None
+        self.init(**kwargs)
+
+    def has_name(self) -> bool:
+        """Test if instance has name value"""
+        return Ut.is_str(self.name, not_null=True)
+
+    def get_name(self) -> Optional[str]:
+        """Set Battery Bank Name."""
+        result = None
+        if self.has_name():
+            result = self.name
+        return result
+
+    def set_name(self, value: Optional[str] = None) -> bool:
+        """Set Battery Bank Name."""
+        result = False
+        if Ut.is_key_pattern(value):
+            self.name = value
+            result = True
+        return result
+
+    def init(self,
+             **kwargs: BatteryBankType
+             ) -> bool:
+        """Init battery bank data"""
+        result = False
         if Ut.is_dict(kwargs, not_null=True):
-            self.set_battery(kwargs.get('battery'))
+            result = self.set_name(kwargs.get('name'))
+        return result
+
+    def serialize(self):
+        """
+        Used to return a dictionary of the model's
+        attributes. This is needed because we are using JSON as our data transfer
+        format, and it requires that the data being transferred be in a dictionary.
+        
+        :return: A dictionary of the in_series attributes.
+        """
+        return {
+            'name': self.name
+        }
+
+    def __str__(self)->dict:
+        """
+        Called when the object is printed. 
+        It returns a string representation of the object, which can be anything you want it to be. 
+        In this case, we are returning a dictionary
+        that contains all of the information about our class.
+        :return: A dictionary of the attributes and values of the object.
+        """
+        return str(self.serialize())
+
+class BankBattery(BatteryBankBase):
+    """
+    Battery Bank Battery model
+    """
+    def __init__(self,
+                 **kwargs: BatteryBankType
+                 )->None:
+        BatteryBankBase.__init__(self, **kwargs)
+        self.battery: Optional[BatteryModel] = None
+        self.init(**kwargs)
 
     def has_battery(self) -> bool:
         """Test if instance has battery object"""
@@ -51,49 +140,90 @@ class BankBatteryHelper:
         return self.has_battery()\
             and self.battery.is_valid()
 
+    def get_battery(self) -> Optional[str]:
+        """Get Battery Object."""
+        result = None
+        if self.has_battery():
+            result = self.battery
+        return result
+
     def set_battery(self,
-                    battery: Optional[Union[BatteryModel, dict]]
+                    battery: Optional[Union[BatteryModel, dict]] = None
                     ) -> bool:
         """Set battery model"""
+        result = False
         self.battery = None
-        if isinstance(battery, BatteryFloodedModel):
+        if isinstance(battery, BatteryModel):
             self.battery = battery
-        elif isinstance(battery, BatteryModel):
-            self.battery = battery
+            result = True
         elif self.is_battery_data(battery):
-            battery_type = battery.get('battery')
+            battery_type = battery.get('battery_type')
             if battery_type == 'flooded':
                 self.battery = BatteryFloodedModel(**battery)
             else:
                 self.battery = BatteryModel(**battery)
+            result = True
 
-        return self.is_valid_battery()
+        return result
 
     def set_charge_settings(self, data: dict) -> bool:
-        """Set Battery Bank Name."""
+        """
+        Set Battery Bank Charge Settings.
+        Charge Settings from Battery bank will overwrite Battery Charge Settings.
+        """
         result = False
         if self.has_battery():
-            self.battery.set_charge_settings(data)
-            result = True
+            result = self.battery.set_charge_settings(data)
+        return result
+
+    def init(self,
+             **kwargs: BatteryBankType
+             ) -> bool:
+        """Init battery bank data"""
+        result = BatteryBankBase.init(
+                self,
+                **kwargs)
+        is_set = False
+        if Ut.is_dict(kwargs, not_null=True):
+            is_s1 = self.set_battery(kwargs.get('battery'))
+            is_s2 = self.set_charge_settings(kwargs.get('charge_settings'))
+            is_set = is_s1 and is_s2
+        return result is True\
+            and is_set is True
+
+    def serialize(self):
+        """
+        Used to return a dictionary of the model's
+        attributes. This is needed because we are using JSON as our data transfer
+        format, and it requires that the data being transferred be in a dictionary.
+        
+        :return: A dictionary of the in_series attributes.
+        """
+        result = BatteryBankBase.serialize(self)
+        if self.has_battery():
+            result.update({
+                'battery': self.battery.serialize()
+            })
         return result
 
     @staticmethod
     def is_battery_data(data: str) -> float:
         """Test if charge setting is set."""
         return Ut.is_dict(data, not_null=True)\
-            and BatteryBank.is_battery_type(
-                data.get('battery_type')
-            )
+            and BatteryModel.is_battery_type(
+                data.get('battery_type'))\
+            and Ut.is_key_pattern(data.get('name'))
 
-class BatteryBankStructure(BankBatteryHelper):
+class BatteryBankStructure(BankBattery):
     """
     Battery Bank Structure model
     """
     def __init__(self,
                  **kwargs: BatteryBankType
                  )->None:
-        BankBatteryHelper.__init__(self, **kwargs)
+        BankBattery.__init__(self, **kwargs)
         self.bank_structure: Optional[dict] = None
+        self.init(**kwargs)
         if Ut.is_dict(kwargs, not_null=True):
             self.set_bank_structure(kwargs.get('bank_structure'))
 
@@ -192,28 +322,40 @@ class BatteryBankStructure(BankBatteryHelper):
             result = True
         return result
 
+    def init(self,
+             **kwargs: BatteryBankType
+             ) -> bool:
+        """Init battery bank data"""
+        result = BatteryBankBase.init(
+                self,
+                **kwargs)
+        is_set = False
+        if Ut.is_dict(kwargs, not_null=True):
+            is_set = self.set_bank_structure(kwargs.get('bank_structure'))
+        return result is True\
+            and is_set is True
+
     def serialize(self):
         """
         Used to return a dictionary of the model's
         attributes. This is needed because we are using JSON as our data transfer
         format, and it requires that the data being transferred be in a dictionary.
         
-        :param self: Used to Access variables that belongs to the class.
         :return: A dictionary of the in_series attributes.
-        
-        :doc-author: Trelent
         """
-        return {
-            'battery': self.battery.serialize(),
-            'bank_structure': {
-                'system_voltage': self.get_system_voltage(),
-                'in_parallel': self.get_in_parallel(),
-                'in_series': self.get_in_series()
-            }
-        }
+        result = BatteryBankBase.serialize(self)
+        if self.has_battery():
+            result.update({
+                'bank_structure': {
+                    'system_voltage': self.get_system_voltage(),
+                    'in_parallel': self.get_in_parallel(),
+                    'in_series': self.get_in_series()
+                }
+            })
+        return result
 
 
-class BatteryBankSettings(BatteryBankStructure):
+class BatteryBankModel(BatteryBankStructure):
     """
     Battery Bank model
     """
@@ -221,31 +363,10 @@ class BatteryBankSettings(BatteryBankStructure):
                  **kwargs: BatteryBankType
                  )->None:
         BatteryBankStructure.__init__(self, **kwargs)
-        self.name: Optional[str] = None
         self.bank_env: Optional[dict] = None
         self.installation_date = 0
         self.real_capacity = 0
         self.bank_capacity = 0
-        self.init_battery_bank(**kwargs)
-
-    def init_battery_bank(self,
-                          **kwargs: BatteryBankType
-                          ) -> bool:
-        """Init battery bank data"""
-        result = False
-        if Ut.is_dict(kwargs, not_null=True):
-            self.set_name(kwargs.get('name'))
-            self.set_charge_settings(kwargs.get('charge_settings'))
-            result = True
-        return result
-
-    def set_name(self, value: str) -> bool:
-        """Set Battery Bank Name."""
-        result = False
-        if Ut.is_str(value, not_null=True):
-            self.name = value
-            result = True
-        return result
 
     def get_nb_cells(self) -> int:
         """Get nb cells per battery."""
@@ -253,38 +374,7 @@ class BatteryBankSettings(BatteryBankStructure):
             return self.battery.nb_cells * self.get_in_series()
         return 0
 
-    def serialize(self):
-        """
-        Used to return a dictionary of the model's
-        attributes. This is needed because we are using JSON as our data transfer
-        format, and it requires that the data being transferred be in a dictionary.
-        
-        :param self: Used to Access variables that belongs to the class.
-        :return: A dictionary of the in_series attributes.
-        
-        :doc-author: Trelent
-        """
-        return {
-            'name': self.name,
-            'battery': self.battery.serialize(),
-            'bank_structure': {
-                'system_voltage': self.get_system_voltage(),
-                'in_parallel': self.get_in_parallel(),
-                'in_series': self.get_in_series()
-            }
-        }
 
-    def __str__(self)->dict:
-        """
-        Called when the object is printed. 
-        It returns a string representation of the object, which can be anything you want it to be. 
-        In this case, we are returning a dictionary
-        that contains all of the information about our class.
-        :return: A dictionary of the attributes and values of the object.
-        
-        :doc-author: Trelent
-        """
-        return str(self.serialize())
 
 
 class BatteryBank:
@@ -294,13 +384,13 @@ class BatteryBank:
     def __init__(self,
                  **kwargs: BatteryBankType
                  )->None:
-        self.bank: BatteryBankSettings = BatteryBankSettings(**kwargs)
+        self.bank: BatteryBankModel = BatteryBankModel(**kwargs)
 
     def is_valid(self) -> bool:
         """
         Checks to make sure that the parameters are valid.
         """
-        return isinstance(self.bank, BatteryBankSettings)
+        return isinstance(self.bank, BatteryBankModel)
 
     def serialize(self):
         """
@@ -360,13 +450,7 @@ class BatteryBank:
         return result
 
     @staticmethod
-    def is_battery_type(value: str) -> float:
-        """Test if charge setting is set."""
-        return Ut.is_str(value, not_null=True)\
-            and value in ["flooded", "gel", "agm", "li"]
-
-    @staticmethod
-    def is_charge_settings(data: ChargeSettingsType) -> float:
+    def is_charge_settings(data: ChargeSettingsProps) -> float:
         """Test if charge setting is set."""
         return Ut.is_dict(data, not_null=True)\
             and (Ut.is_numeric(data.get('charge_float_u'), positive=True)\
