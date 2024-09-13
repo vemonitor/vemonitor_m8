@@ -26,19 +26,28 @@ class BatteryMidBase(Middleware, ABC):
         self.node = 'm8_bat_monit'
 
 
+class InputKeys:
+    """
+    Inputs Keys used in middlware
+    """
+    BAT_VOLTAGE = 'bat_voltage'
+    BAT_CURRENT = 'bat_current'
+
+
 class BatteryMidMin(Middleware):
     """
     Battery Middlware Minimalist Helper
     Used if battery data settings is unreachable.
     Only basic battery monitoring as:
         - bat_status: int: Battery Charge status
-          -1, 0, 1 => 'discharge', 'sleep', 'charge'
+          -2, -1, 0, 1 => 'undefined', 'discharge', 'sleep', 'charge'
         - sys_v: float: Sytem voltage
         - 
     """
     def __init__(self):
         Middleware.__init__(self)
 
+    # -2, -1, 0, 1 => 'undefined', 'discharge', 'sleep', 'charge'
     (UNDEFINED, DISCHARGE, WAIT, CHARGE) = range(-2, 2, 1)
 
     def set_node_name(self):
@@ -54,20 +63,20 @@ class BatteryMidMin(Middleware):
             self.init_cache_data(time_key)
             if BatteryMidMin.is_bat_voltage(data):
                 self.inputs_cache.update({
-                    'bat_voltage': data.get('bat_voltage')
+                    InputKeys.BAT_VOLTAGE: data.get(InputKeys.BAT_VOLTAGE)
                 })
                 self.cache.update({
                     'sys_v_calc': BatteryMidMin.calc_sys_voltage(
-                        bat_voltage=data.get('bat_voltage')
+                        bat_voltage=data.get(InputKeys.BAT_VOLTAGE)
                     )
                 })
             if BatteryMidMin.is_bat_current(data):
                 self.inputs_cache.update({
-                    'bat_current': data.get('bat_current')
+                    InputKeys.BAT_CURRENT: data.get(InputKeys.BAT_CURRENT)
                 })
                 self.cache.update({
                     'charge_stat': BatteryMidMin.get_battery_status(
-                        bat_current=data.get('bat_current')
+                        bat_current=data.get(InputKeys.BAT_CURRENT)
                     )
                 })
         return self.get_formated_cache()
@@ -76,7 +85,7 @@ class BatteryMidMin(Middleware):
     def get_mid_inputs_keys():
         """Get connector by key item and source."""
         return [
-            'bat_voltage', 'bat_current'
+            InputKeys.BAT_VOLTAGE, InputKeys.BAT_CURRENT
         ]
 
     @staticmethod
@@ -140,10 +149,10 @@ class BatteryMidMin(Middleware):
     def is_bat_voltage(data: dict) -> int:
         """Get battery monitor object."""
         return BatteryMidMin.is_data(data)\
-            and Ut.is_numeric(data.get('bat_voltage'))
+            and Ut.is_numeric(data.get(InputKeys.BAT_VOLTAGE))
 
     @staticmethod
     def is_bat_current(data: dict) -> int:
         """Get battery monitor object."""
         return BatteryMidMin.is_data(data)\
-            and Ut.is_numeric(data.get('bat_current'))
+            and Ut.is_numeric(data.get(InputKeys.BAT_CURRENT))
