@@ -1,6 +1,6 @@
 """Test ElecHelper model class."""
-import pytest
 from test.schema_test_helper import LoopTests
+import pytest
 from vemonitor_m8.core.utils import Utils as Ut
 from vemonitor_m8.core.elec_helper import ElecHelper
 
@@ -34,11 +34,11 @@ class TestElecHelper:
             callback=ElecHelper.is_coef_temp
         )
 
-        assert ElecHelper.get_coef_temp_format(
+        assert ElecHelper.format_coef_temp_value(
             -16.03554654654) == -16.04
-        assert ElecHelper.get_coef_temp_format(
+        assert ElecHelper.format_coef_temp_value(
             16.1) == 16.1
-        assert ElecHelper.get_coef_temp_format(
+        assert ElecHelper.format_coef_temp_value(
             -16) == -16
 
         assert ElecHelper.get_coef_temp_value(
@@ -72,13 +72,6 @@ class TestElecHelper:
             data_bad=bad_tests,
             callback=ElecHelper.is_charge_voltage
         )
-
-        assert ElecHelper.get_charge_voltage_format(
-            16.03554654654) == 16.036
-        assert ElecHelper.get_charge_voltage_format(
-            16.1) == 16.1
-        assert ElecHelper.get_charge_voltage_format(
-            16) == 16
 
         assert ElecHelper.get_charge_voltage_value(
             16.03554654654) == 16.036

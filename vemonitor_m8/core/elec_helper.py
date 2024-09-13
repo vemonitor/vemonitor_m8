@@ -18,7 +18,7 @@ class ElecHelper:
     """
     @staticmethod
     def is_coef_temp(value: float) -> bool:
-        """Get Battery Capacity properties."""
+        """Test if is valid coef_temp value."""
         return Ut.is_numeric(
             value,
             not_null=True,
@@ -26,35 +26,30 @@ class ElecHelper:
             maxi=1000)
 
     @staticmethod
-    def get_coef_temp_format(value: float) -> bool:
-        """Get Battery Capacity properties."""
+    def format_coef_temp_value(value: float) -> bool:
+        """Get formatted coef_temp value."""
         return round(value, 2)
 
     @staticmethod
     def get_coef_temp_value(value: float) -> bool:
-        """Get Battery Capacity properties."""
+        """Get formatted coef_temp value."""
         result = 0
         if ElecHelper.is_coef_temp(value):
-            result = ElecHelper.get_coef_temp_format(value)
+            result = ElecHelper.format_coef_temp_value(value)
         return result
 
     @staticmethod
     def is_charge_voltage(value: float) -> bool:
-        """Get Battery Capacity properties."""
+        """Test if is valid charge voltage value."""
         return Ut.is_numeric(
             value,
             positive=True,
             maxi=1000)
 
     @staticmethod
-    def get_charge_voltage_format(value: float) -> bool:
-        """Get Battery Capacity properties."""
-        return round(value, 3)
-
-    @staticmethod
     def get_charge_voltage_value(value: float) -> bool:
-        """Get Battery Capacity properties."""
+        """Get formatted charge_voltage value."""
         result = 0
         if ElecHelper.is_charge_voltage(value):
-            result = ElecHelper.get_charge_voltage_format(value)
+            result = round(value, 3)
         return result
