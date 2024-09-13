@@ -156,7 +156,7 @@ class TestBatteryBankSchema:
              schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
              ('charge_storage_u',
              schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
-             ('charge_egalization_u',
+             ('charge_equalization_u',
              schema_manager.obj['batteryBankArgs']['battery']['charge_settings']),
         ]
         schema_manager.run_test_values(datas=datas, key="positive_number")

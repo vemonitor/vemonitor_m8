@@ -1,7 +1,9 @@
-"""Test config model module."""
+"""Test Battery models module."""
+from typing import Union
+from test.schema_test_helper import LoopTests
 import pytest
-from vemonitor_m8.core.exceptions import VeMonitorError
 from vemonitor_m8.core.utils import Utils as Ut
+from vemonitor_m8.models.battery_charge import ChargeCols
 from vemonitor_m8.models.battery_data import BatteryDataModel
 from vemonitor_m8.models.battery_data import BatteryCapacityModel
 from vemonitor_m8.models.battery_data import BatteryStructureModel
@@ -10,7 +12,7 @@ from vemonitor_m8.models.battery_data import BatteryChargeSettings
 @pytest.fixture(name="helper_manager", scope="class")
 def helper_manager_fixture():
     """Json Schema test manager fixture"""
-    class HelperManager:
+    class HelperManager(LoopTests):
         """Json Helper test manager fixture Class"""
 
         def __init__(self):
@@ -75,53 +77,13 @@ def helper_manager_fixture():
                 'charge_absorption_u': 14.1,
                 'charge_float_u': 13.8,
                 'charge_storage_u': 13.2,
-                'charge_egalization_u': 15.9,
+                'charge_equalization_u': 15.9,
                 'charge_t_coef': -16.02
             }
             result.update({
                 'charge_settings': charge_settings
             })
             return result
-
-        @staticmethod
-        def run_tests(data,
-                      callback,
-                      is_false=False):
-            """Init BatteryStructureModel object"""
-            if Ut.is_list(data, not_null=True):
-                for item in data:
-
-                    callback_res = callback(item)
-
-                    try:
-                        if is_false:
-                            assert callback_res is False
-                        else:
-                            assert callback_res is True
-                    except AssertionError as ex:
-                        raise VeMonitorError(
-                            f"AssertionError on value {item}"
-                        ) from ex
-
-        @staticmethod
-        def run_tests_with_kwargs(data,
-                                  callback,
-                                  is_false=False):
-            """Init BatteryStructureModel object"""
-            if Ut.is_list(data, not_null=True):
-                for item in data:
-
-                    callback_res = callback(**item)
-
-                    try:
-                        if is_false:
-                            assert callback_res is False
-                        else:
-                            assert callback_res is True
-                    except AssertionError as ex:
-                        raise VeMonitorError(
-                            f"AssertionError on value {item}"
-                        ) from ex
 
     return HelperManager()
 
@@ -146,16 +108,10 @@ class TestBatteryDataModel:
             "_Hello", "-Hello", "Hello$", "Hel-lo", "Hello Hello"
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_name,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_name,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_name
         )
 
         helper_manager.obj.name = None
@@ -179,16 +135,10 @@ class TestBatteryDataModel:
             5, False, "&", "#", "%", "$", "@", "'", "`"
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_manufacturer,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_manufacturer,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_manufacturer
         )
 
         helper_manager.obj.model['manufacturer'] = None
@@ -215,16 +165,10 @@ class TestBatteryDataModel:
             5, False, "&", "#", "%", "$", "@", "'", "`"
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_model_name,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_model_name,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_model_name
         )
 
         helper_manager.obj.model['model'] = None
@@ -261,7 +205,7 @@ class TestBatteryDataModel:
 
         assert helper_manager.obj.set_model_data() is False
 
-    def test_init_battery_bank(self, helper_manager):
+    def test_init(self, helper_manager):
         """Test set_model_data method """
         helper_manager.init_battery_data_model()
         assert helper_manager.obj.has_name() is True
@@ -275,7 +219,7 @@ class TestBatteryDataModel:
         assert helper_manager.obj.has_manufacturer() is False
         assert helper_manager.obj.has_model_name() is False
 
-        assert helper_manager.obj.init_battery_bank(**{
+        assert helper_manager.obj.init(**{
             'name': "battery_name",
             'manufacturer': "Manufacturer name",
             'model': "Model name"
@@ -299,7 +243,7 @@ class TestBatteryDataModel:
         """Test serialize method """
         helper_manager.init_battery_data_model()
 
-        assert helper_manager.obj.init_battery_bank(**{
+        assert helper_manager.obj.init(**{
             'name': "battery_name",
             'manufacturer': "Manufacturer name",
             'model': "Model name"
@@ -337,16 +281,10 @@ class TestBatteryStructureModelModel:
             -1, 0, None, "a"
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_bat_voltage,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_bat_voltage,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_bat_voltage
         )
 
         helper_manager.obj.bat_voltage = None
@@ -370,16 +308,10 @@ class TestBatteryStructureModelModel:
             -1, 0, None, "a"
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_cell_voltage,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_cell_voltage,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_cell_voltage
         )
 
         helper_manager.obj.cell_voltage = None
@@ -403,16 +335,10 @@ class TestBatteryStructureModelModel:
             -1, 0, None, "a", 1.1
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_nb_cells,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_nb_cells,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_nb_cells
         )
 
         helper_manager.obj.nb_cells = None
@@ -443,16 +369,11 @@ class TestBatteryStructureModelModel:
             {}
         ]
 
-        helper_manager.run_tests_with_kwargs(
-            data=ok_tests,
-            callback=helper_manager.obj.set_battery_structure,
-            is_false=False
-        )
-
-        helper_manager.run_tests_with_kwargs(
-            data=bad_tests,
-            callback=helper_manager.obj.set_battery_structure,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            is_kwargs=True,
+            callback=helper_manager.obj.set_battery_structure
         )
 
         assert helper_manager.obj.set_battery_structure(
@@ -503,16 +424,10 @@ class TestBatteryCapacityModelModel:
             [[5, 185, 37, 37]],
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_capacity,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_capacity,
-            is_false=True
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=helper_manager.obj.set_capacity
         )
 
         helper_manager.obj.capacity = None
@@ -538,20 +453,15 @@ class TestBatteryCapacityModelModel:
             [[5, 185, 37, 37]],
         ]
 
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=BatteryCapacityModel.is_valid_capacity,
-            is_false=False
+        helper_manager.run_all_tests(
+            data_ok=ok_tests,
+            data_bad=bad_tests,
+            callback=BatteryCapacityModel.is_valid_capacity
         )
 
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=BatteryCapacityModel.is_valid_capacity,
-            is_false=True
-        )
-
-    def test_get_capacity_diff_err(self):
+    def test_get_capacity_diff_err(self, helper_manager):
         """Test get_capacity_diff_err method """
+
         diff = BatteryCapacityModel.get_capacity_diff_err(
             *[5, 185, 37]
         )
@@ -632,174 +542,64 @@ class TestBatteryCapacityModelModel:
         assert Ut.is_list(result, not_null=True)
 
 
-class TestBatteryChargeSettingsModelModel:
+class TestBatteryChargeSettings:
     """Test BatteryChargeSettings model class."""
-    def test_set_charge_t_coef(self, helper_manager):
+    def test_set_charge_settinngs(self, helper_manager):
         """Test set_charge_t_coef method """
         helper_manager.init_battery_charge_data_model()
-        assert helper_manager.obj.has_charge_t_coef() is True
+        assert helper_manager.obj.has_charge_settings() is True
 
-        assert helper_manager.obj.set_charge_t_coef() is False
-        assert helper_manager.obj.set_charge_t_coef(6) is True
-        assert helper_manager.obj.get_charge_t_coef() == 6
-        assert helper_manager.obj.has_charge_t_coef() is True
+        # Test instanse has all charge settings
+        helper_manager.run_tests(
+            data=helper_manager.obj.charge.get_charge_setting_keys(),
+            callback=helper_manager.obj.charge.has_charge_setting
+        )
+        # ToDo: on set charge voltage with other base it will be translated to main base
+        assert helper_manager.obj.charge.set_charge_setting(
+            key=ChargeCols.ABS_U.value,
+            value=6
+        ) is True
+        assert helper_manager.obj.charge.get_charge_setting(
+            key=ChargeCols.ABS_U.value
+        ) == 6
+        assert helper_manager.obj.charge.has_charge_setting(
+            key=ChargeCols.ABS_U.value
+        ) is True
+
+        charge_items = helper_manager.obj.charge.get_charge_setting_keys()
+        callback_res = True
+        def test_callback(value: Union[int, float]):
+            """Test Charge settings callback"""
+            result = True
+            for charge_key in charge_items:
+                is_set = helper_manager.obj.charge.set_charge_setting(
+                    key=charge_key,
+                    value=value
+                )
+                if is_set is False:
+                    result = False
+                assert is_set is callback_res
+            return result
 
         ok_tests = [
-            0.01, 2, 99, 2.3, -16.25, -2
-        ]
-
-        bad_tests = [
-            0, None, "a",
-            [], {}, ()
+            0.1, 5, 1000
         ]
 
         helper_manager.run_tests(
             data=ok_tests,
-            callback=helper_manager.obj.set_charge_t_coef,
-            is_false=False
+            callback=test_callback
         )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_charge_t_coef,
-            is_false=True
-        )
-
-        helper_manager.obj.charge_settings['charge_t_coef'] = None
-        assert helper_manager.obj.has_charge_t_coef() is False
-
-    def test_set_charge_absorption_u(self, helper_manager):
-        """Test set_charge_absorption_u method """
-        helper_manager.init_battery_charge_data_model()
-        assert helper_manager.obj.has_charge_absorption_u() is True
-
-        assert helper_manager.obj.set_charge_absorption_u() is False
-        assert helper_manager.obj.set_charge_absorption_u(6) is True
-        assert helper_manager.obj.get_charge_absorption_u() == 6
-        assert helper_manager.obj.has_charge_absorption_u() is True
-
-        ok_tests = [
-            0.01, 2, 99, 2.3
-        ]
-
+        callback_res = False
         bad_tests = [
-            0, -16.25, -2, None, "a",
-            [], {}, ()
+            -1000.1, -5, -1, 0, None, "a", 1000.1
         ]
-
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_charge_absorption_u,
-            is_false=False
-        )
-
         helper_manager.run_tests(
             data=bad_tests,
-            callback=helper_manager.obj.set_charge_absorption_u,
+            callback=test_callback,
             is_false=True
         )
 
-        helper_manager.obj.charge_settings['charge_absorption_u'] = None
-        assert helper_manager.obj.has_charge_absorption_u() is False
-
-    def test_set_charge_float_u(self, helper_manager):
-        """Test set_charge_float_u method """
-        helper_manager.init_battery_charge_data_model()
-        assert helper_manager.obj.has_charge_float_u() is True
-
-        assert helper_manager.obj.set_charge_float_u() is False
-        assert helper_manager.obj.set_charge_float_u(6) is True
-        assert helper_manager.obj.get_charge_float_u() == 6
-        assert helper_manager.obj.has_charge_float_u() is True
-
-        ok_tests = [
-            0.01, 2, 99, 2.3
-        ]
-
-        bad_tests = [
-            0, -16.25, -2, None, "a",
-            [], {}, ()
-        ]
-
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_charge_float_u,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_charge_float_u,
-            is_false=True
-        )
-
-        helper_manager.obj.charge_settings['charge_float_u'] = None
-        assert helper_manager.obj.has_charge_float_u() is False
-
-    def test_set_charge_storage_u(self, helper_manager):
-        """Test set_charge_storage_u method """
-        helper_manager.init_battery_charge_data_model()
-        assert helper_manager.obj.has_charge_storage_u() is True
-
-        assert helper_manager.obj.set_charge_storage_u() is False
-        assert helper_manager.obj.set_charge_storage_u(6) is True
-        assert helper_manager.obj.get_charge_storage_u() == 6
-        assert helper_manager.obj.has_charge_storage_u() is True
-
-        ok_tests = [
-            0.01, 2, 99, 2.3
-        ]
-
-        bad_tests = [
-            0, -16.25, -2, None, "a",
-            [], {}, ()
-        ]
-
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_charge_storage_u,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_charge_storage_u,
-            is_false=True
-        )
-
-        helper_manager.obj.charge_settings['charge_storage_u'] = None
-        assert helper_manager.obj.has_charge_storage_u() is False
-
-    def test_set_charge_egalization_u(self, helper_manager):
-        """Test set_charge_egalization_u method """
-        helper_manager.init_battery_charge_data_model()
-        assert helper_manager.obj.has_charge_egalization_u() is True
-
-        assert helper_manager.obj.set_charge_egalization_u() is False
-        assert helper_manager.obj.set_charge_egalization_u(6) is True
-        assert helper_manager.obj.get_charge_egalization_u() == 6
-        assert helper_manager.obj.has_charge_egalization_u() is True
-
-        ok_tests = [
-            0.01, 2, 99, 2.3
-        ]
-
-        bad_tests = [
-            0, -16.25, -2, None, "a",
-            [], {}, ()
-        ]
-
-        helper_manager.run_tests(
-            data=ok_tests,
-            callback=helper_manager.obj.set_charge_egalization_u,
-            is_false=False
-        )
-
-        helper_manager.run_tests(
-            data=bad_tests,
-            callback=helper_manager.obj.set_charge_egalization_u,
-            is_false=True
-        )
-
-        helper_manager.obj.charge_settings['charge_egalization_u'] = None
-        assert helper_manager.obj.has_charge_egalization_u() is False
+        helper_manager.obj.charge.charge_settings.items = None
+        assert helper_manager.obj.charge.has_charge_setting(
+            ChargeCols.ABS_U.value
+        ) is False
