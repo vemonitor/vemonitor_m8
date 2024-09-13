@@ -6,7 +6,66 @@ import pytest
 from ve_utils.utype import UType as Ut
 from jsonschema.exceptions import ValidationError
 from vemonitor_m8.conf_manager.schema_validate import SchemaValidate
+from vemonitor_m8.core.exceptions import VeMonitorError
 
+
+class LoopTests:
+    """Loop test Helper, help to test variety of values."""
+    @staticmethod
+    def run_tests(data,
+                  callback,
+                  is_false=False,
+                  is_kwargs=False,
+                  is_args=False
+                  ):
+        """Run tests assigning different values to validate property."""
+        result = False
+        if Ut.is_list(data, not_null=True):
+            for item in data:
+                if is_kwargs is True:
+                    callback_res = callback(**item)
+                elif is_args is True:
+                    callback_res = callback(*item)
+                else:
+                    callback_res = callback(item)
+
+                try:
+                    if is_false:
+                        assert callback_res is False
+                    else:
+                        assert callback_res is True
+                    result = True
+                except AssertionError as ex:
+                    raise VeMonitorError(
+                        f"AssertionError on value {item}"
+                    ) from ex
+        return result
+
+    @staticmethod
+    def run_all_tests(data_ok: list,
+                      data_bad: list,
+                      callback,
+                      is_kwargs: bool=False,
+                      is_args: bool=False
+                      ):
+        """Init BatteryStructureModel object"""
+        is_ok = LoopTests.run_tests(
+            data=data_ok,
+            callback=callback,
+            is_kwargs=is_kwargs,
+            is_args=is_args
+        )
+
+        is_bad = LoopTests.run_tests(
+            data=data_bad,
+            callback=callback,
+            is_false=True,
+            is_kwargs=is_kwargs,
+            is_args=is_args
+        )
+        all_tests = is_ok is True and is_bad is True
+        assert all_tests is True
+        return all_tests is True
 
 class SchemaTestHelper:
     """Helper class to test json schemas validation."""
